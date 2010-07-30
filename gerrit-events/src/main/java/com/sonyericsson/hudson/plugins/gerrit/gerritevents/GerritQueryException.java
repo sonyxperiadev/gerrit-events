@@ -1,7 +1,7 @@
 /*
  *  The MIT License
  *
- *  Copyright 2010 Sony Ericsson Mobile Communications.
+ *  Copyright 2010 Sony Ericsson Mobile Communications. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -21,25 +21,46 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-package com.sonyericsson.hudson.plugins.gerrit.gerritevents.workers;
 
-import com.sonyericsson.hudson.plugins.gerrit.gerritevents.dto.GerritEvent;
-import java.util.concurrent.BlockingQueue;
+package com.sonyericsson.hudson.plugins.gerrit.gerritevents;
 
 /**
- * Representation interface of a EventThread workers coordinator.
+ * Represents a Query result of type "error".
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-public interface Coordinator {
-    /**
-     * Retrieves the work queue for workers to poll.
-     * @return the queue
-     */
-    BlockingQueue<Work> getWorkQueue();
+public class GerritQueryException extends Exception {
 
     /**
-     * Notifies the listeners of a GerritEvent.
-     * @param event the event to fire.
+     * Standard constructor.
+     * @param cause the cause of the Exception.
+     * @see Exception#Exception(java.lang.Throwable)
      */
-    void notifyListeners(GerritEvent event);
+    public GerritQueryException(Throwable cause) {
+        super(cause);
+    }
+
+    /**
+     * Standard constructor.
+     * @param message a message.
+     * @param cause the cause of the Exception.
+     * @see Exception#Exception(java.lang.String, java.lang.Throwable)
+     */
+    public GerritQueryException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    /**
+     * Standard Constructor.
+     * @param message a message.
+     * @see Exception#Exception(java.lang.String)
+     */
+    public GerritQueryException(String message) {
+        super(message);
+    }
+
+    /**
+     * Default Constructor.
+     */
+    public GerritQueryException() {
+    }
 }

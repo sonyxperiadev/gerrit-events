@@ -1,7 +1,7 @@
 /*
  *  The MIT License
  *
- *  Copyright 2010 Sony Ericsson Mobile Communications.
+ *  Copyright 2010 Sony Ericsson Mobile Communications. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -21,25 +21,30 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+
 package com.sonyericsson.hudson.plugins.gerrit.gerritevents.workers;
 
 import com.sonyericsson.hudson.plugins.gerrit.gerritevents.dto.GerritEvent;
-import java.util.concurrent.BlockingQueue;
 
 /**
- * Representation interface of a EventThread workers coordinator.
+ * Notifies all listeners of the arrived event.
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-public interface Coordinator {
-    /**
-     * Retrieves the work queue for workers to poll.
-     * @return the queue
-     */
-    BlockingQueue<Work> getWorkQueue();
+public class GerritEventWork extends AbstractGerritEventWork {
+
+    private GerritEvent event;
 
     /**
-     * Notifies the listeners of a GerritEvent.
-     * @param event the event to fire.
+     * Standard Constructor.
+     * @param event an event.
      */
-    void notifyListeners(GerritEvent event);
+    public GerritEventWork(GerritEvent event) {
+        this.event = event;
+    }
+
+    @Override
+    public void perform(Coordinator coordinator) {
+        perform(event, coordinator);
+    }
+
 }

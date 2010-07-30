@@ -1,7 +1,7 @@
 /*
  *  The MIT License
  *
- *  Copyright 2010 Sony Ericsson Mobile Communications.
+ *  Copyright 2010 Sony Ericsson Mobile Communications. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -23,23 +23,34 @@
  */
 package com.sonyericsson.hudson.plugins.gerrit.gerritevents.workers;
 
+import com.sonyericsson.hudson.plugins.gerrit.gerritevents.GerritJsonEventFactory;
 import com.sonyericsson.hudson.plugins.gerrit.gerritevents.dto.GerritEvent;
-import java.util.concurrent.BlockingQueue;
+import net.sf.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Representation interface of a EventThread workers coordinator.
+ * Abstract work that converts a JSON object to a GerritEvent.
+ * After the conversion the work is handed over to {@link AbstractGerritEventWork}
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-public interface Coordinator {
-    /**
-     * Retrieves the work queue for workers to poll.
-     * @return the queue
-     */
-    BlockingQueue<Work> getWorkQueue();
+public abstract class AbstractJsonObjectWork extends AbstractGerritEventWork implements Work {
+
+    private static final Logger logger = LoggerFactory.getLogger(AbstractJsonObjectWork.class);
 
     /**
-     * Notifies the listeners of a GerritEvent.
-     * @param event the event to fire.
+     * Parses the JSONObject into a Java bean and sends the parsed {@link GerritEvent} down the inheritance chain.
+     * @param json the JSONObject to work on.
+     * @param coordinator the coordinator.
      */
-    void notifyListeners(GerritEvent event);
+    protected void perform(JSONObject json, Coordinator coordinator) {
+        logger.trace("Extracting event from JSON.");
+        GerritEvent event = GerritJsonEventFactory.getEvent(json);
+        if (event != null) {
+            logger.debug("Event is: {}", event);
+            perform(event, coordinator);
+        } else {
+            logger.debug("No event extracted!");
+        }
+    }
 }
