@@ -1,7 +1,7 @@
 Gerrit Events
 =============
-This is a Java library used primarily to listen to stream-events from Gerrit Code Review and to send reviews via the SSH CLI or the REST API.
-It was originally a module in the Jenkins Gerrit Trigger plugin and is now broken out to be used in other tools without the dependency to Jenkins.
+This is a Java library used primarily to listen to [stream-events](https://gerrit-documentation.storage.googleapis.com/Documentation/2.8.1/cmd-stream-events.html) from [Gerrit Code Review](https://code.google.com/p/gerrit/) and to send reviews via the SSH CLI or the REST API.
+It was originally a module in the [Jenkins Gerrit Trigger plugin](https://github.com/jenkinsci/gerrit-trigger-plugin) and is now broken out to be used in other tools without the dependency to Jenkins.
 
 ## Maintainers
 
