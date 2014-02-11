@@ -50,7 +50,7 @@ public class MyEventListener implements GerritEventListener {
 handler.addListener(new MyEventListener());
 ```
 
-All event types can be found in the [com.sonyericsson.hudson.plugins.gerrit.gerritevents.dto.events](https://github.com/sonyxperiadev/gerrit-events/tree/master/src/main/java/com/sonyericsson/hudson/plugins/gerrit/gerritevents/dto/events) package.
+All event types can be found in the [com.sonymobile.tools.gerrit.gerritevents.dto.events](https://github.com/sonyxperiadev/gerrit-events/tree/master/src/main/java/com/sonymobile/tools/gerrit/gerritevents/dto/events) package.
 
 
 # Environments
