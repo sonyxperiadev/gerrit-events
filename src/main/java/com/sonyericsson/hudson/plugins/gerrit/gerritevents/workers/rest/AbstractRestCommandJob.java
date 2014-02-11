@@ -29,7 +29,7 @@ import com.sonyericsson.hudson.plugins.gerrit.gerritevents.dto.events.ChangeBase
 import com.sonyericsson.hudson.plugins.gerrit.gerritevents.dto.rest.ChangeId;
 import com.sonyericsson.hudson.plugins.gerrit.gerritevents.dto.rest.ReviewInput;
 import com.sonyericsson.hudson.plugins.gerrit.gerritevents.rest.RestConnectionConfig;
-import org.apache.commons.httpclient.HttpStatus;
+import org.apache.http.HttpStatus;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;

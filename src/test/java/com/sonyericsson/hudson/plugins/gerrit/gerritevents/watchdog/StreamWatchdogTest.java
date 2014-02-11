@@ -29,7 +29,7 @@ import com.sonyericsson.hudson.plugins.gerrit.gerritevents.ConnectionListener;
 import com.sonyericsson.hudson.plugins.gerrit.gerritevents.GerritConnection;
 import com.sonyericsson.hudson.plugins.gerrit.gerritevents.GerritHandler;
 import com.sonyericsson.hudson.plugins.gerrit.gerritevents.ssh.Authentication;
-import com.sonyericsson.hudson.plugins.gerrit.trigger.test.SshdServerMock;
+import com.sonyericsson.hudson.plugins.gerrit.gerritevents.mock.SshdServerMock;
 import org.apache.sshd.SshServer;
 import org.apache.sshd.server.Environment;
 import org.junit.Test;
@@ -37,7 +37,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Collections;
 
-import static com.sonyericsson.hudson.plugins.gerrit.trigger.test.SshdServerMock.GERRIT_STREAM_EVENTS;
+import static com.sonyericsson.hudson.plugins.gerrit.gerritevents.mock.SshdServerMock.GERRIT_STREAM_EVENTS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
