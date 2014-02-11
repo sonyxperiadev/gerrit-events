@@ -18,9 +18,9 @@ Start by creating a connection, attach some utility listeners and a GerritHandle
 
 ```java
 connection = new GerritConnection(name, config);
-GerritHandler manager = new GerritHandler();
-manager.setIgnoreEMail(name, config.getGerritEMail());
-connection.setHandler(manager);
+GerritHandler handler = new GerritHandler();
+handler.setIgnoreEMail(name, config.getGerritEMail());
+connection.setHandler(handler);
 connection.addListener(gerritConnectionListener);
 connection.start();
 ```
@@ -44,6 +44,10 @@ public class MyEventListener implements GerritEventListener {
         //Do something when someone uploads a patchset...
     }
 }
+```
+
+```java
+handler.addListener(new MyEventListener);
 ```
 
 All event types can be found in the [com.sonyericsson.hudson.plugins.gerrit.gerritevents.dto.events](https://github.com/sonyxperiadev/gerrit-events/tree/master/src/main/java/com/sonyericsson/hudson/plugins/gerrit/gerritevents/dto/events) package.
