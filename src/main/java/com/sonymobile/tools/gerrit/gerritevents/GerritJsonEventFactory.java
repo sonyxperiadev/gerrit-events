@@ -27,6 +27,8 @@ package com.sonymobile.tools.gerrit.gerritevents;
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventType;
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritJsonEvent;
 import java.lang.reflect.Constructor;
+
+import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 import org.slf4j.Logger;
@@ -207,5 +209,37 @@ public final class GerritJsonEventFactory {
      */
     public static String getString(JSONObject json, String key) {
         return getString(json, key, null);
+    }
+
+    /**
+     * Returns the value of a JSON property as a boolean if it exists and boolean value
+     * otherwise returns the defaultValue.
+     * @param json the JSONObject to check.
+     * @param key the key
+     * @param defaultValue the value to return if the key is missing or not boolean value.
+     * @return the value for the key as a boolean.
+     */
+    public static boolean getBoolean(JSONObject json, String key, boolean defaultValue) {
+        if (json.containsKey(key)) {
+            boolean result;
+            try {
+                result = json.getBoolean(key);
+            } catch (JSONException ex) {
+                result = defaultValue;
+            }
+            return result;
+        } else {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Returns the value of a JSON property as a boolean if it exists otherwise returns false.
+     * @param json the JSONObject to check.
+     * @param key the key
+     * @return the value for the key as a boolean.
+     */
+    public static boolean getBoolean(JSONObject json, String key) {
+        return getBoolean(json, key, false);
     }
 }

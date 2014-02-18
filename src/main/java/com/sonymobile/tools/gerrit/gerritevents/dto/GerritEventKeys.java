@@ -103,6 +103,10 @@ public abstract class GerritEventKeys {
      */
     public static final String REF = "ref";
     /**
+     * isDraft.
+     */
+    public static final String IS_DRAFT = "isDraft";
+    /**
      * uploader.
      */
     public static final String UPLOADER = "uploader";

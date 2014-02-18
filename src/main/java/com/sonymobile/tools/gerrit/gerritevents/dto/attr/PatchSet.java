@@ -25,12 +25,14 @@
 package com.sonymobile.tools.gerrit.gerritevents.dto.attr;
 
 import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getString;
+import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getBoolean;
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritJsonDTO;
 import net.sf.json.JSONObject;
 
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.NUMBER;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.REVISION;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.REF;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.IS_DRAFT;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.UPLOADER;
 
 /**
@@ -52,6 +54,10 @@ public class PatchSet implements GerritJsonDTO {
      * The refspec
      */
     private String ref;
+    /**
+     * The flag for draft patch.
+     */
+    private boolean draft;
     /**
      * The one who uploaded the patch-set.
      */
@@ -75,6 +81,7 @@ public class PatchSet implements GerritJsonDTO {
     public void fromJson(JSONObject json) {
         number = getString(json, NUMBER);
         revision = getString(json, REVISION);
+        draft = getBoolean(json, IS_DRAFT);
         ref = getString(json, REF);
         if (json.containsKey(UPLOADER)) {
             uploader = new Account(json.getJSONObject(UPLOADER));
@@ -129,6 +136,22 @@ public class PatchSet implements GerritJsonDTO {
      */
     public void setRef(String ref) {
         this.ref = ref;
+    }
+
+    /**
+     * Draft patchset or not.
+     * @return true if draft patchset.
+     */
+    public boolean isDraft() {
+        return draft;
+    }
+
+    /**
+     * Sets the isDraft.
+     * @param draft the isDraft.
+     */
+    public void setDraft(boolean draft) {
+        this.draft = draft;
     }
 
     /**
