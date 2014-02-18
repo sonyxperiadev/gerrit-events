@@ -32,6 +32,7 @@ import com.sonymobile.tools.gerrit.gerritevents.ssh.Authentication;
 import com.sonymobile.tools.gerrit.gerritevents.mock.SshdServerMock;
 import org.apache.sshd.SshServer;
 import org.apache.sshd.server.Environment;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -51,6 +52,20 @@ import static org.junit.Assert.assertTrue;
  */
 public class StreamWatchdogTest {
 
+    private static int sshPort;
+
+    /**
+     * Setup before all tests.
+     */
+    @BeforeClass
+    public static void setUp() {
+        try {
+            sshPort = new Integer(System.getProperty("gerrit.ssh.port"));
+        } catch (Exception ex) {
+            sshPort = SshdServerMock.GERRIT_SSH_PORT;
+        }
+    }
+
     /**
      * Tests that the {@link StreamWatchdog} actually performs a restart of the connection.
      *
@@ -64,13 +79,13 @@ public class StreamWatchdogTest {
         System.out.println("====This will be a long running test ca. 2 minutes=====");
         SshdServerMock.KeyPairFiles sshKey = SshdServerMock.generateKeyPair();
         SshdServerMock server = new SshdServerMock();
-        SshServer sshd = SshdServerMock.startServer(server);
+        SshServer sshd = SshdServerMock.startServer(sshPort, server);
         server.returnCommandFor("gerrit version", SshdServerMock.EofCommandMock.class);
         server.returnCommandFor("gerrit ls-projects", SshdServerMock.EofCommandMock.class);
         server.returnCommandFor(GERRIT_STREAM_EVENTS, WaitLongTimeCommand.class, true,
                 new Object[]{MINUTES.toMillis(5)}, new Class<?>[]{Long.class});
         server.returnCommandFor(GERRIT_STREAM_EVENTS, SshdServerMock.CommandMock.class);
-        GerritConnection connection = new GerritConnection("", "localhost", SshdServerMock.GERRIT_SSH_PORT, "", "",
+        GerritConnection connection = new GerritConnection("", "localhost", sshPort, "", "",
                 new Authentication(sshKey.getPrivateKey(), "jenkins"), 20,
                 new WatchTimeExceptionData(new int[0], Collections.<WatchTimeExceptionData.TimeSpan>emptyList()));
         Listen connectionListener = new Listen();
