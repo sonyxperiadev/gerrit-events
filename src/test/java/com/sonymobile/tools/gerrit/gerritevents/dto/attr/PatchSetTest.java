@@ -52,12 +52,14 @@ public class PatchSetTest {
         json.put(NUMBER, "2");
         json.put(REVISION, "ad123456789");
         json.put(REF, "refs/changes/00/100/2");
+        json.put("isDraft", true);
         PatchSet patchSet = new PatchSet();
         patchSet.fromJson(json);
 
         assertEquals("2", patchSet.getNumber());
         assertEquals("ad123456789", patchSet.getRevision());
         assertEquals("refs/changes/00/100/2", patchSet.getRef());
+        assertEquals(true, patchSet.isDraft());
     }
 
     /**
@@ -70,12 +72,33 @@ public class PatchSetTest {
         JSONObject json = new JSONObject();
         json.put(NUMBER, "2");
         json.put(REVISION, "ad123456789");
+        json.put("isDraft", true);
+        PatchSet patchSet = new PatchSet();
+        patchSet.fromJson(json);
+
+        assertEquals("2", patchSet.getNumber());
+        assertEquals("ad123456789", patchSet.getRevision());
+        assertEquals(true, patchSet.isDraft());
+        assertNull(patchSet.getRef());
+    }
+
+    /**
+     * Tests {@link PatchSet#fromJson(net.sf.json.JSONObject)}.
+     * Without "isDraft" in the JSON data.
+     * @throws Exception if so.
+     */
+    @Test
+    public void testFromJsonNoIsDraft() throws Exception {
+        JSONObject json = new JSONObject();
+        json.put(NUMBER, "2");
+        json.put(REVISION, "ad123456789");
         PatchSet patchSet = new PatchSet();
         patchSet.fromJson(json);
 
         assertEquals("2", patchSet.getNumber());
         assertEquals("ad123456789", patchSet.getRevision());
         assertNull(patchSet.getRef());
+        assertEquals(false, patchSet.isDraft());
     }
 
     /**
@@ -88,11 +111,13 @@ public class PatchSetTest {
         json.put(NUMBER, "2");
         json.put(REVISION, "ad123456789");
         json.put(REF, "refs/changes/00/100/2");
+        json.put("isDraft", true);
         PatchSet patchSet = new PatchSet(json);
 
         assertEquals("2", patchSet.getNumber());
         assertEquals("ad123456789", patchSet.getRevision());
         assertEquals("refs/changes/00/100/2", patchSet.getRef());
+        assertEquals(true, patchSet.isDraft());
     }
 
     /**
@@ -105,12 +130,14 @@ public class PatchSetTest {
         json.put(NUMBER, "2");
         json.put(REVISION, "ad123456789");
         json.put(REF, "refs/changes/00/100/2");
+        json.put("isDraft", true);
         PatchSet patchSet = new PatchSet(json);
 
         PatchSet patchSet2 = new PatchSet();
         patchSet2.setNumber("2");
         patchSet2.setRevision("ad123456789");
         patchSet2.setRef("refs/changes/00/100/2");
+        patchSet2.setDraft(true);
         assertTrue(patchSet.equals(patchSet2));
     }
 }
