@@ -61,8 +61,8 @@ public class RefUpdated extends GerritTriggeredEvent {
     }
 
     @Override
-    public GerritEventType getEventType() {
-        return GerritEventType.REF_UPDATED;
+    public String getEventType() {
+        return GerritEventType.REF_UPDATED.getTypeValue();
     }
 
     @Override

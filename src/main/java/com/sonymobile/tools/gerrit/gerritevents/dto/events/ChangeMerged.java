@@ -55,8 +55,8 @@ public class ChangeMerged extends ChangeBasedEvent {
     }
 
     @Override
-    public GerritEventType getEventType() {
-        return GerritEventType.CHANGE_MERGED;
+    public String getEventType() {
+        return GerritEventType.CHANGE_MERGED.getTypeValue();
     }
 
     @Override

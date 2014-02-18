@@ -73,8 +73,8 @@ public class ChangeAbandoned extends ChangeBasedEvent {
     }
 
     @Override
-    public GerritEventType getEventType() {
-        return GerritEventType.CHANGE_ABANDONED;
+    public String getEventType() {
+        return GerritEventType.CHANGE_ABANDONED.getTypeValue();
     }
 
     @Override
