@@ -294,7 +294,7 @@ public class SshdServerMock implements CommandFactory {
      * @throws JSchException        if creation of the keys goes wrong.
      */
     public static KeyPairFiles generateKeyPair() throws IOException, InterruptedException, JSchException {
-        File tmp = new File(System.getProperty("java.io.tmpdir"));
+        File tmp = new File(System.getProperty("java.io.tmpdir")).getCanonicalFile();
         File priv = new File(tmp, "jenkins-testkey");
         File pub = new File(tmp, "jenkins-testkey.pub");
         if (!(priv.exists() && pub.exists())) {
