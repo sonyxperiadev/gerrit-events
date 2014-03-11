@@ -24,6 +24,7 @@
 package com.sonymobile.tools.gerrit.gerritevents.dto.events;
 
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventType;
+import com.sonymobile.tools.gerrit.gerritevents.dto.RepositoryModifiedEvent;
 import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Account;
 import net.sf.json.JSONObject;
 
@@ -34,7 +35,7 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.UPLOA
  *
  * @author David Pursehouse &lt;david.pursehouse@sonymobile.com&gt;
  */
-public class DraftPublished extends ChangeBasedEvent {
+public class DraftPublished extends ChangeBasedEvent implements RepositoryModifiedEvent {
 
     /* Uploader has been replaced by GerritTriggeredEvent.account.
      * This allows old builds to deserialize without warnings. */
@@ -62,5 +63,21 @@ public class DraftPublished extends ChangeBasedEvent {
     @Override
     public String toString() {
         return "DraftPublished: " + change + " " + patchSet;
+    }
+
+    @Override
+    public String getModifiedProject() {
+        if (change != null) {
+            return change.getProject();
+        }
+        return null;
+    }
+
+    @Override
+    public String getModifiedRef() {
+        if (patchSet != null) {
+            return patchSet.getRef();
+        }
+        return null;
     }
 }
