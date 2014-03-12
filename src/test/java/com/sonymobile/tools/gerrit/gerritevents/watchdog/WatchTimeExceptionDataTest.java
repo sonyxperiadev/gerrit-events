@@ -99,7 +99,7 @@ public class WatchTimeExceptionDataTest {
             current.add(Calendar.MINUTE, -15);
         } else if (current.get(Calendar.HOUR_OF_DAY) == 0
                 && current.get(Calendar.MINUTE) <= 15) {
-            current.add(Calendar.HOUR_OF_DAY, 15);
+            current.add(Calendar.MINUTE, 15);
         }
         Calendar from = (Calendar)current.clone();
         from.add(Calendar.MINUTE, -15);
