@@ -32,6 +32,7 @@ import org.junit.runner.RunWith;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -52,6 +53,7 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(SshConnectionFactory.class)
+@PowerMockIgnore("org.slf4j.*") // Prevent warning about multiple sl4fj binding
 public class GerritQueryHandlerTest {
 
     private GerritQueryHandler queryHandler;
