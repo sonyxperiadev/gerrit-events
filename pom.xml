@@ -85,6 +85,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
             <version>1.6.1</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.sf.json-lib</groupId>
@@ -156,12 +157,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <repositories>
-        <repository>
-            <id>powermock-repo</id>
-            <url>http://powermock.googlecode.com/svn/repo/</url>
-        </repository>
-    </repositories>
+
     <build>
         <plugins>
             <plugin>
