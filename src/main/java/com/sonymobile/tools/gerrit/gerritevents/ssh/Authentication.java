@@ -34,6 +34,7 @@ import java.io.File;
  */
 public class Authentication {
     private File privateKeyFile;
+    private byte[] privateKeyPhrase;
     private String username;
     private String privateKeyFilePassword;
 
@@ -42,11 +43,26 @@ public class Authentication {
      * @param privateKeyFile the key.
      * @param username the username.
      * @param privateKeyFilePassword password for the key file, or null if there is none.
+     * @param privateKeyPhrase phrase of privatekey.
      */
-    public Authentication(File privateKeyFile, String username, String privateKeyFilePassword) {
+    public Authentication(File privateKeyFile,
+            String username,
+            String privateKeyFilePassword,
+            byte[] privateKeyPhrase) {
         this.privateKeyFile = privateKeyFile;
         this.username = username;
         this.privateKeyFilePassword = privateKeyFilePassword;
+        this.privateKeyPhrase = privateKeyPhrase;
+    }
+
+    /**
+     * Constructor.
+     * @param privateKeyFile the key.
+     * @param username the username.
+     * @param privateKeyFilePassword password for the key file, or null if there is none.
+     */
+    public Authentication(File privateKeyFile, String username, String privateKeyFilePassword) {
+        this(privateKeyFile, username, privateKeyFilePassword, null);
     }
 
     /**
@@ -56,9 +72,7 @@ public class Authentication {
      * @param username the username.
      */
     public Authentication(File privateKeyFile, String username) {
-        this.privateKeyFile = privateKeyFile;
-        this.username = username;
-        this.privateKeyFilePassword = null;
+        this(privateKeyFile, username, null, null);
     }
 
     /**
@@ -83,5 +97,13 @@ public class Authentication {
      */
     public String getUsername() {
         return username;
+    }
+
+    /**
+     * The phrase of private key.
+     * @return the phrase.
+     */
+    public byte[] getPrivateKeyPhrase() {
+        return privateKeyPhrase;
     }
 }
