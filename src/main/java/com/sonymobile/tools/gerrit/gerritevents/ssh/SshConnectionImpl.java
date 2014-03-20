@@ -71,6 +71,7 @@ public class SshConnectionImpl implements SshConnection {
     private int port;
     private String proxy;
     private Authentication authentication;
+    private AuthenticationUpdater updater;
 
     //CS IGNORE RedundantThrows FOR NEXT 30 LINES. REASON: Informative
 
@@ -84,7 +85,7 @@ public class SshConnectionImpl implements SshConnection {
      */
     protected SshConnectionImpl(String host, int port,
                                 Authentication authentication) throws IOException {
-        this(host, port, GerritDefaultValues.DEFAULT_GERRIT_PROXY, authentication);
+        this(host, port, GerritDefaultValues.DEFAULT_GERRIT_PROXY, authentication, null);
     }
 
     /**
@@ -98,24 +99,53 @@ public class SshConnectionImpl implements SshConnection {
      */
     protected SshConnectionImpl(String host, int port, String proxy,
                                 Authentication authentication) {
+        this(host, port, proxy, authentication, null);
+    }
+
+    /**
+     * Creates and opens a SshConnection.
+     *
+     * @param host           the host to connect to.
+     * @param port           the port.
+     * @param proxy          the proxy url.
+     * @param authentication the authentication-info
+     * @param updater        the authentication updater.
+     * @throws IOException   if the unfortunate happens.
+     */
+    protected SshConnectionImpl(String host, int port, String proxy,
+                                Authentication authentication,
+                                AuthenticationUpdater updater) {
         this.host = host;
         this.port = port;
         this.proxy = proxy;
         this.authentication = authentication;
+        this.updater = updater;
     }
 
     /**
      * Connects the connection.
      */
     @Override
-    public void connect() throws IOException {
+    public synchronized void connect() throws IOException {
         logger.debug("connecting...");
+        Authentication auth = authentication;
+        if (updater != null) {
+            Authentication updatedAuth = updater.updateAuthentication(authentication);
+            if (updatedAuth != null && auth != updatedAuth) {
+                auth = updatedAuth;
+            }
+        }
         try {
             client = new JSch();
-            client.addIdentity(authentication.getPrivateKeyFile().getAbsolutePath(),
-                    authentication.getPrivateKeyFilePassword());
+            if (auth.getPrivateKeyPhrase() == null) {
+                client.addIdentity(auth.getPrivateKeyFile().getAbsolutePath(),
+                        auth.getPrivateKeyFilePassword());
+            } else {
+                client.addIdentity(auth.getUsername(), auth.getPrivateKeyPhrase(), null,
+                        auth.getPrivateKeyFilePassword().getBytes("UTF-8"));
+            }
             client.setHostKeyRepository(new BlindHostKeyRepository());
-            connectSession = client.getSession(authentication.getUsername(), host, port);
+            connectSession = client.getSession(auth.getUsername(), host, port);
             if (proxy != null && !proxy.isEmpty()) {
                 String[] splitted = proxy.split(":");
                 if (splitted.length > 2 && splitted[1].length() >= PROTO_HOST_DELIM_LENGTH) {
