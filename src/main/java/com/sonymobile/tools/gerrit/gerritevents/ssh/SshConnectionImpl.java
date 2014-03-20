@@ -81,10 +81,9 @@ public class SshConnectionImpl implements SshConnection {
      * @param host           the host to connect to.
      * @param port           the port.
      * @param authentication the authentication-info
-     * @throws IOException if the unfortunate happens.
      */
     protected SshConnectionImpl(String host, int port,
-                                Authentication authentication) throws IOException {
+                                Authentication authentication) {
         this(host, port, GerritDefaultValues.DEFAULT_GERRIT_PROXY, authentication, null);
     }
 
@@ -95,7 +94,6 @@ public class SshConnectionImpl implements SshConnection {
      * @param port           the port.
      * @param proxy          the proxy url.
      * @param authentication the authentication-info
-     * @throws IOException   if the unfortunate happens.
      */
     protected SshConnectionImpl(String host, int port, String proxy,
                                 Authentication authentication) {
@@ -110,7 +108,6 @@ public class SshConnectionImpl implements SshConnection {
      * @param proxy          the proxy url.
      * @param authentication the authentication-info
      * @param updater        the authentication updater.
-     * @throws IOException   if the unfortunate happens.
      */
     protected SshConnectionImpl(String host, int port, String proxy,
                                 Authentication authentication,
@@ -124,6 +121,7 @@ public class SshConnectionImpl implements SshConnection {
 
     /**
      * Connects the connection.
+     * @throws IOException if the unfortunate happens.
      */
     @Override
     public synchronized void connect() throws IOException {

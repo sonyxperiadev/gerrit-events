@@ -90,6 +90,7 @@ public interface SshConnection {
 
     /**
      * Connects the connection.
+     * @throws IOException if it is so.
      */
     void connect() throws IOException;
 
