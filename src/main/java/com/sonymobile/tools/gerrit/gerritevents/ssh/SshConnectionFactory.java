@@ -74,6 +74,8 @@ public abstract class SshConnectionFactory {
      */
     public static SshConnection getConnection(String host, int port, String proxy,
                                               Authentication authentication) throws IOException {
-        return new SshConnectionImpl(host, port, proxy, authentication);
+        SshConnection connection = new SshConnectionImpl(host, port, proxy, authentication);
+        connection.connect();
+        return connection;
     }
 }

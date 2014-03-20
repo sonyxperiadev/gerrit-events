@@ -89,6 +89,11 @@ public interface SshConnection {
     ChannelExec executeCommandChannel(String command) throws SshException, IOException;
 
     /**
+     * Connects the connection.
+     */
+    void connect() throws IOException;
+
+    /**
      * Disconnects the connection.
      */
     void disconnect();

@@ -65,8 +65,12 @@ public class SshConnectionImpl implements SshConnection {
      * The str length of "://" used for proxy parsing.
      */
     protected static final int PROTO_HOST_DELIM_LENGTH = 3;
-    private final JSch client;
+    private JSch client;
     private Session connectSession;
+    private String host;
+    private int port;
+    private String proxy;
+    private Authentication authentication;
 
     //CS IGNORE RedundantThrows FOR NEXT 30 LINES. REASON: Informative
 
@@ -93,7 +97,18 @@ public class SshConnectionImpl implements SshConnection {
      * @throws IOException   if the unfortunate happens.
      */
     protected SshConnectionImpl(String host, int port, String proxy,
-                                Authentication authentication) throws IOException {
+                                Authentication authentication) {
+        this.host = host;
+        this.port = port;
+        this.proxy = proxy;
+        this.authentication = authentication;
+    }
+
+    /**
+     * Connects the connection.
+     */
+    @Override
+    public void connect() throws IOException {
         logger.debug("connecting...");
         try {
             client = new JSch();
