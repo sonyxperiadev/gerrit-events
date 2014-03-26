@@ -332,6 +332,8 @@ public class GerritConnection extends Thread implements Connector {
                 } while (line != null);
             } catch (IOException ex) {
                 logger.error("Stream events command error. ", ex);
+            } catch (IllegalStateException ex) {
+                logger.error("Unexpected disconnection occurred after initial moment of connection. ", ex);
             } finally {
                 logger.trace("Connection closed, ended read loop.");
                 nullifyWatchdog();
