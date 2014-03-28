@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Provider;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.Authentication;
+import com.sonymobile.tools.gerrit.gerritevents.ssh.AuthenticationUpdater;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.SshAuthenticationException;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.SshConnectException;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.SshConnection;
@@ -83,6 +84,7 @@ public class GerritConnection extends Thread implements Connector {
     private StreamWatchdog watchdog;
     private int reconnectCallCount = 0;
     private GerritHandler handler;
+    private AuthenticationUpdater authenticationUpdater = null;
     private final Set<ConnectionListener> listeners = new CopyOnWriteArraySet<ConnectionListener>();
 
     /**
@@ -278,6 +280,14 @@ public class GerritConnection extends Thread implements Connector {
     }
 
     /**
+     * Sets {@link AuthenticationUpdater}.
+     * @param authenticationUpdater The {@link AuthenticationUpdater}.
+     */
+    public void setAuthenticationUpdater(AuthenticationUpdater authenticationUpdater) {
+        this.authenticationUpdater = authenticationUpdater;
+    }
+
+    /**
      * If watchdog field is not null, shut it down and put it to null.
      */
     private void nullifyWatchdog() {
@@ -367,7 +377,8 @@ public class GerritConnection extends Thread implements Connector {
             SshConnection ssh = null;
             try {
                 logger.debug("Connecting...");
-                ssh = SshConnectionFactory.getConnection(gerritHostName, gerritSshPort, gerritProxy, authentication);
+                ssh = SshConnectionFactory.getConnection(gerritHostName, gerritSshPort, gerritProxy,
+                        authentication, authenticationUpdater);
                 gerritVersion  = formatVersion(ssh.executeCommand("gerrit version"));
                 logger.debug("connection seems ok, returning it.");
                 return ssh;

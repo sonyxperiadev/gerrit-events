@@ -30,6 +30,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -37,7 +38,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PipedReader;
 import java.io.PipedWriter;
-
 import java.util.concurrent.CountDownLatch;
 
 import org.junit.AfterClass;
@@ -94,7 +94,7 @@ public class GerritConnectionTest {
         when(sshConnectionMock.executeCommandReader(eq("gerrit stream-events"))).thenReturn(pipedReader);
         PowerMockito.mockStatic(SshConnectionFactory.class);
         PowerMockito.doReturn(sshConnectionMock).when(SshConnectionFactory.class, "getConnection",
-                isA(String.class), isA(Integer.class), isA(String.class), isA(Authentication.class));
+                isA(String.class), isA(Integer.class), isA(String.class), isA(Authentication.class), any());
         connection = new GerritConnection("", "localhost", 29418, new Authentication(null, ""));
         connection.setHandler(new HandlerMock());
         connection.addListener(new ListenerMock());

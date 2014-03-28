@@ -74,6 +74,28 @@ public abstract class SshConnectionFactory {
      */
     public static SshConnection getConnection(String host, int port, String proxy,
                                               Authentication authentication) throws IOException {
-        return new SshConnectionImpl(host, port, proxy, authentication);
+        return getConnection(host, port, proxy, authentication, null);
+    }
+
+    /**
+     * Creates a {@link SshConnection}.
+     *
+     * @param host           the host name
+     * @param port           the port
+     * @param proxy          the proxy url
+     * @param authentication the credentials
+     * @param updater        the updater.
+     * @return a new connection.
+     *
+     * @throws IOException if so.
+     * @see SshConnection
+     * @see SshConnectionImpl
+     */
+    public static SshConnection getConnection(String host, int port, String proxy,
+                                              Authentication authentication,
+                                              AuthenticationUpdater updater) throws IOException {
+        SshConnection connection = new SshConnectionImpl(host, port, proxy, authentication, updater);
+        connection.connect();
+        return connection;
     }
 }

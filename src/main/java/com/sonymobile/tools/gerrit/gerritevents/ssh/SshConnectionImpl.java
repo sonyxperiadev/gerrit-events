@@ -65,8 +65,13 @@ public class SshConnectionImpl implements SshConnection {
      * The str length of "://" used for proxy parsing.
      */
     protected static final int PROTO_HOST_DELIM_LENGTH = 3;
-    private final JSch client;
+    private JSch client;
     private Session connectSession;
+    private String host;
+    private int port;
+    private String proxy;
+    private Authentication authentication;
+    private AuthenticationUpdater updater;
 
     //CS IGNORE RedundantThrows FOR NEXT 30 LINES. REASON: Informative
 
@@ -76,11 +81,10 @@ public class SshConnectionImpl implements SshConnection {
      * @param host           the host to connect to.
      * @param port           the port.
      * @param authentication the authentication-info
-     * @throws IOException if the unfortunate happens.
      */
     protected SshConnectionImpl(String host, int port,
-                                Authentication authentication) throws IOException {
-        this(host, port, GerritDefaultValues.DEFAULT_GERRIT_PROXY, authentication);
+                                Authentication authentication) {
+        this(host, port, GerritDefaultValues.DEFAULT_GERRIT_PROXY, authentication, null);
     }
 
     /**
@@ -90,17 +94,56 @@ public class SshConnectionImpl implements SshConnection {
      * @param port           the port.
      * @param proxy          the proxy url.
      * @param authentication the authentication-info
-     * @throws IOException   if the unfortunate happens.
      */
     protected SshConnectionImpl(String host, int port, String proxy,
-                                Authentication authentication) throws IOException {
+                                Authentication authentication) {
+        this(host, port, proxy, authentication, null);
+    }
+
+    /**
+     * Creates and opens a SshConnection.
+     *
+     * @param host           the host to connect to.
+     * @param port           the port.
+     * @param proxy          the proxy url.
+     * @param authentication the authentication-info
+     * @param updater        the authentication updater.
+     */
+    protected SshConnectionImpl(String host, int port, String proxy,
+                                Authentication authentication,
+                                AuthenticationUpdater updater) {
+        this.host = host;
+        this.port = port;
+        this.proxy = proxy;
+        this.authentication = authentication;
+        this.updater = updater;
+    }
+
+    /**
+     * Connects the connection.
+     * @throws IOException if the unfortunate happens.
+     */
+    @Override
+    public synchronized void connect() throws IOException {
         logger.debug("connecting...");
+        Authentication auth = authentication;
+        if (updater != null) {
+            Authentication updatedAuth = updater.updateAuthentication(authentication);
+            if (updatedAuth != null && auth != updatedAuth) {
+                auth = updatedAuth;
+            }
+        }
         try {
             client = new JSch();
-            client.addIdentity(authentication.getPrivateKeyFile().getAbsolutePath(),
-                    authentication.getPrivateKeyFilePassword());
+            if (auth.getPrivateKeyPhrase() == null) {
+                client.addIdentity(auth.getPrivateKeyFile().getAbsolutePath(),
+                        auth.getPrivateKeyFilePassword());
+            } else {
+                client.addIdentity(auth.getUsername(), auth.getPrivateKeyPhrase(), null,
+                        auth.getPrivateKeyFilePassword().getBytes("UTF-8"));
+            }
             client.setHostKeyRepository(new BlindHostKeyRepository());
-            connectSession = client.getSession(authentication.getUsername(), host, port);
+            connectSession = client.getSession(auth.getUsername(), host, port);
             if (proxy != null && !proxy.isEmpty()) {
                 String[] splitted = proxy.split(":");
                 if (splitted.length > 2 && splitted[1].length() >= PROTO_HOST_DELIM_LENGTH) {
