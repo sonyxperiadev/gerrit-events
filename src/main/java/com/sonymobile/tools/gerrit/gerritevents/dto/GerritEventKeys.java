@@ -99,6 +99,10 @@ public abstract class GerritEventKeys {
      */
     public static final String REVISION = "revision";
     /**
+     * parents
+     */
+    public static final String PARENTS = "parents";
+    /**
      * ref.
      */
     public static final String REF = "ref";
@@ -190,7 +194,18 @@ public abstract class GerritEventKeys {
      * nodesCount.
      */
     public static final String NODES_COUNT = "nodesCount";
-
+    /**
+     * comments.
+     */
+    public static final String COMMENTS = "comments";
+    /**
+     * message.
+     */
+    public static final String MESSAGE = "message";
+    /**
+     * reviewer.
+     */
+    public static final String REVIEWER = "reviewer";
     /**
      * Empty default constructor to hinder instantiation.
      */

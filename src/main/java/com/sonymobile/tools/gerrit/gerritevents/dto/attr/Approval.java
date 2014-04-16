@@ -47,10 +47,9 @@ public class Approval implements GerritJsonDTO {
      */
     private String value;
     /**
-     * The approval username
      * The user who has approved the patch
      */
-    private String username;
+    private Account by;
 
     /**
      * Default constructor.
@@ -73,30 +72,24 @@ public class Approval implements GerritJsonDTO {
             value = getString(json, VALUE);
         }
         if (json.containsKey(BY)) {
-            Object obj = json.get(BY);
-            if (obj instanceof JSONObject) {
-                JSONObject userData = (JSONObject)obj;
-                if (userData.containsKey(USERNAME)) {
-                    username = getString(userData, USERNAME);
-                }
-            }
+            by = new Account(json.getJSONObject(BY));
         }
     }
 
     /**
-     * The approval category.
+     * The approval user.
      * @return the username.
      */
+    @Deprecated()
     public String getUsername() {
-        return username;
+        return by == null ? null : by.getUsername();
     }
 
     /**
-     * The approval category.
-     * @param username the reviewer's username.
+     * The approval author account
      */
-    public void setUsername(String username) {
-        this.username = username;
+    public Account getBy() {
+        return by;
     }
 
     /**
