@@ -76,11 +76,11 @@ public class PatchSet implements GerritJsonDTO {
     /**
      * The list of approvals.
      */
-    private List<Approval> approvals = new ArrayList<Approval>();
+    private List<Approval> approvals;
     /**
      * The list of parent ids.
      */
-    private List<String> parents = new ArrayList<String>();
+    private List<String> parents;
 
     /**
      * Default constructor.
@@ -109,12 +109,14 @@ public class PatchSet implements GerritJsonDTO {
             author = new Account(json.getJSONObject(AUTHOR));
         }
         if (json.containsKey(APPROVALS)) {
+            approvals = new ArrayList<Approval>();
             JSONArray eventApprovals = json.getJSONArray(APPROVALS);
             for (int i = 0; i < eventApprovals.size(); i++) {
                 approvals.add(new Approval(eventApprovals.getJSONObject(i)));
             }
         }
         if (json.containsKey(PARENTS)) {
+            parents = new ArrayList<String>();
             JSONArray eventParents = json.getJSONArray(PARENTS);
             for (int i = 0; i < eventParents.size(); i++) {
                 parents.add(eventParents.getString(i));

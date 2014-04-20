@@ -88,7 +88,7 @@ public class Change implements GerritJsonDTO {
      */
     private String url;
 
-    private List<Comment> comments = new ArrayList<Comment>();
+    private List<Comment> comments;
     /**
      * Default constructor.
      */
@@ -116,6 +116,7 @@ public class Change implements GerritJsonDTO {
             owner = new Account(json.getJSONObject(OWNER));
         }
         if (json.containsKey(COMMENTS)) {
+            comments = new ArrayList<Comment>();
             JSONArray eventApprovals = json.getJSONArray(COMMENTS);
             for (int i = 0; i < eventApprovals.size(); i++) {
                 comments.add(new Comment(eventApprovals.getJSONObject(i)));

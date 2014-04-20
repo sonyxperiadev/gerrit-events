@@ -29,6 +29,7 @@ import net.sf.json.JSONObject;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNull;
 
 /**
  * Tests for {@link Account}.
@@ -119,4 +120,25 @@ public class AccountTest {
         String expected = "";
         assertEquals(expected, account.getNameAndEmail());
     }
+
+    /**
+     * Tests {@link com.sonymobile.tools.gerrit.gerritevents.dto.attr.Account#getNameAndEmail()}.
+     * With username set.
+     * @throws Exception if so.
+     */
+    @Test
+    public void testUserNameDontMessWithGetNameAndEmail() throws Exception {
+        Account account = new Account();
+        account.setUsername("anything");
+        assertNull(account.getNameAndEmail());
+
+        account.setEmail("");
+        account.setName("");
+        assertEquals("", account.getNameAndEmail());
+
+        account.setEmail("foo@acme.com");
+        account.setName("Foo Bar JR.");
+        assertEquals("\"Foo Bar JR.\" <foo@acme.com>", account.getNameAndEmail());
+    }
+
 }

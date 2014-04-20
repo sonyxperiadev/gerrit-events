@@ -25,22 +25,13 @@
 
 package com.sonymobile.tools.gerrit.gerritevents.dto.attr;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.PROJECT;
-import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.BRANCH;
-import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.ID;
-import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.NUMBER;
-import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.SUBJECT;
-import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.OWNER;
-import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.URL;
-import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.EMAIL;
-import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.NAME;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.*;
+import static org.junit.Assert.*;
 
 /**
  * JUnit tests for {@link com.sonymobile.tools.gerrit.gerritevents.dto.attr.Change}.
@@ -87,6 +78,7 @@ public class ChangeTest {
         assertEquals(change.getSubject(), "subject");
         assertTrue(change.getOwner().equals(account));
         assertEquals(change.getUrl(), "http://localhost:8080");
+        assertNull(change.getComments());
     }
 
     /**
@@ -113,6 +105,45 @@ public class ChangeTest {
         assertEquals(change.getSubject(), "subject");
         assertTrue(change.getOwner().equals(account));
         assertNull(change.getUrl());
+        assertNull(change.getComments());
+    }
+
+    /**
+     * Tests {@link Change#fromJson(net.sf.json.JSONObject)}.
+     * With comments.
+     * @throws Exception if so.
+     */
+    @Test
+    public void testFromJsonWithEmptyComments() throws Exception {
+        JSONArray jsonComments = new JSONArray();
+        JSONObject json = new JSONObject();
+        json.put(COMMENTS, jsonComments);
+        Change change = new Change();
+        change.fromJson(json);
+
+        assertNotNull(change.getComments());
+        assertTrue(change.getComments().isEmpty());
+    }
+
+    /**
+     * Tests {@link Change#fromJson(net.sf.json.JSONObject)}.
+     * With comments.
+     * @throws Exception if so.
+     */
+    @Test
+    public void testFromJsonWithNonEmptyComments() throws Exception {
+        JSONObject jsonComment = new JSONObject();
+        jsonComment.put(MESSAGE, "Some review message");
+        jsonComment.put(REVIEWER, jsonAccount);
+        JSONArray jsonComments = new JSONArray();
+        jsonComments.add(jsonComment);
+        JSONObject json = new JSONObject();
+        json.put(COMMENTS, jsonComments);
+        Change change = new Change();
+        change.fromJson(json);
+
+        assertNotNull(change.getComments());
+        assertEquals(1, change.getComments().size());
     }
 
     /**
@@ -138,6 +169,7 @@ public class ChangeTest {
         assertEquals(change.getSubject(), "subject");
         assertTrue(change.getOwner().equals(account));
         assertEquals(change.getUrl(), "http://localhost:8080");
+        assertNull(change.getComments());
     }
 
     /**
