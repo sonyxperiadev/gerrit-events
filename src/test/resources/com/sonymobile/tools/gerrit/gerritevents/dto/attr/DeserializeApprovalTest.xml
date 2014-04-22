@@ -1,0 +1,5 @@
+<com.sonymobile.tools.gerrit.gerritevents.dto.attr.Approval>
+    <type>foo</type>
+    <value>bar</value>
+    <username>uname</username>
+</com.sonymobile.tools.gerrit.gerritevents.dto.attr.Approval>
