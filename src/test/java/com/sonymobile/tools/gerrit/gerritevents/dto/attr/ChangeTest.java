@@ -30,8 +30,22 @@ import net.sf.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.*;
-import static org.junit.Assert.*;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.PROJECT;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.BRANCH;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.ID;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.NUMBER;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.SUBJECT;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.OWNER;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.URL;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.EMAIL;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.NAME;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.COMMENTS;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.MESSAGE;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.REVIEWER;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * JUnit tests for {@link com.sonymobile.tools.gerrit.gerritevents.dto.attr.Change}.
