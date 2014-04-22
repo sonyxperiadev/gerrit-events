@@ -27,13 +27,20 @@ package com.sonymobile.tools.gerrit.gerritevents.dto.attr;
 import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getString;
 import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getBoolean;
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritJsonDTO;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.NUMBER;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.REVISION;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.REF;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.IS_DRAFT;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.UPLOADER;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.AUTHOR;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.APPROVALS;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.PARENTS;
 
 /**
  * Represents a Gerrit JSON Patchset DTO.
@@ -62,6 +69,18 @@ public class PatchSet implements GerritJsonDTO {
      * The one who uploaded the patch-set.
      */
     private Account uploader;
+    /**
+     * The patch author.
+     */
+    private Account author;
+    /**
+     * The list of approvals.
+     */
+    private List<Approval> approvals;
+    /**
+     * The list of parent ids.
+     */
+    private List<String> parents;
 
     /**
      * Default constructor.
@@ -86,8 +105,32 @@ public class PatchSet implements GerritJsonDTO {
         if (json.containsKey(UPLOADER)) {
             uploader = new Account(json.getJSONObject(UPLOADER));
         }
+        if (json.containsKey(AUTHOR)) {
+            author = new Account(json.getJSONObject(AUTHOR));
+        }
+        if (json.containsKey(APPROVALS)) {
+            approvals = new ArrayList<Approval>();
+            JSONArray eventApprovals = json.getJSONArray(APPROVALS);
+            for (int i = 0; i < eventApprovals.size(); i++) {
+                approvals.add(new Approval(eventApprovals.getJSONObject(i)));
+            }
+        }
+        if (json.containsKey(PARENTS)) {
+            parents = new ArrayList<String>();
+            JSONArray eventParents = json.getJSONArray(PARENTS);
+            for (int i = 0; i < eventParents.size(); i++) {
+                parents.add(eventParents.getString(i));
+            }
+        }
     }
 
+    /**
+     * @return the List of parent dependency hashes
+     */
+    public List<String> getParents() {
+        return parents;
+    }
+    
     /**
      * The patchset number.
      * @return the number.
@@ -95,6 +138,15 @@ public class PatchSet implements GerritJsonDTO {
     public String getNumber() {
         return number;
     }
+
+    /**
+     * The list of approvals for this patch set
+     * @return the list of approvals
+     */
+    public List<Approval> getApprovals() {
+        return approvals;
+    }
+
 
     /**
      * The patchset number.
@@ -160,6 +212,14 @@ public class PatchSet implements GerritJsonDTO {
      */
     public Account getUploader() {
         return uploader;
+    }
+
+    /**
+     * The patch set author (may not be the owner)
+     * @return the author
+     */
+    public Account getAuthor() {
+        return author;
     }
 
     /**

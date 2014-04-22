@@ -30,6 +30,7 @@ import net.sf.json.JSONObject;
 import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getString;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.EMAIL;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.NAME;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.USERNAME;
 
 /**
  * Represents a Gerrit JSON Account DTO.
@@ -47,6 +48,10 @@ public class Account implements GerritJsonDTO {
      * Account user's preferred email.
      */
     private String email;
+    /**
+     * Account username.
+     */
+    private String username;
 
     /**
      * Default constructor.
@@ -78,6 +83,7 @@ public class Account implements GerritJsonDTO {
     public void fromJson(JSONObject json) {
         name = getString(json, NAME);
         email = getString(json, EMAIL);
+        username = getString(json, USERNAME);
     }
 
     /**
@@ -114,6 +120,24 @@ public class Account implements GerritJsonDTO {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Account username.
+     *
+     * @return the username.
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * Account username.
+     *
+     * @param username the username
+     */
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     /**

@@ -26,9 +26,15 @@ package com.sonymobile.tools.gerrit.gerritevents.dto.attr;
 
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritJsonDTO;
 import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getString;
+
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.BRANCH;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.COMMENTS;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.COMMIT_MESSAGE;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.TOPIC;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.ID;
@@ -82,6 +88,7 @@ public class Change implements GerritJsonDTO {
      */
     private String url;
 
+    private List<Comment> comments;
     /**
      * Default constructor.
      */
@@ -108,6 +115,13 @@ public class Change implements GerritJsonDTO {
         if (json.containsKey(OWNER)) {
             owner = new Account(json.getJSONObject(OWNER));
         }
+        if (json.containsKey(COMMENTS)) {
+            comments = new ArrayList<Comment>();
+            JSONArray eventApprovals = json.getJSONArray(COMMENTS);
+            for (int i = 0; i < eventApprovals.size(); i++) {
+                comments.add(new Comment(eventApprovals.getJSONObject(i)));
+            }
+        }
         if (json.containsKey(COMMIT_MESSAGE)) {
             commitMessage = getString(json, COMMIT_MESSAGE);
         }
@@ -128,6 +142,14 @@ public class Change implements GerritJsonDTO {
      */
     public void setBranch(String branch) {
         this.branch = branch;
+    }
+
+    /**
+     * Comments (only filled up if getComments equals true during query).
+     * @return the comments list.
+     */
+    public List<Comment> getComments() {
+        return comments;
     }
 
     /**

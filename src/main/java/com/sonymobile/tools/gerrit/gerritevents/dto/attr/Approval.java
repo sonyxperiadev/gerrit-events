@@ -47,9 +47,16 @@ public class Approval implements GerritJsonDTO {
      */
     private String value;
     /**
-     * The approval username
      * The user who has approved the patch
      */
+    private Account by;
+
+    /* username has been replaced by Approval.by Account.
+     * This allows old builds to deserialize without warnings.
+     * Below readResolve() method will handle the migration.
+     * I can't flag it transient as it will skip the deserialization
+     *  part, preventing any migration. */
+    @SuppressWarnings("unused")
     private String username;
 
     /**
@@ -57,6 +64,8 @@ public class Approval implements GerritJsonDTO {
      */
     public Approval() {
     }
+
+
 
     /**
      * Constructor that fills with data directly.
@@ -73,30 +82,32 @@ public class Approval implements GerritJsonDTO {
             value = getString(json, VALUE);
         }
         if (json.containsKey(BY)) {
-            Object obj = json.get(BY);
-            if (obj instanceof JSONObject) {
-                JSONObject userData = (JSONObject)obj;
-                if (userData.containsKey(USERNAME)) {
-                    username = getString(userData, USERNAME);
-                }
-            }
+            by = new Account(json.getJSONObject(BY));
         }
     }
 
     /**
-     * The approval category.
+     * The approval user.
      * @return the username.
      */
+    @Deprecated()
     public String getUsername() {
-        return username;
+        return by == null ? null : by.getUsername();
     }
 
     /**
-     * The approval category.
-     * @param username the reviewer's username.
+     * The approval author account
      */
-    public void setUsername(String username) {
-        this.username = username;
+    public Account getBy() {
+        return by;
+    }
+
+    /**
+     * The approval author account
+     * @param by the account.
+     */
+    public void setBy(Account by) {
+        this.by = by;
     }
 
     /**
@@ -169,5 +180,15 @@ public class Approval implements GerritJsonDTO {
         } else if (!value.equals(other.value))
             return false;
         return true;
+    }
+
+    @SuppressWarnings("unused")
+    private Object readResolve() {
+        if (username != null) {
+            by = new Account();
+            by.setUsername(username);
+            username = null;
+        }
+        return this;
     }
 }
