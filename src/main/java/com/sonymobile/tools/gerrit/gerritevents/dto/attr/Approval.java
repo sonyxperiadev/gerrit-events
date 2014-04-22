@@ -51,11 +51,21 @@ public class Approval implements GerritJsonDTO {
      */
     private Account by;
 
+    /* username has been replaced by Approval.by Account.
+     * This allows old builds to deserialize without warnings.
+     * Below readResolve() method will handle the migration.
+     * I can't flag it transient as it will skip the deserialization
+     *  part, preventing any migration. */
+    @SuppressWarnings("unused")
+    private String username;
+
     /**
      * Default constructor.
      */
     public Approval() {
     }
+
+
 
     /**
      * Constructor that fills with data directly.
@@ -90,6 +100,14 @@ public class Approval implements GerritJsonDTO {
      */
     public Account getBy() {
         return by;
+    }
+
+    /**
+     * The approval author account
+     * @param by the account.
+     */
+    public void setBy(Account by) {
+        this.by = by;
     }
 
     /**
@@ -162,5 +180,15 @@ public class Approval implements GerritJsonDTO {
         } else if (!value.equals(other.value))
             return false;
         return true;
+    }
+
+    @SuppressWarnings("unused")
+    private Object readResolve() {
+        if (username != null) {
+            by = new Account();
+            by.setUsername(username);
+            username = null;
+        }
+        return this;
     }
 }

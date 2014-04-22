@@ -26,10 +26,13 @@ package com.sonymobile.tools.gerrit.gerritevents.dto.attr;
 
 import com.thoughtworks.xstream.XStream;
 import org.junit.Test;
+import org.powermock.reflect.Whitebox;
 
 import java.io.IOException;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
 
 /**
  * Serialization handling test for {@link com.sonymobile.tools.gerrit.gerritevents.dto.attr.Approval}.
@@ -39,10 +42,14 @@ public class DeserializeApprovalTest {
     /**
      * Verifies old Approval gets deserialized correctly (Approval::username String was replaced by Approval::by Account)
      */
+    @SuppressWarnings("deprecation")
     @Test
-    public void testProtoToScheme() throws IOException {
+    public void testApprovalUsernameMigration() throws IOException {
         XStream x = new XStream();
         Approval approval = (Approval) x.fromXML(getClass().getResourceAsStream("DeserializeApprovalTest.xml"));
+        assertNotNull(approval.getBy());
+        assertEquals("uname", approval.getBy().getUsername());
         assertEquals("uname", approval.getUsername());
+        assertNull(Whitebox.getInternalState(approval, "username"));
     }
 }
