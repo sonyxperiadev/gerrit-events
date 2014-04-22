@@ -153,11 +153,12 @@ public class GerritQueryHandler {
      * @throws IOException for some other IO problem.
      */
     public List<JSONObject> queryJava(String queryString, boolean getPatchSets, boolean getCurrentPatchSet,
-                                      boolean getFiles, boolean getCommitMessage) throws SshException, IOException, GerritQueryException {
+                                      boolean getFiles, boolean getCommitMessage) throws SshException,
+                                      IOException, GerritQueryException {
         return queryJava(queryString, getPatchSets, getCurrentPatchSet, getFiles, getCommitMessage, false);
     }
 
-    //CS IGNORE RedundantThrows FOR NEXT 22 LINES. REASON: Informative.
+    //CS IGNORE RedundantThrows FOR NEXT 24 LINES. REASON: Informative.
 
     /**
      * Runs the query and returns the result as a list of Java JSONObjects.
@@ -184,17 +185,17 @@ public class GerritQueryHandler {
 
         final List<JSONObject> list = new LinkedList<JSONObject>();
 
-        runQuery(queryString, getPatchSets, getCurrentPatchSet, getFiles, getCommitMessage, getComments, new LineVisitor() {
-
-            @Override
-            public void visit(String line) throws GerritQueryException {
-                JSONObject json = (JSONObject)JSONSerializer.toJSON(line.trim());
-                if (json.has("type") && "error".equalsIgnoreCase(json.getString("type"))) {
-                    throw new GerritQueryException(json.getString("message"));
-                }
-                list.add(json);
-            }
-        });
+        runQuery(queryString, getPatchSets, getCurrentPatchSet, getFiles, getCommitMessage, getComments,
+                new LineVisitor() {
+                    @Override
+                    public void visit(String line) throws GerritQueryException {
+                        JSONObject json = (JSONObject)JSONSerializer.toJSON(line.trim());
+                        if (json.has("type") && "error".equalsIgnoreCase(json.getString("type"))) {
+                            throw new GerritQueryException(json.getString("message"));
+                        }
+                        list.add(json);
+                    }
+                });
         return list;
     }
 
@@ -268,26 +269,26 @@ public class GerritQueryHandler {
      * @throws SshException if there is an error in the SSH Connection.
      * @throws IOException for some other IO problem.
      */
-    public List<String> queryJson(String queryString, boolean getPatchSets, boolean getCurrentPatchSet, boolean getFiles,
-                                  boolean getCommitMessage)
+    public List<String> queryJson(String queryString, boolean getPatchSets, boolean getCurrentPatchSet,
+                                  boolean getFiles, boolean getCommitMessage)
             throws SshException, IOException {
         final List<String> list = new LinkedList<String>();
         try {
-            runQuery(queryString, getPatchSets, getCurrentPatchSet, getFiles, getCommitMessage, false, new LineVisitor() {
-
-                @Override
-                public void visit(String line) {
-                    list.add(line.trim());
-                }
-            });
+            runQuery(queryString, getPatchSets, getCurrentPatchSet, getFiles, getCommitMessage, false,
+                    new LineVisitor() {
+                        @Override
+                        public void visit(String line) {
+                            list.add(line.trim());
+                        }
+                    });
         } catch (GerritQueryException gqe) {
             logger.error("This should not have happened!", gqe);
         }
         return list;
     }
 
-    //CS IGNORE RedundantThrows FOR NEXT 22 LINES. REASON: Informative.
-    //CS IGNORE JavadocMethod FOR NEXT 17 LINES. REASON: It is there.
+    //CS IGNORE RedundantThrows FOR NEXT 24 LINES. REASON: Informative.
+    //CS IGNORE JavadocMethod FOR NEXT 20 LINES. REASON: It is there.
 
     /**
      * Runs the query on the Gerrit server and lets the provided visitor handle each line in the result.

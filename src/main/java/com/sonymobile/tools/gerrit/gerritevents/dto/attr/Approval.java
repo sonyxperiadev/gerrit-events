@@ -30,10 +30,10 @@ import net.sf.json.JSONObject;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.BY;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.TYPE;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.VALUE;
-import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.USERNAME;
 
 /**
  * Represents a Gerrit JSON Approval DTO.
+ *
  * @author James E. Blair &lt;jeblair@hp.com&gt;
  */
 public class Approval implements GerritJsonDTO {
@@ -69,6 +69,7 @@ public class Approval implements GerritJsonDTO {
 
     /**
      * Constructor that fills with data directly.
+     *
      * @param json the JSON object with corresponding data.
      */
     public Approval(JSONObject json) {
@@ -88,22 +89,30 @@ public class Approval implements GerritJsonDTO {
 
     /**
      * The approval user.
+     *
      * @return the username.
      */
     @Deprecated()
     public String getUsername() {
-        return by == null ? null : by.getUsername();
+        if (by == null) {
+            return null;
+        } else {
+            return by.getUsername();
+        }
     }
 
     /**
-     * The approval author account
+     * The approval author account.
+     *
+     * @return the account
      */
     public Account getBy() {
         return by;
     }
 
     /**
-     * The approval author account
+     * The approval author account.
+     *
      * @param by the account.
      */
     public void setBy(Account by) {
@@ -112,6 +121,7 @@ public class Approval implements GerritJsonDTO {
 
     /**
      * The approval category.
+     *
      * @return the type.
      */
     public String getType() {
@@ -120,6 +130,7 @@ public class Approval implements GerritJsonDTO {
 
     /**
      * The approval category.
+     *
      * @param type the type.
      */
     public void setType(String type) {
@@ -128,6 +139,7 @@ public class Approval implements GerritJsonDTO {
 
     /**
      * The approval value.
+     *
      * @return the approval value.
      */
     public String getValue() {
@@ -136,6 +148,7 @@ public class Approval implements GerritJsonDTO {
 
     /**
      * Set the approval value.
+     *
      * @param value the approval value.
      */
     public void setValue(String value) {
@@ -182,6 +195,11 @@ public class Approval implements GerritJsonDTO {
         return true;
     }
 
+    /**
+     * Converts old serialized data to newer construct.
+     *
+     * @return itself
+     */
     @SuppressWarnings("unused")
     private Object readResolve() {
         if (username != null) {

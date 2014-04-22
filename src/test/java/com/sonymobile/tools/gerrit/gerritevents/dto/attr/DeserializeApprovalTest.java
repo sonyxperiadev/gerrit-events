@@ -40,13 +40,16 @@ import static junit.framework.Assert.assertNull;
 public class DeserializeApprovalTest {
 
     /**
-     * Verifies old Approval gets deserialized correctly (Approval::username String was replaced by Approval::by Account)
+     * Verifies old Approval gets deserialized correctly
+     * (Approval::username String was replaced by Approval::by Account).
+     *
+     * @throws IOException if so.
      */
     @SuppressWarnings("deprecation")
     @Test
     public void testApprovalUsernameMigration() throws IOException {
         XStream x = new XStream();
-        Approval approval = (Approval) x.fromXML(getClass().getResourceAsStream("DeserializeApprovalTest.xml"));
+        Approval approval = (Approval)x.fromXML(getClass().getResourceAsStream("DeserializeApprovalTest.xml"));
         assertNotNull(approval.getBy());
         assertEquals("uname", approval.getBy().getUsername());
         assertEquals("uname", approval.getUsername());

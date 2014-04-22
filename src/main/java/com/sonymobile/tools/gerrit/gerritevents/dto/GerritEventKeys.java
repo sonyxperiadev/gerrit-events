@@ -99,7 +99,7 @@ public abstract class GerritEventKeys {
      */
     public static final String REVISION = "revision";
     /**
-     * parents
+     * parents.
      */
     public static final String PARENTS = "parents";
     /**

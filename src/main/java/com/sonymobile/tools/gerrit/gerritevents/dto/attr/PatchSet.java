@@ -130,7 +130,7 @@ public class PatchSet implements GerritJsonDTO {
     public List<String> getParents() {
         return parents;
     }
-    
+
     /**
      * The patchset number.
      * @return the number.
@@ -140,7 +140,8 @@ public class PatchSet implements GerritJsonDTO {
     }
 
     /**
-     * The list of approvals for this patch set
+     * The list of approvals for this patch set.
+     *
      * @return the list of approvals
      */
     public List<Approval> getApprovals() {
@@ -208,6 +209,7 @@ public class PatchSet implements GerritJsonDTO {
 
     /**
      * The one who uploaded the patch-set.
+     *
      * @return the account of the uploader.
      */
     public Account getUploader() {
@@ -215,7 +217,8 @@ public class PatchSet implements GerritJsonDTO {
     }
 
     /**
-     * The patch set author (may not be the owner)
+     * The patch set author (may not be the owner).
+     *
      * @return the author
      */
     public Account getAuthor() {
