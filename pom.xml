@@ -4,7 +4,12 @@
     <artifactId>gerrit-events</artifactId>
     <packaging>jar</packaging>
     <version>2.0.0-SNAPSHOT</version>
-    <name>Gerrit Events</name>
+    <name>Gerrit Events Client library</name>
+    <description>
+        Java client library for receiving stream-events from Gerrit code review.
+        As well as performing queries and sending reviews.
+    </description>
+    <url>https://github.com/sonyxperiadev/gerrit-events/</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -211,10 +216,14 @@
     </build>
 
     <distributionManagement>
-        <!--<repository>
-            <id>maven.jenkins-ci.org</id>
-            <url>http://maven.jenkins-ci.org:8081/content/repositories/releases/</url>
-        </repository>-->
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
     </distributionManagement>
 
     <scm>
