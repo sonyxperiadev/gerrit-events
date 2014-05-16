@@ -43,6 +43,7 @@ public class ReviewInput {
     final String message;
     final Map<String, Integer> labels = new HashMap<String, Integer>();
     final Map<String, List<LineComment>> comments = new HashMap<String, List<LineComment>>();
+    Notify notify;
 
     /**
      * Standard Constructor.
@@ -104,5 +105,16 @@ public class ReviewInput {
             }
             comments.get(file.getFileName()).addAll(file.getLineComments());
         }
+    }
+
+    /**
+     * Sets the 'notify' value.  Defines to whom email notifications should be sent after the review is stored.
+     *
+     * @param value the value to set.
+     * @return this instance for convenience
+     */
+    public ReviewInput setNotify(Notify value) {
+        this.notify = value;
+        return this;
     }
 }
