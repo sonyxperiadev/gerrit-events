@@ -111,6 +111,10 @@ public abstract class GerritEventKeys {
      */
     public static final String IS_DRAFT = "isDraft";
     /**
+     * kind.
+     */
+    public static final String KIND = "kind";
+    /**
      * uploader.
      */
     public static final String UPLOADER = "uploader";
