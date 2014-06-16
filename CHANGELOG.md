@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.1.0 - 2014-06-16
+Added ChangeKind to PatchSet _(introduced in Gerrit 2.10)_ [pull 17](https://github.com/sonyxperiadev/gerrit-events/pull/17)
+
 ## 2.0.1 - 2014-05-16
 Added notify field to REST ReviewInput [pull 16](https://github.com/sonyxperiadev/gerrit-events/pull/16)
 
