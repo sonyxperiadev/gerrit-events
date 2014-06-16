@@ -26,6 +26,7 @@ package com.sonymobile.tools.gerrit.gerritevents.dto.attr;
 
 import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getString;
 import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getBoolean;
+import com.sonymobile.tools.gerrit.gerritevents.dto.GerritChangeKind;
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritJsonDTO;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -37,6 +38,7 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.NUMBE
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.REVISION;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.REF;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.IS_DRAFT;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.KIND;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.UPLOADER;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.AUTHOR;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.APPROVALS;
@@ -65,6 +67,10 @@ public class PatchSet implements GerritJsonDTO {
      * The flag for draft patch.
      */
     private boolean draft;
+    /**
+     * The kind of change uploaded.
+     */
+    private GerritChangeKind kind;
     /**
      * The one who uploaded the patch-set.
      */
@@ -101,6 +107,9 @@ public class PatchSet implements GerritJsonDTO {
         number = getString(json, NUMBER);
         revision = getString(json, REVISION);
         draft = getBoolean(json, IS_DRAFT);
+        if (json.containsKey(KIND)) {
+            kind = GerritChangeKind.fromString(getString(json, KIND));
+        }
         ref = getString(json, REF);
         if (json.containsKey(UPLOADER)) {
             uploader = new Account(json.getJSONObject(UPLOADER));
@@ -205,6 +214,22 @@ public class PatchSet implements GerritJsonDTO {
      */
     public void setDraft(boolean draft) {
         this.draft = draft;
+    }
+
+    /**
+     * Kind of change uploaded.
+     * @return String of the change kind.
+     */
+    public GerritChangeKind getKind() {
+        return kind;
+    }
+
+    /**
+     * Sets the result of getKind().
+     * @param kind the kind of the change.
+     */
+    public void setKind(GerritChangeKind kind) {
+        this.kind = kind;
     }
 
     /**
