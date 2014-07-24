@@ -203,6 +203,10 @@ public abstract class GerritEventKeys {
      */
     public static final String COMMENTS = "comments";
     /**
+     * comment.
+     */
+    public static final String COMMENT = "comment";
+    /**
      * message.
      */
     public static final String MESSAGE = "message";
