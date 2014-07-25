@@ -25,25 +25,27 @@
 
 package com.sonymobile.tools.gerrit.gerritevents.ssh;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.MalformedURLException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.HostKey;
 import com.jcraft.jsch.HostKeyRepository;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.ProxyHTTP;
+import com.jcraft.jsch.ProxySOCKS5;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UserInfo;
-import com.jcraft.jsch.ProxySOCKS5;
-import com.jcraft.jsch.ProxyHTTP;
 import com.sonymobile.tools.gerrit.gerritevents.GerritDefaultValues;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.MalformedURLException;
 
 /**
  * A simple ssh client connection with private key.
@@ -57,6 +59,14 @@ public class SshConnectionImpl implements SshConnection {
      * Keep-alive interval [msec]
      */
     private static final int ALIVE_INTERVAL = 30 * 1000;
+    /**
+     * Time to wait for the channel to close [msec]
+     */
+    private static final int CLOSURE_WAIT_TIMEOUT = 200;
+    /**
+     * Time to check for channel to close [msec]
+     */
+    private static final int CLOSURE_WAIT_INTERVAL = 50;
     /**
      * SSH Command to open an "exec channel".
      */
@@ -205,10 +215,15 @@ public class SshConnectionImpl implements SshConnection {
         if (!isConnected()) {
             throw new IllegalStateException("Not connected!");
         }
+
+        Channel channel = null;
         try {
             logger.debug("Opening channel");
-            Channel channel = connectSession.openChannel(CMD_EXEC);
+            channel = connectSession.openChannel(CMD_EXEC);
             ((ChannelExec)channel).setCommand(command);
+
+            ByteArrayOutputStream errOut = new ByteArrayOutputStream();
+            channel.setExtOutputStream(errOut);
 
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(channel.getInputStream()));
             logger.debug("connecting channel.");
@@ -226,16 +241,57 @@ public class SshConnectionImpl implements SshConnection {
             }
             logger.trace("Closing reader.");
             bufferedReader.close();
-            logger.trace("disconnecting channel.");
-            channel.disconnect();
+
+            // Exit code is only available if channel is closed, so wait a bit for it.
+            // Channel.disconnect(), however, must not have been called yet.
+            // See http://stackoverflow.com/questions/3154940/jsch-error-return-codes-not-consistent.
+            waitForChannelClosure(channel, CLOSURE_WAIT_TIMEOUT);
+            int exitCode = channel.getExitStatus();
+            if (exitCode > 0) {
+               String error = errOut.toString();
+               if (error != null && error.trim().length() > 0) {
+                   throw new SshException(error.trim() + " (" + String.valueOf(exitCode) + ")");
+               } else {
+                   throw new SshException(String.valueOf(exitCode));
+               }
+            }
 
             return commandOutput.toString();
+        } catch (SshException ex) {
+            throw ex;
         } catch (JSchException ex) {
             throw new SshException(ex);
         } catch (IOException ex) {
             throw new SshException(ex);
+        } finally {
+            if (channel != null) {
+                logger.trace("disconnecting channel.");
+                channel.disconnect();
+            }
         }
     }
+
+    /**
+     * Blocks until the given channel is close or the timout is reached
+     *
+     * @param channel the channel to wait for
+     * @param timoutInMs the timeout
+     */
+    private static void waitForChannelClosure(Channel channel, long timoutInMs) {
+        final long start = System.currentTimeMillis();
+        final long until = start + timoutInMs;
+        try {
+            while (!channel.isClosed() && System.currentTimeMillis() < until) {
+                Thread.sleep(CLOSURE_WAIT_INTERVAL);
+            }
+            logger.trace("Time waited for channel closure: " + (System.currentTimeMillis() - start));
+        } catch (InterruptedException e) {
+            logger.trace("Interrupted", e);
+        }
+        if (!channel.isClosed()) {
+            logger.trace("Channel not closed in timely manner!");
+        }
+    };
 
     //CS IGNORE RedundantThrows FOR NEXT 14 LINES. REASON: Informative.
 
