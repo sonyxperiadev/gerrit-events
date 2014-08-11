@@ -32,14 +32,21 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Approval;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONArray;
 
+import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getString;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.AUTHOR;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.APPROVALS;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.COMMENT;
 
 /**
  * A DTO representation of the comment-added Gerrit Event.
  * @author James E. Blair &lt;jeblair@hp.com&gt;
  */
 public class CommentAdded extends ChangeBasedEvent {
+    /**
+     * Comment string
+     */
+    private String comment;
+
     private List<Approval> approvals = new ArrayList<Approval>();
 
     @Override
@@ -63,6 +70,22 @@ public class CommentAdded extends ChangeBasedEvent {
         this.approvals = approvals;
     }
 
+    /**
+     * Comment.
+     * @return the comment
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Comment
+     * @param comment the comment to set
+     */
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     @Override
     public boolean isScorable() {
         return true;
@@ -71,6 +94,7 @@ public class CommentAdded extends ChangeBasedEvent {
     @Override
     public void fromJson(JSONObject json) {
         super.fromJson(json);
+        comment = getString(json, COMMENT);
         if (json.containsKey(AUTHOR)) {
             account = new Account(json.getJSONObject(AUTHOR));
         }
