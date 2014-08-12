@@ -79,7 +79,7 @@ public class CommentAdded extends ChangeBasedEvent {
     }
 
     /**
-     * Comment
+     * Comment.
      * @param comment the comment to set
      */
     public void setComment(String comment) {
