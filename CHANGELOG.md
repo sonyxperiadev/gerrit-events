@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.0 - 2014-08-12
+Added CommentAdded::comment event attribute [pull 18](https://github.com/sonyxperiadev/gerrit-events/pull/18)
+
+Expose exit code and stderr of ssh commands [pull 19](https://github.com/sonyxperiadev/gerrit-events/pull/19)
+
 ## 2.1.0 - 2014-06-16
 Added ChangeKind to PatchSet _(introduced in Gerrit 2.10)_ [pull 17](https://github.com/sonyxperiadev/gerrit-events/pull/17)
 
