@@ -24,7 +24,6 @@
  */
 package com.sonymobile.tools.gerrit.gerritevents.dto.attr;
 
-import com.sonymobile.tools.gerrit.gerritevents.dto.GerritJsonDTO;
 import net.sf.json.JSONObject;
 
 import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getString;
@@ -33,7 +32,7 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.REVIE
 
 /**
  */
-public class Comment implements GerritJsonDTO {
+public class Comment extends Entity {
 
     private Account reviewer;
     private String message;
@@ -56,6 +55,7 @@ public class Comment implements GerritJsonDTO {
 
     @Override
     public void fromJson(JSONObject json) {
+        super.fromJson(json);
         message = getString(json, MESSAGE);
         if (json.containsKey(REVIEWER)) {
             reviewer = new Account(json.getJSONObject(REVIEWER));

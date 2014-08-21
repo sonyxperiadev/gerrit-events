@@ -24,7 +24,6 @@
 package com.sonymobile.tools.gerrit.gerritevents.dto.attr;
 
 import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getString;
-import com.sonymobile.tools.gerrit.gerritevents.dto.GerritJsonDTO;
 import net.sf.json.JSONObject;
 
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.BY;
@@ -36,7 +35,7 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.VALUE
  *
  * @author James E. Blair &lt;jeblair@hp.com&gt;
  */
-public class Approval implements GerritJsonDTO {
+public class Approval extends Entity {
 
     /**
      * The approval category.
@@ -78,6 +77,7 @@ public class Approval implements GerritJsonDTO {
 
     @Override
     public void fromJson(JSONObject json) {
+        super.fromJson(json);
         if (json.containsKey(TYPE) && json.containsKey(VALUE)) {
             type = getString(json, TYPE);
             value = getString(json, VALUE);

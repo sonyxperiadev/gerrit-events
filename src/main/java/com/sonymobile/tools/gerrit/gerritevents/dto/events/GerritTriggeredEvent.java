@@ -39,7 +39,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Provider;
  */
 public abstract class GerritTriggeredEvent implements GerritJsonEvent {
 
-
+    private JSONObject json;
 
     /**
      * The account that triggered the event.
@@ -116,9 +116,16 @@ public abstract class GerritTriggeredEvent implements GerritJsonEvent {
     }
 
     @Override
-    public void fromJson(JSONObject json) {
+    public void fromJson(JSONObject rawJson) {
+        this.json = rawJson;
         if (json.containsKey(PROVIDER)) {
             provider = new Provider(json.getJSONObject(PROVIDER));
         }
     }
+
+    @Override
+    public JSONObject getJson() {
+        return this.json;
+    }
+
 }

@@ -36,4 +36,9 @@ public interface GerritJsonDTO {
      * @param json the JSON Object.
      */
     void fromJson(JSONObject json);
+
+    /**
+     * @return the raw JSONObject
+     */
+    JSONObject getJson();
 }

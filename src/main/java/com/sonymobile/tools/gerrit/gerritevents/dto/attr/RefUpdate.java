@@ -23,7 +23,6 @@
  */
 package com.sonymobile.tools.gerrit.gerritevents.dto.attr;
 
-import com.sonymobile.tools.gerrit.gerritevents.dto.GerritJsonDTO;
 import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getString;
 import net.sf.json.JSONObject;
 
@@ -36,7 +35,7 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.NEWRE
  * Represents a Gerrit JSON Reference Updated DTO.
  * @author James E. Blair &lt;jeblair@hp.com&gt;
  */
-public class RefUpdate implements GerritJsonDTO {
+public class RefUpdate extends Entity {
 
     private static final String REFS_HEADS = "refs/heads/";
     /**
@@ -73,6 +72,7 @@ public class RefUpdate implements GerritJsonDTO {
 
     @Override
     public void fromJson(JSONObject json) {
+        super.fromJson(json);
         project = getString(json, PROJECT);
         refName = getString(json, REFNAME);
         oldRev = getString(json, OLDREV);

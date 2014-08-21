@@ -24,7 +24,6 @@
  */
 package com.sonymobile.tools.gerrit.gerritevents.dto.attr;
 
-import com.sonymobile.tools.gerrit.gerritevents.dto.GerritJsonDTO;
 import net.sf.json.JSONObject;
 
 import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getString;
@@ -38,7 +37,7 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.USERN
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-public class Account implements GerritJsonDTO {
+public class Account extends Entity {
 
     /**
      * Account user's full name.
@@ -81,6 +80,7 @@ public class Account implements GerritJsonDTO {
 
     @Override
     public void fromJson(JSONObject json) {
+        super.fromJson(json);
         name = getString(json, NAME);
         email = getString(json, EMAIL);
         username = getString(json, USERNAME);

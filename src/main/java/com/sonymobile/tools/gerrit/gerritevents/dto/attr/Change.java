@@ -24,7 +24,6 @@
  */
 package com.sonymobile.tools.gerrit.gerritevents.dto.attr;
 
-import com.sonymobile.tools.gerrit.gerritevents.dto.GerritJsonDTO;
 import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getString;
 
 import net.sf.json.JSONArray;
@@ -49,7 +48,7 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.URL;
  * The Gerrit change the event is related to.
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-public class Change implements GerritJsonDTO {
+public class Change extends Entity {
 
     /**
      * Project path in Gerrit.
@@ -106,6 +105,7 @@ public class Change implements GerritJsonDTO {
 
     @Override
     public void fromJson(JSONObject json) {
+        super.fromJson(json);
         project = getString(json, PROJECT);
         branch = getString(json, BRANCH);
         topic = getString(json, TOPIC);
