@@ -27,7 +27,6 @@ package com.sonymobile.tools.gerrit.gerritevents.dto.attr;
 import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getString;
 import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getBoolean;
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritChangeKind;
-import com.sonymobile.tools.gerrit.gerritevents.dto.GerritJsonDTO;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -49,7 +48,7 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.PAREN
  * Refers to a specific patchset within a change.
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-public class PatchSet implements GerritJsonDTO {
+public class PatchSet extends Entity {
 
     /**
      * The patchset number.
@@ -104,6 +103,7 @@ public class PatchSet implements GerritJsonDTO {
 
     @Override
     public void fromJson(JSONObject json) {
+        super.fromJson(json);
         number = getString(json, NUMBER);
         revision = getString(json, REVISION);
         draft = getBoolean(json, IS_DRAFT);

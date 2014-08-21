@@ -36,7 +36,6 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.VERSI
 import com.sonymobile.tools.gerrit.gerritevents.GerritConnection;
 import net.sf.json.JSONObject;
 
-import com.sonymobile.tools.gerrit.gerritevents.dto.GerritJsonDTO;
 
 /**
  * Represents a Gerrit JSON Provider DTO.
@@ -44,7 +43,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.GerritJsonDTO;
  *
  * @author rinrinne &lt;rinrin.ne@gmail.com&gt;
  */
-public class Provider implements GerritJsonDTO {
+public class Provider extends Entity {
 
     /**
      * The name of the Gerrit instance.
@@ -106,6 +105,7 @@ public class Provider implements GerritJsonDTO {
 
     @Override
     public void fromJson(JSONObject json) {
+        super.fromJson(json);
         name = getString(json, NAME);
         host = getString(json, HOST);
         port = getString(json, PORT);
