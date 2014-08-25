@@ -33,7 +33,6 @@ public interface GerritCmdRunner2 extends GerritCmdRunner {
     /**
      * Runs a command on the gerrit server.
      * @param command the command.
-     * @return true if the command was successful, false otherwise.
      * @throws IOException if error.
      * @throws InterruptedException if interrupted.
      */
