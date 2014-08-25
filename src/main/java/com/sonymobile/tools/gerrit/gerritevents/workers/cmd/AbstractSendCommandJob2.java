@@ -25,13 +25,12 @@
 
 package com.sonymobile.tools.gerrit.gerritevents.workers.cmd;
 
-import com.sonymobile.tools.gerrit.gerritevents.GerritCmdRunner;
-import com.sonymobile.tools.gerrit.gerritevents.GerritConnectionConfig;
+import java.io.IOException;
+
+import com.sonymobile.tools.gerrit.gerritevents.GerritCmdRunner2;
 import com.sonymobile.tools.gerrit.gerritevents.GerritConnectionConfig2;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.SshConnection;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.SshConnectionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An abstract Job implementation
@@ -39,29 +38,14 @@ import org.slf4j.LoggerFactory;
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-public abstract class AbstractSendCommandJob implements Runnable, GerritCmdRunner {
-
-    /**
-     * An instance of a logger for sub-classes to use.
-     */
-    protected static Logger logger = LoggerFactory.getLogger(AbstractSendCommandJob.class);
-
-    protected GerritConnectionConfig2 config;
+public abstract class AbstractSendCommandJob2 extends AbstractSendCommandJob implements GerritCmdRunner2 {
 
     /**
      * Standard constructor taking the latest configuration.
      * @param config the connection config.
      */
-    protected AbstractSendCommandJob(GerritConnectionConfig2 config) {
-        this.config = config;
-    }
-
-    /**
-     * Gets the connection config used when sending a command.
-     * @return the config.
-     */
-    public GerritConnectionConfig getConfig() {
-        return config;
+    protected AbstractSendCommandJob2(GerritConnectionConfig2 config) {
+        super(config);
     }
 
     /**
@@ -100,5 +84,60 @@ public abstract class AbstractSendCommandJob implements Runnable, GerritCmdRunne
             logger.error("Could not run command " + command, ex);
             return null;
         }
+    }
+
+    /**
+     * Sends a command to the Gerrit server.
+     * @param command the command.
+     * @return true if there were no exceptions when sending.
+     * @throws IOException if error.
+     * @throws InterruptedException if interrupted.
+     */
+    @Override
+    public void sendCommand2(String command) throws IOException, InterruptedException {
+        SshConnection ssh = null;
+        try {
+            ssh = SshConnectionFactory.getConnection(config.getGerritHostName(),
+                    config.getGerritSshPort(), config.getGerritProxy(), config.getGerritAuthentication());
+            ssh.executeCommand(command);
+        } catch (Exception ex) {
+            if (ex instanceof InterruptedException) {
+                throw (InterruptedException)ex;
+            } else {
+                throw new IOException("Error during sending command", ex);
+            }
+        } finally {
+            if (ssh != null) {
+                ssh.disconnect();
+            }
+        }
+    }
+
+    /**
+     * Sends a command to the Gerrit server, returning the output from the command.
+     * This is blocking method until command is actually sent or intrrupted.
+     * @throws IOException if error.
+     * @throws InterruptedException if interrupted.
+     */
+    @Override
+    public String sendCommandStr2(String command) throws IOException, InterruptedException {
+        String str = null;
+        SshConnection ssh = null;
+        try {
+            ssh = SshConnectionFactory.getConnection(config.getGerritHostName(),
+                    config.getGerritSshPort(), config.getGerritProxy(), config.getGerritAuthentication());
+            str = ssh.executeCommand(command);
+        } catch (Exception ex) {
+            if (ex instanceof InterruptedException) {
+                throw (InterruptedException)ex;
+            } else {
+                throw new IOException("Error during sending command", ex);
+            }
+        } finally {
+            if (ssh != null) {
+                ssh.disconnect();
+            }
+        }
+        return str;
     }
 }
