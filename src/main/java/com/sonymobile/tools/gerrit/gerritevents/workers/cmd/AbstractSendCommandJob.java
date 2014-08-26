@@ -25,11 +25,15 @@
 
 package com.sonymobile.tools.gerrit.gerritevents.workers.cmd;
 
+import java.io.IOException;
+
 import com.sonymobile.tools.gerrit.gerritevents.GerritCmdRunner;
+import com.sonymobile.tools.gerrit.gerritevents.GerritCmdRunner2;
 import com.sonymobile.tools.gerrit.gerritevents.GerritConnectionConfig;
 import com.sonymobile.tools.gerrit.gerritevents.GerritConnectionConfig2;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.SshConnection;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.SshConnectionFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +43,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-public abstract class AbstractSendCommandJob implements Runnable, GerritCmdRunner {
+public abstract class AbstractSendCommandJob implements Runnable, GerritCmdRunner, GerritCmdRunner2 {
 
     /**
      * An instance of a logger for sub-classes to use.
@@ -72,15 +76,12 @@ public abstract class AbstractSendCommandJob implements Runnable, GerritCmdRunne
     @Override
     public boolean sendCommand(String command) {
         try {
-            SshConnection ssh = SshConnectionFactory.getConnection(config.getGerritHostName(),
-                    config.getGerritSshPort(), config.getGerritProxy(), config.getGerritAuthentication());
-            ssh.executeCommand(command);
-            ssh.disconnect();
-            return true;
+            sendCommand2(command);
         } catch (Exception ex) {
             logger.error("Could not run command " + command, ex);
             return false;
         }
+        return true;
     }
 
     /**
@@ -90,15 +91,36 @@ public abstract class AbstractSendCommandJob implements Runnable, GerritCmdRunne
      */
     @Override
     public String sendCommandStr(String command) {
+        String str = null;
         try {
-            SshConnection ssh = SshConnectionFactory.getConnection(config.getGerritHostName(),
-                    config.getGerritSshPort(), config.getGerritProxy(), config.getGerritAuthentication());
-            String str = ssh.executeCommand(command);
-            ssh.disconnect();
-            return str;
+            str = sendCommand2(command);
         } catch (Exception ex) {
             logger.error("Could not run command " + command, ex);
-            return null;
         }
+        return str;
+    }
+
+    /**
+     * Runs a command on the gerrit server and returns the output from the command.
+     * @param command the command.
+     * @return the output of the command, or null if something went wrong.
+     * @throws IOException if error.
+     */
+    @Override
+    public String sendCommand2(String command) throws IOException {
+        String str = null;
+        SshConnection ssh = null;
+        try {
+            ssh = SshConnectionFactory.getConnection(config.getGerritHostName(),
+                    config.getGerritSshPort(), config.getGerritProxy(), config.getGerritAuthentication());
+            str = ssh.executeCommand(command);
+        } catch (Exception ex) {
+            throw new IOException("Error during sending command", ex);
+        } finally {
+            if (ssh != null) {
+                ssh.disconnect();
+            }
+        }
+        return str;
     }
 }
