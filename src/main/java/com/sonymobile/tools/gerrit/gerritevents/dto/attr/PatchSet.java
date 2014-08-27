@@ -1,8 +1,7 @@
 /*
  *  The MIT License
  *
- *  Copyright 2010 Sony Ericsson Mobile Communications. All rights reserved.
- *  Copyright 2014 Sony Mobile Communications AB. All rights reserved.
+ *  Copyright 2010 Sony Mobile Communications Inc. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -24,15 +23,18 @@
  */
 package com.sonymobile.tools.gerrit.gerritevents.dto.attr;
 
-import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getString;
-import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getBoolean;
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritChangeKind;
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritJsonDTO;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getDate;
+import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getString;
+import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getBoolean;
 
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.NUMBER;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.REVISION;
@@ -43,6 +45,7 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.UPLOA
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.AUTHOR;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.APPROVALS;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.PARENTS;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.CREATED_ON;
 
 /**
  * Represents a Gerrit JSON Patchset DTO.
@@ -87,7 +90,10 @@ public class PatchSet implements GerritJsonDTO {
      * The list of parent ids.
      */
     private List<String> parents;
-
+    /**
+     * The Date when this change was created.
+     */
+    private Date createdOn;
     /**
      * Default constructor.
      */
@@ -107,6 +113,7 @@ public class PatchSet implements GerritJsonDTO {
         number = getString(json, NUMBER);
         revision = getString(json, REVISION);
         draft = getBoolean(json, IS_DRAFT);
+        createdOn = getDate(json, CREATED_ON);
         if (json.containsKey(KIND)) {
             kind = GerritChangeKind.fromString(getString(json, KIND));
         }
@@ -256,6 +263,22 @@ public class PatchSet implements GerritJsonDTO {
      */
     public void setUploader(Account uploader) {
         this.uploader = uploader;
+    }
+
+    /**
+     * The Date this change was created on.
+     * @return the Date.
+     */
+    public Date getCreatedOn() {
+        return createdOn;
+    }
+
+    /**
+     * The Date this change was created on.
+     * @param date the Date.
+     */
+    public void setCreatedOn(Date date) {
+        this.createdOn = date;
     }
 
     @Override

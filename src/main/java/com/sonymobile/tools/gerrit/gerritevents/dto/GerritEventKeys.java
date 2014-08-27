@@ -1,8 +1,7 @@
 /*
  *  The MIT License
  *
- *  Copyright 2010 Sony Ericsson Mobile Communications. All rights reserved.
- *  Copyright 2012 Sony Mobile Communications AB. All rights reserved.
+ *  Copyright 2010 Sony Mobile Communications Inc. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -214,6 +213,14 @@ public abstract class GerritEventKeys {
      * reviewer.
      */
     public static final String REVIEWER = "reviewer";
+    /**
+     * createdOn.
+     */
+    public static final String CREATED_ON = "createdOn";
+    /**
+     * lastUpdated.
+     */
+    public static final String LAST_UPDATED = "lastUpdated";
     /**
      * Empty default constructor to hinder instantiation.
      */
