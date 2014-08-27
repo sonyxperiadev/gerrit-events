@@ -1,8 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2010 Sony Ericsson Mobile Communications. All rights reserved.
- * Copyright 2014 Sony Mobile Communications AB. All rights reserved.
+ * Copyright 2010 Sony Mobile Communications Inc. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,9 +27,14 @@ package com.sonymobile.tools.gerrit.gerritevents.dto.attr;
 import net.sf.json.JSONObject;
 import org.junit.Test;
 
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.NUMBER;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.REF;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.REVISION;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.CREATED_ON;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -118,6 +122,24 @@ public class PatchSetTest {
         assertEquals("ad123456789", patchSet.getRevision());
         assertEquals("refs/changes/00/100/2", patchSet.getRef());
         assertEquals(true, patchSet.isDraft());
+    }
+
+     /**
+     * Test {@link PatchSet#PatchSet(net.sf.json.JSONObject)}.
+      * With createdOn.
+     * @throws Exception if so.
+     */
+    @Test
+    // CS IGNORE MagicNumber FOR NEXT 3 LINES. REASON: TestData
+    public void testCreatedOnFromJson() throws Exception {
+        long createdOn = 100000000L;
+        //In gerrit, time is written in seconds, not milliseconds.
+        long milliseconds = TimeUnit.SECONDS.toMillis(createdOn);
+        Date createdOnAsDate = new Date(milliseconds);
+        JSONObject json = new JSONObject();
+        json.put(CREATED_ON, createdOn);
+        PatchSet patchSet = new PatchSet(json);
+        assertEquals(createdOnAsDate, patchSet.getCreatedOn());
     }
 
     /**

@@ -1,8 +1,7 @@
 /*
  *  The MIT License
  *
- *  Copyright 2010 Sony Ericsson Mobile Communications.  All rights reserved.
- *  Copyright 2014 Sony Mobile Communications AB. All rights reserved.
+ *  Copyright 2010 Sony Mobile Communications Inc. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +26,8 @@ package com.sonymobile.tools.gerrit.gerritevents;
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventType;
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritJsonEvent;
 import java.lang.reflect.Constructor;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
@@ -187,8 +188,8 @@ public final class GerritJsonEventFactory {
     /**
      * Returns the value of a JSON property as a String if it exists otherwise returns the defaultValue.
      * @param json the JSONObject to check.
-     * @param key the key
-     * @param defaultValue the value to return if the key is missing
+     * @param key the key.
+     * @param defaultValue the value to return if the key is missing.
      * @return the value for the key as a string.
      */
     public static String getString(JSONObject json, String key, String defaultValue) {
@@ -204,7 +205,7 @@ public final class GerritJsonEventFactory {
      * Same as calling {@link #getString(net.sf.json.JSONObject, java.lang.String, java.lang.String) }
      * with null as defaultValue.
      * @param json the JSONObject to check.
-     * @param key the key
+     * @param key the key.
      * @return the value for the key as a string.
      */
     public static String getString(JSONObject json, String key) {
@@ -215,7 +216,7 @@ public final class GerritJsonEventFactory {
      * Returns the value of a JSON property as a boolean if it exists and boolean value
      * otherwise returns the defaultValue.
      * @param json the JSONObject to check.
-     * @param key the key
+     * @param key the key.
      * @param defaultValue the value to return if the key is missing or not boolean value.
      * @return the value for the key as a boolean.
      */
@@ -236,10 +237,43 @@ public final class GerritJsonEventFactory {
     /**
      * Returns the value of a JSON property as a boolean if it exists otherwise returns false.
      * @param json the JSONObject to check.
-     * @param key the key
+     * @param key the key.
      * @return the value for the key as a boolean.
      */
     public static boolean getBoolean(JSONObject json, String key) {
         return getBoolean(json, key, false);
+    }
+
+    /**
+     * Returns the value of a JSON property as a Date if it exists otherwise returns null.
+     * @param json the JSONObject to check.
+     * @param key the key.
+     * @return the value for the key as a Date.
+     */
+    public static Date getDate(JSONObject json, String key) {
+        return getDate(json, key, null);
+    }
+
+    /**
+     * Returns the value of a JSON property as a Date if it exists otherwise returns the defaultValue.
+     * @param json the JSONObject to check.
+     * @param key the key.
+     * @param defaultValue the value to return if the key is missing.
+     * @return the value for the key as a Date.
+     */
+    public static Date getDate(JSONObject json, String key, Date defaultValue) {
+        Date result = defaultValue;
+        if (json.containsKey(key)) {
+            try {
+                String secondsString = json.getString(key);
+                //In gerrit, time is written in seconds, not milliseconds.
+                Long milliseconds = TimeUnit.SECONDS.toMillis(Long.parseLong(secondsString));
+                result = new Date(milliseconds);
+                // CS IGNORE EmptyBlockCheck FOR NEXT 2 LINES. REASON: result is already set to defaultValue.
+            } catch (JSONException ex) {
+            } catch (NumberFormatException nfe) {
+            }
+        }
+        return result;
     }
 }

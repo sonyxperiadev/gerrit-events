@@ -1,8 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2010 Sony Ericsson Mobile Communications. All rights reserved.
- * Copyright 2014 Sony Mobile Communications AB. All rights reserved.
+ * Copyright 2010 Sony Mobile Communications Inc. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +29,9 @@ import net.sf.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.PROJECT;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.BRANCH;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.ID;
@@ -42,6 +44,9 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.NAME;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.COMMENTS;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.MESSAGE;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.REVIEWER;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.CREATED_ON;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.LAST_UPDATED;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
@@ -158,6 +163,32 @@ public class ChangeTest {
 
         assertNotNull(change.getComments());
         assertEquals(1, change.getComments().size());
+    }
+
+    /**
+     * Tests {@link Change#fromJson(net.sf.json.JSONObject)}.
+     * With date values, createdOn and lastUpdated.
+     * @throws Exception if so.
+     */
+    @Test
+    // CS IGNORE MagicNumber FOR NEXT 3 LINES. REASON: TestData
+    public void testFromJsonWithDateValues() throws Exception {
+        long createdOn = 100000000L;
+        long lastUpdated = 110000000L;
+        JSONObject json = new JSONObject();
+        //In gerrit, time is written in seconds, not milliseconds.
+        long createdOnInMilliseconds = TimeUnit.SECONDS.toMillis(createdOn);
+        Date createdOnAsDate = new Date(createdOnInMilliseconds);
+        //In gerrit, time is written in seconds, not milliseconds.
+        long lastUpdatedInMilliseconds = TimeUnit.SECONDS.toMillis(lastUpdated);
+        Date lastUpdatedAsDate = new Date(lastUpdatedInMilliseconds);
+        json.put(CREATED_ON, createdOn);
+        json.put(LAST_UPDATED, lastUpdated);
+        Change change = new Change();
+        change.fromJson(json);
+
+        assertEquals(createdOnAsDate, change.getCreatedOn());
+        assertEquals(lastUpdatedAsDate, change.getLastUpdated());
     }
 
     /**

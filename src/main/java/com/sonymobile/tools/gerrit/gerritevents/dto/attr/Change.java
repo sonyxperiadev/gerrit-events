@@ -1,8 +1,7 @@
 /*
  *  The MIT License
  *
- *  Copyright 2010 Sony Ericsson Mobile Communications.  All rights reserved.
- *  Copyright 2013 Sony Mobile Communications AB. All rights reserved.
+ *  Copyright 2010 Sony Mobile Communications Inc. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -25,13 +24,16 @@
 package com.sonymobile.tools.gerrit.gerritevents.dto.attr;
 
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritJsonDTO;
-import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getString;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getString;
+import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getDate;
 
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.BRANCH;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.COMMENTS;
@@ -43,6 +45,9 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.OWNER
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.PROJECT;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.SUBJECT;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.URL;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.CREATED_ON;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.LAST_UPDATED;
+
 
 /**
  * Represents a Gerrit JSON Change DTO.
@@ -88,6 +93,16 @@ public class Change implements GerritJsonDTO {
      */
     private String url;
 
+    /**
+     * The Date when this change was created.
+     */
+    private Date createdOn;
+
+    /**
+     * The Date when this change was last updated.
+     */
+    private Date lastUpdated;
+
     private List<Comment> comments;
     /**
      * Default constructor.
@@ -112,6 +127,8 @@ public class Change implements GerritJsonDTO {
         id = getString(json, ID);
         number = getString(json, NUMBER);
         subject = getString(json, SUBJECT);
+        createdOn = getDate(json, CREATED_ON);
+        lastUpdated = getDate(json, LAST_UPDATED);
         if (json.containsKey(OWNER)) {
             owner = new Account(json.getJSONObject(OWNER));
         }
@@ -280,6 +297,38 @@ public class Change implements GerritJsonDTO {
      */
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    /**
+     * The Date this change was created on.
+     * @return the Date.
+     */
+    public Date getCreatedOn() {
+        return createdOn;
+    }
+
+    /**
+     * The Date this change was created on.
+     * @param date the Date.
+     */
+    public void setCreatedOn(Date date) {
+        this.createdOn = date;
+    }
+
+    /**
+     * The Date this change was last updated.
+     * @return the Date.
+     */
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+
+    /**
+     * The Date this change was last updated.
+     * @param date the Date.
+     */
+    public void setLastUpdated(Date date) {
+        this.lastUpdated = date;
     }
 
     @Override
