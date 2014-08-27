@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.0 - 2014-08-27
+Added createdOn and lastUpdated for Change and createdOn for PatchSet attributes [a154e14](https://github.com/sonyxperiadev/gerrit-events/commit/a154e14938f2982e4240e43f873d2c029e163a3e)
+
+Added methods to AbstractSendCommandJob that throws exception on connection error for easier retrying
+[pull 22](https://github.com/sonyxperiadev/gerrit-events/pull/22)
+
 ## 2.2.0 - 2014-08-12
 Added CommentAdded::comment event attribute [pull 18](https://github.com/sonyxperiadev/gerrit-events/pull/18)
 
