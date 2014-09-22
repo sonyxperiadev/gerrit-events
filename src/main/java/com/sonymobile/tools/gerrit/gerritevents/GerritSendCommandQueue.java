@@ -27,12 +27,16 @@ package com.sonymobile.tools.gerrit.gerritevents;
 
 import com.sonymobile.tools.gerrit.gerritevents.workers.GerritWorkersConfig;
 import com.sonymobile.tools.gerrit.gerritevents.workers.cmd.AbstractSendCommandJob;
-
+import com.sonymobile.tools.gerrit.gerritevents.workers.cmd.AbstractSendCommandJob2;
 import com.sonymobile.tools.gerrit.gerritevents.workers.rest.AbstractRestCommandJob;
+import com.sonymobile.tools.gerrit.gerritevents.workers.rest.AbstractRestCommandJob2;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
@@ -96,6 +100,24 @@ public final class GerritSendCommandQueue {
     }
 
     /**
+     * Adds a command-job to the singleton instance's queue.
+     *
+     * @param job the job to do.
+     */
+    public static void queue(AbstractSendCommandJob2 job) {
+        getInstance().queueJob(job);
+    }
+
+    /**
+     * Adds a command-job to the singleton instance's queue.
+     *
+     * @param job the job to do.
+     */
+    public static void queue(AbstractRestCommandJob2 job) {
+        getInstance().queueJob(job);
+    }
+
+    /**
      * Returns the current queue size.
      *
      * @return the queue size,
@@ -123,7 +145,33 @@ public final class GerritSendCommandQueue {
         } catch (RejectedExecutionException e) {
             logger.error("Unable to queue a send-command-job! ", e);
         }
+        checkQueueSize();
+    }
 
+    /**
+     * Adds a job to the queue.
+     * At the same time tries to update the thread-pool size from the latest config of the job.
+     *
+     * @param job the job to do.
+     * @return the future object.
+     * @see java.util.concurrent.ThreadPoolExecutor#submit(Runnable)
+     */
+    public Future<String> queueJob(Callable<String> job) {
+        Future<String> future = null;
+        try {
+            logger.debug("Queueing job {}", job);
+            future = executor.submit(job);
+        } catch (RejectedExecutionException e) {
+            logger.error("Unable to queue a send-command-job! ", e);
+        }
+        checkQueueSize();
+        return future;
+    }
+
+    /**
+     * Checks queue size.
+     */
+    private void checkQueueSize() {
         int queueSize = getQueueSize();
         if (queueSize >= SEND_QUEUE_SIZE_WARNING_THRESHOLD) {
             logger.warn("The Gerrit-trigger send commands queue contains {} items!"
