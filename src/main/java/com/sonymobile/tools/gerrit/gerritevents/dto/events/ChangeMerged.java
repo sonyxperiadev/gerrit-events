@@ -25,10 +25,10 @@
 package com.sonymobile.tools.gerrit.gerritevents.dto.events;
 
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventType;
+import com.sonymobile.tools.gerrit.gerritevents.dto.RepositoryModifiedEvent;
 import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Account;
 
 import net.sf.json.JSONObject;
-
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.SUBMITTER;
 
 /**
@@ -36,7 +36,7 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.SUBMI
  *
  * @author David Pursehouse &lt;david.pursehouse@sonyericsson.com&gt;
  */
-public class ChangeMerged extends ChangeBasedEvent {
+public class ChangeMerged extends ChangeBasedEvent implements RepositoryModifiedEvent {
 
     /**
      * Default constructor.
@@ -62,6 +62,22 @@ public class ChangeMerged extends ChangeBasedEvent {
     @Override
     public boolean isScorable() {
         return false;
+    }
+
+    @Override
+    public String getModifiedProject() {
+        if (change != null) {
+            return change.getProject();
+        }
+        return null;
+    }
+
+    @Override
+    public String getModifiedRef() {
+        if (patchSet != null) {
+            return patchSet.getRef();
+        }
+        return null;
     }
 
     @Override
