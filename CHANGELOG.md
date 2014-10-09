@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.4.0 - 2014-09-09
+Change-Id is now part of event attribute comparison [pull 23](https://github.com/sonyxperiadev/gerrit-events/pull/23)
+
+Added [Callable](http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/Callable.html) versions of the send command jobs [pull 24](https://github.com/sonyxperiadev/gerrit-events/pull/24)
+
+Fixed waiting for replication for DraftPublished and ChangeMerged events [pull 25](https://github.com/sonyxperiadev/gerrit-events/pull/25)
+
+**WARNING:** this breaks binary compatibility with previous versions as it removed an interface implementation from DraftPublished,
+and therefore should have bumped the major version. But it was an oversight in the original implementation and is more considered a bug-fix;
+so only the minor version is bumped.
+
 ## 2.3.0 - 2014-08-27
 Added createdOn and lastUpdated for Change and createdOn for PatchSet attributes [a154e14](https://github.com/sonyxperiadev/gerrit-events/commit/a154e14938f2982e4240e43f873d2c029e163a3e)
 
