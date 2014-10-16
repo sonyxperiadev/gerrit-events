@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.4.1 - 2014-09-16
+DraftPublished as RepositoryModifiedEvent is back _(fixing the binary compatibility problem in 2.4.0)_ [pull 26](https://github.com/sonyxperiadev/gerrit-events/pull/26)
+
 ## 2.4.0 - 2014-09-09
 Change-Id is now part of event attribute comparison [pull 23](https://github.com/sonyxperiadev/gerrit-events/pull/23)
 
