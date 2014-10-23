@@ -201,7 +201,10 @@ public class RefUpdate implements GerritJsonDTO {
      */
     public String getRef() {
         if (refName != null) {
-            return REFS_HEADS + refName;
+            if (!refName.startsWith("refs/")) {
+                return REFS_HEADS + refName;
+            }
+            return refName;
         }
         return null;
     }
