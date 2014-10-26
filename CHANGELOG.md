@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.4.2 - 2014-10-26
+Correct the construction of the refname [pull 27](https://github.com/sonyxperiadev/gerrit-events/pull/27)
+
 ## 2.4.1 - 2014-09-16
 DraftPublished as RepositoryModifiedEvent is back _(fixing the binary compatibility problem in 2.4.0)_ [pull 26](https://github.com/sonyxperiadev/gerrit-events/pull/26)
 
