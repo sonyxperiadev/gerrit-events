@@ -312,7 +312,7 @@ public class SshConnectionImpl implements SshConnection {
         try {
             Channel channel = connectSession.openChannel("exec");
             ((ChannelExec)channel).setCommand(command);
-            InputStreamReader reader = new InputStreamReader(channel.getInputStream());
+            InputStreamReader reader = new InputStreamReader(channel.getInputStream(), "utf-8");
             channel.connect();
             return reader;
         } catch (JSchException ex) {
