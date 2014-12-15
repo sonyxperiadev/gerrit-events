@@ -218,6 +218,10 @@ public abstract class GerritEventKeys {
      */
     public static final String CREATED_ON = "createdOn";
     /**
+     * eventCreatedOn.
+     */
+    public static final String EVENTCREATED_ON = "eventCreatedOn";
+    /**
      * lastUpdated.
      */
     public static final String LAST_UPDATED = "lastUpdated";

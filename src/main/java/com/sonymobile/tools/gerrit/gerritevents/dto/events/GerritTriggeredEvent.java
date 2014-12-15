@@ -24,12 +24,17 @@
  */
 package com.sonymobile.tools.gerrit.gerritevents.dto.events;
 
+import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getDate;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.EVENTCREATED_ON;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.PROVIDER;
 import net.sf.json.JSONObject;
 
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritJsonEvent;
 import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Account;
 import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Provider;
+
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -55,6 +60,11 @@ public abstract class GerritTriggeredEvent implements GerritJsonEvent {
      * Time stamp when the event was received.
      */
     protected long receivedOn;
+
+    /**
+     * Gerrit server-based time stamp when the event was created by Gerrit Server.
+     */
+    protected Date eventCreatedOn;
 
     /**
      * Standard constructor, initialize the receivedOn time stamp.
@@ -108,6 +118,14 @@ public abstract class GerritTriggeredEvent implements GerritJsonEvent {
     }
 
     /**
+     * Gerrit server-based time stamp when the event was created by Gerrit Server..
+     * @return the eventCreatedOn time stamp
+     */
+    public Date getEventCreatedOn() {
+        return eventCreatedOn;
+    }
+
+    /**
      * Time stamp when the event was received.
      * @param receivedOn the receivedOn to set
      */
@@ -115,10 +133,23 @@ public abstract class GerritTriggeredEvent implements GerritJsonEvent {
         this.receivedOn = receivedOn;
     }
 
+    /**
+     * Gerrit server-based time stamp when the event was created by Gerrit Server.
+     * ONLY USE FOR UNIT TESTS!
+     * @param eventCreatedOn the eventCreatedOn to set
+     */
+    public void setEventCreatedOn(String eventCreatedOn) {
+        Long milliseconds = TimeUnit.SECONDS.toMillis(Long.parseLong(eventCreatedOn));
+        this.eventCreatedOn = new Date(milliseconds);
+    }
+
     @Override
     public void fromJson(JSONObject json) {
         if (json.containsKey(PROVIDER)) {
             provider = new Provider(json.getJSONObject(PROVIDER));
+        }
+        if (json.containsKey(EVENTCREATED_ON)) {
+            eventCreatedOn = getDate(json, EVENTCREATED_ON);
         }
     }
 }
