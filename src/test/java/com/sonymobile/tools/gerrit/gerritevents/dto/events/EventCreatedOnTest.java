@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
 
@@ -57,8 +58,9 @@ public class EventCreatedOnTest {
         GerritTriggeredEvent gEvt = (GerritTriggeredEvent)evt;
         Date dt = gEvt.getEventCreatedOn();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
         System.out.println(df.format(dt));
-        String expectDateString = "2014-12-09 09:02:52";
+        String expectDateString = "2014-12-09 14:02:52";
         assertEquals(expectDateString, df.format(dt));
     }
 }
