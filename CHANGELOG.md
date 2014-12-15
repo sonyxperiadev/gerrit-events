@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.5.0 - 2014-12-15
+Fix corrupted chars while reading from utf-8 stream [pull 28](https://github.com/sonyxperiadev/gerrit-events/pull/28)
+
+New eventCreatedOn attribute for GerritTriggeredEvent [pull 29](https://github.com/sonyxperiadev/gerrit-events/pull/29)
+
 ## 2.4.2 - 2014-10-26
 Correct the construction of the refname [pull 27](https://github.com/sonyxperiadev/gerrit-events/pull/27)
 
