@@ -93,10 +93,19 @@ public class GerritHandler implements Coordinator, Handler {
         workQueue = new LinkedBlockingQueue<Work>();
         workers = new ArrayList<EventThread>(numberOfWorkerThreads);
         for (int i = 0; i < numberOfWorkerThreads; i++) {
-            EventThread eventThread = new EventThread(this, "Gerrit Worker EventThread_" + i);
+            EventThread eventThread = createEventThread("Gerrit Worker EventThread_" + i);
             eventThread.start();
             workers.add(eventThread);
         }
+    }
+
+    /**
+     * Create the Event Thread.
+     * @param threadName Name of thread to be created.
+     * @return new EventThread to be used by worker
+     */
+    protected EventThread createEventThread(String threadName) {
+        return new EventThread(this, threadName);
     }
 
     /**
