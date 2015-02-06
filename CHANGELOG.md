@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.6.0 - 2015-02-06
+Allow subclasses of [GerritHandler](https://github.com/sonyxperiadev/gerrit-events/blob/master/src/main/java/com/sonymobile/tools/gerrit/gerritevents/GerritHandler.java) 
+to control the creation of [EventThreads](https://github.com/sonyxperiadev/gerrit-events/blob/master/src/main/java/com/sonymobile/tools/gerrit/gerritevents/workers/EventThread.java). 
+[pull 31](https://github.com/sonyxperiadev/gerrit-events/pull/31)
+
 ## 2.5.0 - 2014-12-15
 Fix corrupted chars while reading from utf-8 stream [pull 28](https://github.com/sonyxperiadev/gerrit-events/pull/28)
 
