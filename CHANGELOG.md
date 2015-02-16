@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.6.1 - 2015-02-16
+Updated com.jcraft.jsch to 0.1.51 [pull 32](https://github.com/sonyxperiadev/gerrit-events/pull/32)
+
 ## 2.6.0 - 2015-02-06
 Allow subclasses of [GerritHandler](https://github.com/sonyxperiadev/gerrit-events/blob/master/src/main/java/com/sonymobile/tools/gerrit/gerritevents/GerritHandler.java) 
 to control the creation of [EventThreads](https://github.com/sonyxperiadev/gerrit-events/blob/master/src/main/java/com/sonymobile/tools/gerrit/gerritevents/workers/EventThread.java). 
