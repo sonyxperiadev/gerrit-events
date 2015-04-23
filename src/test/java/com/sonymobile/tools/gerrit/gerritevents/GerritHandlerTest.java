@@ -1,8 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
- * Copyright 2012 Sony Mobile Communications AB. All rights reserved.
+ * Copyright 2011 Sony Mobile Communications Inc. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +33,8 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.CommentAdded;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.DraftPublished;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.PatchsetCreated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.RefUpdated;
+import com.sonymobile.tools.gerrit.gerritevents.dto.events.ProjectCreated;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -364,6 +365,10 @@ public class GerritHandlerTest {
         RefUpdated refUpdated = new RefUpdated();
         handler.notifyListeners(refUpdated);
         verify(listenerMock, times(1)).gerritEvent(refUpdated);
+
+        ProjectCreated projectCreated = new ProjectCreated();
+        handler.notifyListeners(projectCreated);
+        verify(listenerMock, times(1)).gerritEvent(projectCreated);
     }
 
     /**
@@ -479,6 +484,22 @@ public class GerritHandlerTest {
     }
 
     /**
+     * Tests that ProjectCreated event are going in the method with
+     * that type as parameter and that other type of events are going
+     * in the default method.
+     */
+    @Test
+    public void testEventNotificationWithListenerProjectCreatedMethodSignature() {
+        SpecificEventListener projectCreatedListener = new SpecificEventListener() {
+            @SuppressWarnings("unused") //method is called by reflection
+            public void gerritEvent(ProjectCreated event) {
+                specificMethodCalled = true;
+            }
+        };
+        testListenerWithSpecificSignature(projectCreatedListener, new ProjectCreated());
+    }
+
+    /**
      * Base test listener implementation.
      */
     private abstract static class SpecificEventListener implements GerritEventListener {
@@ -511,7 +532,8 @@ public class GerritHandlerTest {
                                                      new ChangeAbandoned(),
                                                      new DraftPublished(),
                                                      new PatchsetCreated(),
-                                                     new RefUpdated(), };
+                                                     new RefUpdated(),
+                                                     new ProjectCreated(), };
         handler.addListener(listener);
 
         // Validate that event was sent to the specific method

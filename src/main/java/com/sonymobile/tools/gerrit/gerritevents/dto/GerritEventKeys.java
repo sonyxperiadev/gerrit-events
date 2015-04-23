@@ -78,6 +78,10 @@ public abstract class GerritEventKeys {
      */
     public static final String PROJECT = "project";
     /**
+     * project name.
+     */
+    public static final String PROJECT_NAME = "projectName";
+    /**
      * restorer.
      */
     public static final String RESTORER = "restorer";
@@ -129,6 +133,10 @@ public abstract class GerritEventKeys {
      * refname.
      */
     public static final String REFNAME = "refName";
+    /**
+     * HEAD reference name.
+     */
+    public static final String HEAD_NAME = "headName";
     /**
      * oldrev.
      */

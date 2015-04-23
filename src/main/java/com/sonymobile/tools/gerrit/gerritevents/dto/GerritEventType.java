@@ -1,8 +1,7 @@
 /*
  *  The MIT License
  *
- *  Copyright 2010 Sony Ericsson Mobile Communications. All rights reserved.
- *  Copyright 2012 Sony Mobile Communications AB. All rights reserved.
+ *  Copyright 2010 Sony Mobile Communications Inc. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +32,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.PatchsetCreated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.RefReplicated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.RefReplicationDone;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.RefUpdated;
+import com.sonymobile.tools.gerrit.gerritevents.dto.events.ProjectCreated;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -78,7 +78,11 @@ public enum GerritEventType {
     /**
      * A ref-replication-done event.
      */
-    REF_REPLICATION_DONE("ref-replication-done", true, RefReplicationDone.class);
+    REF_REPLICATION_DONE("ref-replication-done", true, RefReplicationDone.class),
+    /***
+     * A project-created event.
+     */
+    PROJECT_CREATED("project-created", true, ProjectCreated.class);
 
     private String typeValue;
     private boolean interesting;
