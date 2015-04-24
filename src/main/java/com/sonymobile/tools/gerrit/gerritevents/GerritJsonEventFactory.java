@@ -125,7 +125,7 @@ public final class GerritJsonEventFactory {
         try {
             JSONObject jsonObject = (JSONObject)JSONSerializer.toJSON(jsonString);
             logger.debug("Parsed a JSONObject");
-            if (isInteresgingAndUsable(jsonObject)) {
+            if (isInterestingAndUsable(jsonObject)) {
                 return jsonObject;
             }
         } catch (Exception ex) {
@@ -134,6 +134,16 @@ public final class GerritJsonEventFactory {
         return null;
     }
 
+    /**
+     * Deprecated due to misspelling.
+     * <p>Use isInterestingAndUsable instead.</p>
+     * @param json the string to parse
+     * @return true if an interesting and usable JSONObject.
+     */
+    @Deprecated
+    public static boolean isInteresgingAndUsable(JSONObject json) {
+        return isInterestingAndUsable(json);
+    }
     /**
      * Check if it is interesting and usable. If it is interesting is determined by:
      * <ol>
@@ -146,7 +156,7 @@ public final class GerritJsonEventFactory {
      * @param json the string to parse.
      * @return true if an interesting and usable JSONObject.
      */
-    public static boolean isInteresgingAndUsable(JSONObject json) {
+    public static boolean isInterestingAndUsable(JSONObject json) {
         try {
             if (json != null) {
                 if (json.get("type") != null) {
