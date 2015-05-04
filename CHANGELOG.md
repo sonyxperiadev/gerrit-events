@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.7.0
+Added patchset-notified event [pull 33](https://github.com/sonyxperiadev/gerrit-events/pull/33)
+
+Added project-created event [pull 34](https://github.com/sonyxperiadev/gerrit-events/pull/34)
+
+Corrected spelling of ```GerritJsonEventFactory.isInteresgingAndUsable``` [pull 35](https://github.com/sonyxperiadev/gerrit-events/pull/35)
+
 ## 2.6.1 - 2015-02-16
 Updated com.jcraft.jsch to 0.1.51 [pull 32](https://github.com/sonyxperiadev/gerrit-events/pull/32)
 
