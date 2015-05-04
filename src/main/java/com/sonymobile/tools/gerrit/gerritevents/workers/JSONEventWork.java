@@ -60,7 +60,7 @@ public class JSONEventWork extends AbstractJsonObjectWork {
 
     @Override
     public void perform(Coordinator coordinator) {
-        if (GerritJsonEventFactory.isInteresgingAndUsable(json)) {
+        if (GerritJsonEventFactory.isInterestingAndUsable(json)) {
             perform(json, coordinator, provider);
         }
     }
