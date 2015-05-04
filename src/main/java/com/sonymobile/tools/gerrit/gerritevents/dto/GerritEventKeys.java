@@ -234,6 +234,10 @@ public abstract class GerritEventKeys {
      */
     public static final String LAST_UPDATED = "lastUpdated";
     /**
+     * PLUGIN: notifier.
+     */
+    public static final String NOTIFIER = "notifier";
+    /**
      * Empty default constructor to hinder instantiation.
      */
     private GerritEventKeys() {
