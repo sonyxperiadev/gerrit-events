@@ -33,6 +33,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.RefReplicated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.RefReplicationDone;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.RefUpdated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.ProjectCreated;
+import com.sonymobile.tools.gerrit.gerritevents.dto.events.PatchsetNotified;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -79,6 +80,10 @@ public enum GerritEventType {
      * A ref-replication-done event.
      */
     REF_REPLICATION_DONE("ref-replication-done", true, RefReplicationDone.class),
+    /**
+     * PLUGIN: A pathcset-notified event.
+     */
+    PATCHSET_NOTIFIED("patchset-notified", true, PatchsetNotified.class),
     /***
      * A project-created event.
      */
