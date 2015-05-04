@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.7.0
+## 2.7.0 - 2015-05-04
 Added patchset-notified event [pull 33](https://github.com/sonyxperiadev/gerrit-events/pull/33)
 
 Added project-created event [pull 34](https://github.com/sonyxperiadev/gerrit-events/pull/34)
