@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.7.1 - 2015-05-18
+Use public key as preferred authentication [pull 36](https://github.com/sonyxperiadev/gerrit-events/pull/36)
+
 ## 2.7.0 - 2015-05-04
 Added patchset-notified event [pull 33](https://github.com/sonyxperiadev/gerrit-events/pull/33)
 
