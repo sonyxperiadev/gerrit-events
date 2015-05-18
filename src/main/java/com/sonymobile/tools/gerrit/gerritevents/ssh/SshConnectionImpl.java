@@ -154,6 +154,7 @@ public class SshConnectionImpl implements SshConnection {
             }
             client.setHostKeyRepository(new BlindHostKeyRepository());
             connectSession = client.getSession(auth.getUsername(), host, port);
+            connectSession.setConfig("PreferredAuthentications", "publickey");
             if (proxy != null && !proxy.isEmpty()) {
                 String[] splitted = proxy.split(":");
                 if (splitted.length > 2 && splitted[1].length() >= PROTO_HOST_DELIM_LENGTH) {
