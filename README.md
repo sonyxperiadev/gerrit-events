@@ -5,6 +5,8 @@ It was originally a module in the [Jenkins Gerrit Trigger plugin](https://github
 
 Most of the development will still target the Jenkins plugin, but now it can also be used elsewhere.
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.sonymobile.tools.gerrit/gerrit-events/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.sonymobile.tools.gerrit/gerrit-events)
+
 ## Maintainers
 
 * Robert Sandell
