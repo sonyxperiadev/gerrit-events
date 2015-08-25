@@ -34,10 +34,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,14 +101,17 @@ public abstract class AbstractRestCommandJob implements Runnable {
             return;
         }
 
-        DefaultHttpClient httpclient = new DefaultHttpClient();
-        httpclient.getCredentialsProvider().setCredentials(new AuthScope(null, -1),
-                        config.getHttpCredentials());
+        CredentialsProvider credsProvider = new BasicCredentialsProvider();
+        credsProvider.setCredentials(new AuthScope(null, -1),
+            config.getHttpCredentials());
+        HttpClientBuilder builder =
+            HttpClients.custom().setDefaultCredentialsProvider(credsProvider);
         if (config.getGerritProxy() != null && !config.getGerritProxy().isEmpty()) {
             try {
                 URL url = new URL(config.getGerritProxy());
-                HttpHost proxy = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
-                httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+                HttpHost proxy = new HttpHost(
+                    url.getHost(), url.getPort(), url.getProtocol());
+                builder.setProxy(proxy);
             } catch (MalformedURLException e) {
                 logger.error("Could not parse proxy URL, attempting without proxy.", e);
                 if (altLogger != null) {
@@ -114,6 +120,7 @@ public abstract class AbstractRestCommandJob implements Runnable {
                 }
             }
         }
+        HttpClient httpclient = builder.build();
         try {
             HttpResponse httpResponse = httpclient.execute(httpPost);
             String response = IOUtils.toString(httpResponse.getEntity().getContent(), "UTF-8");
