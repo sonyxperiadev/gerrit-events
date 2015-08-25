@@ -73,15 +73,15 @@ public enum GerritEventType {
      */
     REF_UPDATED("ref-updated", true, RefUpdated.class),
     /**
-     * A ref-replicated event.
+     * Replication Plugin: A ref-replicated event.
      */
     REF_REPLICATED("ref-replicated", true, RefReplicated.class),
     /**
-     * A ref-replication-done event.
+     * Replication Plugin: A ref-replication-done event.
      */
     REF_REPLICATION_DONE("ref-replication-done", true, RefReplicationDone.class),
     /**
-     * PLUGIN: A pathcset-notified event.
+     * Notify PatchSet Plugin: A patchset-notified event.
      */
     PATCHSET_NOTIFIED("patchset-notified", true, PatchsetNotified.class),
     /***
