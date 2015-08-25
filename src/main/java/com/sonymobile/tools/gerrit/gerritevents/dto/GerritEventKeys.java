@@ -238,6 +238,15 @@ public abstract class GerritEventKeys {
      */
     public static final String NOTIFIER = "notifier";
     /**
+     * changer.
+     */
+    public static final String CHANGER = "changer";
+    /**
+     * oldTopic.
+     */
+    public static final String OLD_TOPIC = "oldTopic";
+
+    /**
      * Empty default constructor to hinder instantiation.
      */
     private GerritEventKeys() {
