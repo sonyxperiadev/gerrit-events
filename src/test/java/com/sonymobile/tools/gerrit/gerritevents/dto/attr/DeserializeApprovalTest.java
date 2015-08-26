@@ -30,9 +30,9 @@ import org.powermock.reflect.Whitebox;
 
 import java.io.IOException;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * Serialization handling test for {@link com.sonymobile.tools.gerrit.gerritevents.dto.attr.Approval}.

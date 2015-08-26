@@ -28,8 +28,8 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys;
 import net.sf.json.JSONObject;
 import org.junit.Test;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Tests for {@link Account}.
