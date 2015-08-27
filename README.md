@@ -10,7 +10,7 @@ Most of the development will still target the Jenkins plugin, but now it can als
 ## Maintainers
 
 * Robert Sandell
-  - robert.sandell@sonymobile.com
+  - robert.sandell@cloudbees.com
   - sandell.robert@gmail.com
 
 # Usage
