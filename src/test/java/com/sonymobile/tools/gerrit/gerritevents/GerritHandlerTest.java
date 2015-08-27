@@ -33,6 +33,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.CommentAdded;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.DraftPublished;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.PatchsetCreated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.RefUpdated;
+import com.sonymobile.tools.gerrit.gerritevents.dto.events.TopicChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.ProjectCreated;
 
 import org.junit.After;
@@ -369,6 +370,10 @@ public class GerritHandlerTest {
         ProjectCreated projectCreated = new ProjectCreated();
         handler.notifyListeners(projectCreated);
         verify(listenerMock, times(1)).gerritEvent(projectCreated);
+
+        TopicChanged topicChanged = new TopicChanged();
+        handler.notifyListeners(topicChanged);
+        verify(listenerMock, times(1)).gerritEvent(topicChanged);
     }
 
     /**
@@ -497,6 +502,22 @@ public class GerritHandlerTest {
             }
         };
         testListenerWithSpecificSignature(projectCreatedListener, new ProjectCreated());
+    }
+
+    /**
+     * Tests that TopicChanged events are going in the method with
+     * that type as parameter and that other type of events are going
+     * in the default method.
+     */
+    @Test
+    public void testEventNotificationWithListenerTopicChangedMethodSignature() {
+        SpecificEventListener topicChangedListener = new SpecificEventListener() {
+            @SuppressWarnings("unused") //method is called by reflection
+            public void gerritEvent(TopicChanged event) {
+                specificMethodCalled = true;
+            }
+        };
+        testListenerWithSpecificSignature(topicChangedListener, new TopicChanged());
     }
 
     /**
