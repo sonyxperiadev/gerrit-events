@@ -32,6 +32,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.PatchsetCreated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.RefReplicated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.RefReplicationDone;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.RefUpdated;
+import com.sonymobile.tools.gerrit.gerritevents.dto.events.TopicChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.ProjectCreated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.PatchsetNotified;
 
@@ -73,21 +74,25 @@ public enum GerritEventType {
      */
     REF_UPDATED("ref-updated", true, RefUpdated.class),
     /**
-     * A ref-replicated event.
+     * Replication Plugin: A ref-replicated event.
      */
     REF_REPLICATED("ref-replicated", true, RefReplicated.class),
     /**
-     * A ref-replication-done event.
+     * Replication Plugin: A ref-replication-done event.
      */
     REF_REPLICATION_DONE("ref-replication-done", true, RefReplicationDone.class),
     /**
-     * PLUGIN: A pathcset-notified event.
+     * Notify PatchSet Plugin: A patchset-notified event.
      */
     PATCHSET_NOTIFIED("patchset-notified", true, PatchsetNotified.class),
     /***
      * A project-created event.
      */
-    PROJECT_CREATED("project-created", true, ProjectCreated.class);
+    PROJECT_CREATED("project-created", true, ProjectCreated.class),
+    /***
+     * A topic-changed event.
+     */
+    TOPIC_CHANGED("topic-changed", true, TopicChanged.class);
 
     private String typeValue;
     private boolean interesting;
