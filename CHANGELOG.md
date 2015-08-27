@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.8.0 - 2015-08-27
+Added topic-changed event [pull 39](https://github.com/sonyxperiadev/gerrit-events/pull/39)
+
+Switched from using deprecated ```DefaultHttpClient``` to ```HttpClientBuilder```  [pull 37](https://github.com/sonyxperiadev/gerrit-events/pull/37)
+
 ## 2.7.1 - 2015-05-18
 Use public key as preferred authentication [pull 36](https://github.com/sonyxperiadev/gerrit-events/pull/36)
 
