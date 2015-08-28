@@ -33,6 +33,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.CommentAdded;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.DraftPublished;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.PatchsetCreated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.RefUpdated;
+import com.sonymobile.tools.gerrit.gerritevents.dto.events.ReviewerAdded;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.TopicChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.ProjectCreated;
 
@@ -374,6 +375,10 @@ public class GerritHandlerTest {
         TopicChanged topicChanged = new TopicChanged();
         handler.notifyListeners(topicChanged);
         verify(listenerMock, times(1)).gerritEvent(topicChanged);
+
+        ReviewerAdded reviewerAdded = new ReviewerAdded();
+        handler.notifyListeners(reviewerAdded);
+        verify(listenerMock, times(1)).gerritEvent(reviewerAdded);
     }
 
     /**
@@ -518,6 +523,22 @@ public class GerritHandlerTest {
             }
         };
         testListenerWithSpecificSignature(topicChangedListener, new TopicChanged());
+    }
+
+    /**
+     * Tests that ReviewerAdded events are going in the method with
+     * that type as parameter and that other type of events are going
+     * in the default method.
+     */
+    @Test
+    public void testEventNotificationWithListenerReviewerAddedMethodSignature() {
+        SpecificEventListener reviewerAddedListener = new SpecificEventListener() {
+            @SuppressWarnings("unused") //method is called by reflection
+            public void gerritEvent(ReviewerAdded event) {
+                specificMethodCalled = true;
+            }
+        };
+        testListenerWithSpecificSignature(reviewerAddedListener, new ReviewerAdded());
     }
 
     /**
