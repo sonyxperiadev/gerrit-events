@@ -31,6 +31,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.ChangeMerged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.ChangeRestored;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.CommentAdded;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.DraftPublished;
+import com.sonymobile.tools.gerrit.gerritevents.dto.events.MergeFailed;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.PatchsetCreated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.RefUpdated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.ReviewerAdded;
@@ -379,6 +380,10 @@ public class GerritHandlerTest {
         ReviewerAdded reviewerAdded = new ReviewerAdded();
         handler.notifyListeners(reviewerAdded);
         verify(listenerMock, times(1)).gerritEvent(reviewerAdded);
+
+        MergeFailed mergeFailed = new MergeFailed();
+        handler.notifyListeners(mergeFailed);
+        verify(listenerMock, times(1)).gerritEvent(mergeFailed);
     }
 
     /**
@@ -539,6 +544,22 @@ public class GerritHandlerTest {
             }
         };
         testListenerWithSpecificSignature(reviewerAddedListener, new ReviewerAdded());
+    }
+
+    /**
+     * Tests that MergeFailed events are going in the method with
+     * that type as parameter and that other type of events are going
+     * in the default method.
+     */
+    @Test
+    public void testEventNotificationWithListenerMergeFailedMethodSignature() {
+        SpecificEventListener mergeFailedListener = new SpecificEventListener() {
+            @SuppressWarnings("unused") //method is called by reflection
+            public void gerritEvent(MergeFailed event) {
+                specificMethodCalled = true;
+            }
+        };
+        testListenerWithSpecificSignature(mergeFailedListener, new MergeFailed());
     }
 
     /**
