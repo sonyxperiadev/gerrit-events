@@ -245,6 +245,10 @@ public abstract class GerritEventKeys {
      * oldTopic.
      */
     public static final String OLD_TOPIC = "oldTopic";
+    /**
+     * reason.
+     */
+    public static final String REASON = "reason";
 
     /**
      * Empty default constructor to hinder instantiation.

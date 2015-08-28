@@ -28,6 +28,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.ChangeMerged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.ChangeRestored;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.CommentAdded;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.DraftPublished;
+import com.sonymobile.tools.gerrit.gerritevents.dto.events.MergeFailed;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.PatchsetCreated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.RefReplicated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.RefReplicationDone;
@@ -97,7 +98,11 @@ public enum GerritEventType {
     /***
      * A reviewer-added event.
      */
-    REVIEWER_ADDED("reviewer-added", true, ReviewerAdded.class);
+    REVIEWER_ADDED("reviewer-added", true, ReviewerAdded.class),
+    /***
+     * A merge-failed event.
+     */
+    MERGE_FAILED("merge-failed", true, MergeFailed.class);
 
     private String typeValue;
     private boolean interesting;
