@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.9.0 - 2015-08-28
+Added reviewer-added event [pull 41](https://github.com/sonyxperiadev/gerrit-events/pull/41)
+
+Added merge-failed event [pull 42](https://github.com/sonyxperiadev/gerrit-events/pull/42)
+
 ## 2.8.0 - 2015-08-27
 Added topic-changed event [pull 39](https://github.com/sonyxperiadev/gerrit-events/pull/39)
 
