@@ -32,6 +32,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.PatchsetCreated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.RefReplicated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.RefReplicationDone;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.RefUpdated;
+import com.sonymobile.tools.gerrit.gerritevents.dto.events.ReviewerAdded;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.TopicChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.ProjectCreated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.PatchsetNotified;
@@ -92,7 +93,11 @@ public enum GerritEventType {
     /***
      * A topic-changed event.
      */
-    TOPIC_CHANGED("topic-changed", true, TopicChanged.class);
+    TOPIC_CHANGED("topic-changed", true, TopicChanged.class),
+    /***
+     * A reviewer-added event.
+     */
+    REVIEWER_ADDED("reviewer-added", true, ReviewerAdded.class);
 
     private String typeValue;
     private boolean interesting;
