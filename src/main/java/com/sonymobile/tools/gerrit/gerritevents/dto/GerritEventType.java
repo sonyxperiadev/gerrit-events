@@ -28,6 +28,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.ChangeMerged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.ChangeRestored;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.CommentAdded;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.DraftPublished;
+import com.sonymobile.tools.gerrit.gerritevents.dto.events.HashtagsChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.MergeFailed;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.PatchsetCreated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.RefReplicated;
@@ -102,7 +103,11 @@ public enum GerritEventType {
     /***
      * A merge-failed event.
      */
-    MERGE_FAILED("merge-failed", true, MergeFailed.class);
+    MERGE_FAILED("merge-failed", true, MergeFailed.class),
+    /**
+     * A hashtags-changed event.
+     */
+    HASHTAGS_CHANGED("hashtags-changed", true, HashtagsChanged.class);
 
     private String typeValue;
     private boolean interesting;
