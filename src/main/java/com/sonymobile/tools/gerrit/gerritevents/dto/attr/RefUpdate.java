@@ -100,6 +100,13 @@ public class RefUpdate implements GerritJsonDTO {
      * @return the ref.
      */
     public String getRefName() {
+        // We need to take into consideration whether
+        // the event contains the long or short name for Ref
+        // Gerrit 2.12 will no longer have short branch names in the
+        // RefUpdated event.
+        if (refName.startsWith(REFS_HEADS)) {
+            return refName.substring(REFS_HEADS.length());
+        }
         return refName;
     }
 
