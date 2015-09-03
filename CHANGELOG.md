@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.9.1 - 2015-09-03
+Backwards compat for RefUpdated in Gerrit 2.12 [pull 44](https://github.com/sonyxperiadev/gerrit-events/pull/44)
+
 ## 2.9.0 - 2015-08-28
 Added reviewer-added event [pull 41](https://github.com/sonyxperiadev/gerrit-events/pull/41)
 
