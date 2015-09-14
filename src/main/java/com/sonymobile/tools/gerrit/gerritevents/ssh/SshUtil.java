@@ -24,10 +24,11 @@
  */
 package com.sonymobile.tools.gerrit.gerritevents.ssh;
 
-import com.sshtools.j2ssh.transport.publickey.InvalidSshKeyException;
-import com.sshtools.j2ssh.transport.publickey.SshPrivateKeyFile;
+import com.sshtools.publickey.SshPrivateKeyFile;
+import com.sshtools.publickey.SshPrivateKeyFileFactory;
 
 import java.io.File;
+import java.nio.file.Files;
 
 /**
  * Base util for connecting, authenticating and doing stuff on an ssh client->server connection.
@@ -57,7 +58,9 @@ public final class SshUtil {
      */
     private static SshPrivateKeyFile parsePrivateKeyFile(File keyFile) {
         try {
-            return SshPrivateKeyFile.parse(keyFile);
+            byte[] data = Files.readAllBytes(keyFile.toPath());
+            SshPrivateKeyFile key =  SshPrivateKeyFileFactory.parse(data);
+            return key;
         } catch (Exception ex) {
             return null;
         }
@@ -70,15 +73,22 @@ public final class SshUtil {
      * @return true if it is valid.
      */
     public static boolean checkPassPhrase(File keyFilePath, String passPhrase) {
-        SshPrivateKeyFile keyFile = parsePrivateKeyFile(keyFilePath);
-        if (keyFile != null) {
-            try {
-                keyFile.toPrivateKey(passPhrase);
-            } catch (InvalidSshKeyException e) {
+
+        try {
+            SshPrivateKeyFile key =  parsePrivateKeyFile(keyFilePath);
+            boolean isValidPhrase = passPhrase != null && !passPhrase.trim().isEmpty();
+            if (key == null) {
                 return false;
+            } else if (key.isPassphraseProtected() != isValidPhrase) {
+                return false;
+            } else if (key.isPassphraseProtected()) {
+                // Throws an exception if passphrase is invalid
+                key.toKeyPair(passPhrase);
+                return true;
             }
             return true;
-        } else {
+
+        } catch (Exception e) {
             return false;
         }
     }
