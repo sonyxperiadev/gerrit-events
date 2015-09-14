@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.9.2 - 2015-09-14
+[JENKINS-12690](https://issues.jenkins-ci.org/browse/JENKINS-12690) Fixed SSH Key passphrase validation [pull 45](https://github.com/sonyxperiadev/gerrit-events/pull/45)
+
 ## 2.9.1 - 2015-09-03
 Backwards compat for RefUpdated in Gerrit 2.12 [pull 44](https://github.com/sonyxperiadev/gerrit-events/pull/44)
 
