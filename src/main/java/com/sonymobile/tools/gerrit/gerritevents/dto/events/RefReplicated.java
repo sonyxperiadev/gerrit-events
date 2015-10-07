@@ -209,4 +209,10 @@ public class RefReplicated extends GerritTriggeredEvent {
         }
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "RefReplicated [project=" + project + ", ref=" + ref + ", status=" + status
+                + ", targetNode=" + targetNode + "]";
+    }
 }

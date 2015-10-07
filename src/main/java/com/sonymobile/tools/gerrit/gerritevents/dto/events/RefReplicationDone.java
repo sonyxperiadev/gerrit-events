@@ -166,4 +166,10 @@ public class RefReplicationDone extends GerritTriggeredEvent {
         }
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "RefReplicationDone [project=" + project + ", ref=" + ref + ", nodesCount="
+                + nodesCount + "]";
+    }
 }
