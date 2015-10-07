@@ -162,6 +162,10 @@ public abstract class GerritEventKeys {
      */
     public static final String VALUE = "value";
     /**
+     * approval updated.
+     */
+    public static final String UPDATED = "updated";
+    /**
      * approval by.
      */
     public static final String BY = "by";
