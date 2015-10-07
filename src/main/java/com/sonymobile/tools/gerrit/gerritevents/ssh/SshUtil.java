@@ -26,9 +26,9 @@ package com.sonymobile.tools.gerrit.gerritevents.ssh;
 
 import com.sshtools.publickey.SshPrivateKeyFile;
 import com.sshtools.publickey.SshPrivateKeyFileFactory;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.nio.file.Files;
 
 /**
  * Base util for connecting, authenticating and doing stuff on an ssh client->server connection.
@@ -58,7 +58,7 @@ public final class SshUtil {
      */
     private static SshPrivateKeyFile parsePrivateKeyFile(File keyFile) {
         try {
-            byte[] data = Files.readAllBytes(keyFile.toPath());
+            byte[] data = FileUtils.readFileToByteArray(keyFile);
             SshPrivateKeyFile key =  SshPrivateKeyFileFactory.parse(data);
             return key;
         } catch (Exception ex) {
