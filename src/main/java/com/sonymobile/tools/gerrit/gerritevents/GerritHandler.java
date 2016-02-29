@@ -44,6 +44,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -239,6 +240,16 @@ public class GerritHandler implements Coordinator, Handler {
      */
     public int getEventListenersCount() {
         return gerritEventListeners.size();
+    }
+
+    /**
+     * Returns an unmodifiable view of the set of {@link GerritEventListener}s.
+     *
+     * @return a list of the registered event listeners.
+     * @see Collections#unmodifiableSet(Set)
+     */
+    public Set<GerritEventListener> getGerritEventListenersView() {
+        return Collections.unmodifiableSet(gerritEventListeners);
     }
 
     /**
