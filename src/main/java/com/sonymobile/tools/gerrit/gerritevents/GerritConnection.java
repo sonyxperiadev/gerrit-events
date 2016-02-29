@@ -28,6 +28,7 @@ package com.sonymobile.tools.gerrit.gerritevents;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -277,6 +278,16 @@ public class GerritConnection extends Thread implements Connector {
      */
     public void removeListeners() {
         listeners.clear();
+    }
+
+    /**
+     * Returns an unmodifiable view of the set of {@link ConnectionListener}s.
+     *
+     * @return the set of connection listeners.
+     * @see Collections#unmodifiableSet(Set)
+     */
+    public Set<ConnectionListener> getListenersView() {
+        return Collections.unmodifiableSet(listeners);
     }
 
     /**
