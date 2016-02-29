@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.9.4 - 2016-02-29
+Added methods to get a read only view of registered listeners [pull 49](https://github.com/sonyxperiadev/gerrit-events/pull/49)
+
 ## 2.9.3 - 2015-10-07
 Fixed a Java 6 compatibility issue introduced in 2.9.2
 
