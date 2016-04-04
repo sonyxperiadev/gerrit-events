@@ -162,9 +162,9 @@ public abstract class GerritEventKeys {
      */
     public static final String VALUE = "value";
     /**
-     * approval updated.
+     * the approval's old (or previous) value.
      */
-    public static final String UPDATED = "updated";
+    public static final String OLD_VALUE = "oldValue";
     /**
      * approval by.
      */

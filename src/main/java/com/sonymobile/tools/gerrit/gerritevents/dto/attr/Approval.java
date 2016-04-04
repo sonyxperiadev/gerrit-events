@@ -24,14 +24,13 @@
 package com.sonymobile.tools.gerrit.gerritevents.dto.attr;
 
 import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getString;
-import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getBoolean;
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritJsonDTO;
 import net.sf.json.JSONObject;
 
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.BY;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.TYPE;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.VALUE;
-import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.UPDATED;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.OLD_VALUE;
 
 /**
  * Represents a Gerrit JSON Approval DTO.
@@ -49,9 +48,9 @@ public class Approval implements GerritJsonDTO {
      */
     private String value;
     /**
-     * Approval value update indicator
+     * The old (or previous) approval value
      */
-    private Boolean updated;
+    private String oldValue;
     /**
      * The user who has approved the patch
      */
@@ -91,8 +90,8 @@ public class Approval implements GerritJsonDTO {
         if (json.containsKey(BY)) {
             by = new Account(json.getJSONObject(BY));
         }
-        if (json.containsKey(UPDATED)) {
-            updated = getBoolean(json, UPDATED);
+        if (json.containsKey(OLD_VALUE)) {
+            oldValue = getString(json, OLD_VALUE);
         }
     }
 
@@ -156,13 +155,25 @@ public class Approval implements GerritJsonDTO {
     }
 
     /**
-     * The approval score updated flag.
+     * The old (or previous) approval value.
      *
-     * @return true if approval score changed, false otherwise
-     *         null if Gerrit does not support this attribute
+     * @return the old approval value.
      */
-    public Boolean getUpdated() {
-        return updated;
+    public String getOldValue() {
+        return oldValue;
+    }
+
+    /**
+     * Checks whether this approval was updated.
+     * oldValue is only set when the approval has been changed.
+     *
+     * @return true if approval was updated, otherwise false.
+     */
+    public Boolean isUpdated() {
+        if (getOldValue() != null) {
+          return true;
+        }
+        return false;
     }
 
     /**
