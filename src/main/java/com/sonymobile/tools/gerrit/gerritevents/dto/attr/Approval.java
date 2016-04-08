@@ -24,12 +24,14 @@
 package com.sonymobile.tools.gerrit.gerritevents.dto.attr;
 
 import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getString;
+import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getBoolean;
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritJsonDTO;
 import net.sf.json.JSONObject;
 
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.BY;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.TYPE;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.VALUE;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.UPDATED;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.OLD_VALUE;
 
 /**
@@ -47,6 +49,10 @@ public class Approval implements GerritJsonDTO {
      * The approval value
      */
     private String value;
+    /**
+     * Approval value update indicator
+     */
+    private Boolean updated;
     /**
      * The old (or previous) approval value
      */
@@ -89,6 +95,9 @@ public class Approval implements GerritJsonDTO {
         }
         if (json.containsKey(BY)) {
             by = new Account(json.getJSONObject(BY));
+        }
+        if (json.containsKey(UPDATED)) {
+            updated = getBoolean(json, UPDATED);
         }
         if (json.containsKey(OLD_VALUE)) {
             oldValue = getString(json, OLD_VALUE);
@@ -152,6 +161,19 @@ public class Approval implements GerritJsonDTO {
      */
     public String getValue() {
         return value;
+    }
+
+    /**
+     * The approval score updated flag.
+     *
+     *  @return true if approval score changed, false otherwise
+     *         null if Gerrit does not support this attribute
+     *
+     * @deprecated use {@link #isUpdated()} instead.
+     */
+    @Deprecated
+    public Boolean getUpdated() {
+        return updated;
     }
 
     /**
