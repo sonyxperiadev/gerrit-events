@@ -1,12 +1,15 @@
 # Changelog
 
+## 2.9.5 - 2016-04-11
+Support `oldValue` instead of `updated` property for Approvals that was added in 2.9.3. [pull 51](https://github.com/sonyxperiadev/gerrit-events/pull/51), [52](https://github.com/sonyxperiadev/gerrit-events/pull/52)
+
 ## 2.9.4 - 2016-02-29
-Added methods to get a read only view of registered listeners [pull 49](https://github.com/sonyxperiadev/gerrit-events/pull/49)
+Added methods to get a read only view of registered listeners. [pull 49](https://github.com/sonyxperiadev/gerrit-events/pull/49)
 
 ## 2.9.3 - 2015-10-07
 Fixed a Java 6 compatibility issue introduced in 2.9.2
 
-Added the coming `updated` attribute to Approval [pull 48](https://github.com/sonyxperiadev/gerrit-events/pull/48)
+Added the coming `updated` attribute to Approval. [pull 48](https://github.com/sonyxperiadev/gerrit-events/pull/48)
 
 Added ```toString()``` methods to ```RefReplicated``` and ```RefReplicationDone``` to help in debugging [pull 47](https://github.com/sonyxperiadev/gerrit-events/pull/47)
 
