@@ -32,6 +32,7 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.BY;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.TYPE;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.VALUE;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.UPDATED;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.OLD_VALUE;
 
 /**
  * Represents a Gerrit JSON Approval DTO.
@@ -52,6 +53,10 @@ public class Approval implements GerritJsonDTO {
      * Approval value update indicator
      */
     private Boolean updated;
+    /**
+     * The old (or previous) approval value
+     */
+    private String oldValue;
     /**
      * The user who has approved the patch
      */
@@ -93,6 +98,9 @@ public class Approval implements GerritJsonDTO {
         }
         if (json.containsKey(UPDATED)) {
             updated = getBoolean(json, UPDATED);
+        }
+        if (json.containsKey(OLD_VALUE)) {
+            oldValue = getString(json, OLD_VALUE);
         }
     }
 
@@ -158,11 +166,36 @@ public class Approval implements GerritJsonDTO {
     /**
      * The approval score updated flag.
      *
-     * @return true if approval score changed, false otherwise
+     *  @return true if approval score changed, false otherwise
      *         null if Gerrit does not support this attribute
+     *
+     * @deprecated use {@link #isUpdated()} instead.
      */
+    @Deprecated
     public Boolean getUpdated() {
         return updated;
+    }
+
+    /**
+     * The old (or previous) approval value.
+     *
+     * @return the old approval value.
+     */
+    public String getOldValue() {
+        return oldValue;
+    }
+
+    /**
+     * Checks whether this approval was updated.
+     * oldValue is only set when the approval has been changed.
+     *
+     * @return true if approval was updated, otherwise false.
+     */
+    public Boolean isUpdated() {
+        if (getOldValue() != null) {
+          return true;
+        }
+        return false;
     }
 
     /**
