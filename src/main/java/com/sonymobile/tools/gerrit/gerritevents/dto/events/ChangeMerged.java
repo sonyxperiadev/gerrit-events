@@ -30,6 +30,8 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Account;
 
 import net.sf.json.JSONObject;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.SUBMITTER;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.NEWREV;
+import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getString;
 
 /**
  * A DTO representation of the change-merged Gerrit Event.
@@ -37,6 +39,10 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.SUBMI
  * @author David Pursehouse &lt;david.pursehouse@sonyericsson.com&gt;
  */
 public class ChangeMerged extends ChangeBasedEvent implements RepositoryModifiedEvent {
+    /**
+     * Rev of the merge-commit.
+     */
+    protected String newRev;
 
     /**
      * Default constructor.
@@ -86,5 +92,25 @@ public class ChangeMerged extends ChangeBasedEvent implements RepositoryModified
         if (json.containsKey(SUBMITTER)) {
             account = new Account(json.getJSONObject(SUBMITTER));
         }
+
+        if (json.containsKey(NEWREV)) {
+            this.newRev = getString(json, NEWREV);
+        }
+    }
+
+    /**
+     * Rev of the merge-commit.
+     * @return the new Rev
+     */
+    public String getNewRev() {
+        return this.newRev;
+    }
+
+     /**
+     * Rev of the merge-commit.
+     * @param newRev the new Rev
+     */
+    public void setNewRev(String newRev) {
+        this.newRev = newRev;
     }
 }
