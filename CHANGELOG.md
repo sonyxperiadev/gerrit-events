@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.10.0 - not released
+## 2.10.0 - 2016-05-18
 Added newRev to change-merged event. [pull 54](https://github.com/sonyxperiadev/gerrit-events/pull/54), [55](https://github.com/sonyxperiadev/gerrit-events/pull/55)
 
 Bumped Apache HttpClient dependency to 4.5.2
