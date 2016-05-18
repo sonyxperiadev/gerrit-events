@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.9.6 - not released
+Added newRev to change-merged event. [pull 54](https://github.com/sonyxperiadev/gerrit-events/pull/54), [55](https://github.com/sonyxperiadev/gerrit-events/pull/55)
+
 ## 2.9.5 - 2016-04-11
 Support `oldValue` instead of `updated` property for Approvals that was added in 2.9.3. [pull 51](https://github.com/sonyxperiadev/gerrit-events/pull/51), [52](https://github.com/sonyxperiadev/gerrit-events/pull/52)
 
