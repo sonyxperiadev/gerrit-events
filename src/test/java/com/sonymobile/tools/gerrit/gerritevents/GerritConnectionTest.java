@@ -34,12 +34,16 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.PipedReader;
-import java.io.PipedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.concurrent.CountDownLatch;
 
+import com.jcraft.jsch.ChannelExec;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -69,8 +73,8 @@ public class GerritConnectionTest {
 
     private static SshConnection sshConnectionMock;
     private static GerritConnection connection;
-    private static BufferedWriter pipedWriter;
-    private static PipedReader pipedReader;
+    private static PipedOutputStream pipedOutStream;
+    private static Reader pipedReader;
 
     private static CountDownLatch establishedLatch = new CountDownLatch(1);
     private static CountDownLatch finishLatch = new CountDownLatch(1);
@@ -87,11 +91,16 @@ public class GerritConnectionTest {
         sshConnectionMock = mock(SshConnection.class);
         when(sshConnectionMock.isAuthenticated()).thenReturn(true);
         when(sshConnectionMock.isConnected()).thenReturn(true);
-        PipedWriter piped = new PipedWriter();
-        pipedReader = new PipedReader(piped);
-        pipedWriter = new BufferedWriter(piped);
+        pipedOutStream = new PipedOutputStream();
+        PipedInputStream pipedInStream = new PipedInputStream(pipedOutStream);
+        pipedReader = new InputStreamReader(pipedInStream);
+
         when(sshConnectionMock.executeCommand(eq("gerrit version"))).thenReturn("gerrit version 2.5.2");
         when(sshConnectionMock.executeCommandReader(eq("gerrit stream-events"))).thenReturn(pipedReader);
+        ChannelExec channelExecMock = mock(ChannelExec.class);
+        when(channelExecMock.isConnected()).thenReturn(true);
+        when(sshConnectionMock.executeCommandChannel(eq("gerrit stream-events"))).thenReturn(channelExecMock);
+        when(channelExecMock.getInputStream()).thenReturn(pipedInStream);
         PowerMockito.mockStatic(SshConnectionFactory.class);
         PowerMockito.doReturn(sshConnectionMock).when(SshConnectionFactory.class, "getConnection",
                 isA(String.class), isA(Integer.class), isA(String.class), isA(Authentication.class), any());
@@ -123,9 +132,10 @@ public class GerritConnectionTest {
             assertTrue(connection.isShutdownInProgress());
 
             try {
-                pipedWriter.append("hello");
-                pipedWriter.newLine();
-                pipedWriter.close();
+                Writer writer = new OutputStreamWriter(pipedOutStream);
+                writer.append("hello");
+                writer.append("\n");
+                writer.close();
                 downLatch.await();
                 assertFalse(connection.isConnected());
                 connection.join();
@@ -138,7 +148,7 @@ public class GerritConnectionTest {
         connection = null;
         sshConnectionMock = null;
         pipedReader = null;
-        pipedWriter = null;
+        pipedOutStream = null;
     }
 
     /**
@@ -190,18 +200,32 @@ public class GerritConnectionTest {
      */
     @Test
     public void testReceiveEvent() throws Exception {
+        Writer writer = new OutputStreamWriter(pipedOutStream);
         // String
-        pipedWriter.append("Test");
-        pipedWriter.newLine();
-        pipedWriter.flush();
+        writer.append("Test\n");
+        writer.flush();
+        Thread.sleep(500);
         // JSON String
-        pipedWriter.append("{\"say\":\"hello\"}");
-        pipedWriter.newLine();
-        pipedWriter.flush();
+        writer.append("{\"say\":\"hello\"}\n");
+        writer.flush();
+        Thread.sleep(500);
+        // Delayed Sending
+        writer.append("Thank ");
+        writer.flush();
+        System.out.println("Wait1: 2s...");
+        Thread.sleep(2 * 1000);
+        writer.append("You!");
+        writer.flush();
+        System.out.println("Wait2: 2s...");
+        Thread.sleep(2 * 1000);
+        writer.append("\n");
+        writer.flush();
+        Thread.sleep(500);
         // Send finish
-        pipedWriter.append(FINISH_WORD);
-        pipedWriter.newLine();
-        pipedWriter.flush();
+        writer.append(FINISH_WORD);
+        writer.append("\n");
+        writer.flush();
+        Thread.sleep(500);
     }
 
     /**

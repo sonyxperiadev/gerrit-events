@@ -25,13 +25,16 @@
 package com.sonymobile.tools.gerrit.gerritevents;
 
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.CharBuffer;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import com.jcraft.jsch.ChannelExec;
+import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +68,8 @@ public class GerritConnection extends Thread implements Connector {
      */
     public static final String CMD_STREAM_EVENTS = "gerrit stream-events";
     private static final String GERRIT_VERSION_PREFIX = "gerrit version ";
+    private static final int SSH_RX_BUFFER_SIZE = 16384;
+    private static final int SSH_RX_SLEEP_MILLIS = 100;
     /**
      * The standard scheme used for stream-events.
      */
@@ -87,6 +92,7 @@ public class GerritConnection extends Thread implements Connector {
     private GerritHandler handler;
     private AuthenticationUpdater authenticationUpdater = null;
     private final Set<ConnectionListener> listeners = new CopyOnWriteArraySet<ConnectionListener>();
+    private int sshRxBufferSize = SSH_RX_BUFFER_SIZE;
 
     /**
      * Creates a GerritHandler with all the default values set.
@@ -227,6 +233,18 @@ public class GerritConnection extends Thread implements Connector {
     }
 
     /**
+     * Sets Buffer size for receiving SSH stream.
+     *
+     * @param size buffer size.
+     * @return The previous size.
+     */
+    public int setSshRxBufferSize(int size) {
+        int prev = sshRxBufferSize;
+        sshRxBufferSize = size;
+        return prev;
+    }
+
+    /**
      * Sets gerrit handler.
      *
      * @param handler the handler.
@@ -307,6 +325,49 @@ public class GerritConnection extends Thread implements Connector {
             watchdog = null;
         }
     }
+
+    /**
+     * Offers lines in buffer to queue.
+     *
+     * @param cb a buffer to have received text data.
+     * @return the line string. null if no EOL, otherwise buffer is compacted.
+     */
+    private String getLine(CharBuffer cb) {
+        String line = null;
+        int pos = cb.position();
+        cb.flip();
+        for (int i = 0; i < cb.length(); i++) {
+            if (cb.charAt(i) == '\n') {
+                line = getSubSequence(cb, 0, i).toString().trim();
+                cb.position(i + 1);
+            }
+        }
+        if (line != null) {
+            cb.compact();
+        } else {
+            cb.clear().position(pos);
+        }
+        return line;
+    }
+
+    /**
+     *  Get sub sequence of buffer.
+     *
+     *  This method avoids error in java-api-check.
+     *  animal-sniffer is confused by the signature of CharBuffer.subSequence()
+     *  due to declaration of this method has been changed since Java7.
+     *  (abstract -> non-abstract)
+     *
+     * @param cb a buffer
+     * @param start start of sub sequence
+     * @param end end of sub sequence
+     * @return sub sequence.
+     */
+    @IgnoreJRERequirement
+    private CharSequence getSubSequence(CharBuffer cb, int start, int end) {
+        return cb.subSequence(start, end);
+    }
+
     /**
      * Main loop for connecting and reading Gerrit JSON Events and dispatching them to Workers.
      */
@@ -323,12 +384,15 @@ public class GerritConnection extends Thread implements Connector {
                 watchdog = new StreamWatchdog(this, watchdogTimeoutSeconds, exceptionData);
             }
 
-            BufferedReader br = null;
+            ChannelExec channel = null;
             try {
                 logger.trace("Executing stream-events command.");
-                Reader reader = sshConnection.executeCommandReader(CMD_STREAM_EVENTS);
-                br = new BufferedReader(reader);
-                String line = "";
+                channel = sshConnection.executeCommandChannel(CMD_STREAM_EVENTS);
+                if (channel == null) {
+                    throw new IOException();
+                }
+                Reader reader = new InputStreamReader(channel.getInputStream(), "utf-8");
+                CharBuffer cb = CharBuffer.allocate(sshRxBufferSize);
                 notifyConnectionEstablished();
                 Provider provider = new Provider(
                         gerritName,
@@ -338,38 +402,40 @@ public class GerritConnection extends Thread implements Connector {
                         gerritFrontEndUrl,
                         getGerritVersionString());
                 logger.info("Ready to receive data from Gerrit: " + gerritName);
-                do {
-                    if (watchdog != null) {
-                        watchdog.signal();
-                    }
-                    logger.debug("Data-line from Gerrit: {}", line);
-                    if (line != null && line.length() > 0) {
+                String line;
+                while (reader.read(cb) != -1) {
+                    while ((line = getLine(cb)) != null) {
+                        logger.debug("Data-line from Gerrit: {}", line);
                         if (handler != null) {
                             handler.post(line, provider);
                         }
                     }
-                    logger.trace("Reading next line.");
-                    line = br.readLine();
-                } while (line != null);
+                    if (shutdownInProgress || interrupted()) {
+                        throw new InterruptedException("shutdown requested: " + shutdownInProgress);
+                    }
+                    if (watchdog != null) {
+                        watchdog.signal();
+                    }
+                    sleep(SSH_RX_SLEEP_MILLIS);
+                }
             } catch (IOException ex) {
                 logger.error("Stream events command error. ", ex);
             } catch (IllegalStateException ex) {
                 logger.error("Unexpected disconnection occurred after initial moment of connection. ", ex);
+            } catch (InterruptedException ex) {
+                logger.error("Interrupted.", ex);
             } finally {
-                logger.trace("Connection closed, ended read loop.");
                 nullifyWatchdog();
-                try {
-                    sshConnection.disconnect();
-                } catch (Exception ex) {
-                    logger.warn("Error when disconnecting sshConnection.", ex);
-                }
-                sshConnection = null;
-                if (br != null) {
+                if (channel != null && !channel.isClosed()) {
+                    logger.trace("Close channel.");
                     try {
-                        br.close();
-                    } catch (IOException ex) {
-                        logger.warn("Could not close events reader.", ex);
+                        channel.disconnect();
+                    } catch (Exception ex) {
+                        logger.warn("Error when disconnecting SSH command channel.", ex);
                     }
+                }
+                if (!sshConnection.isConnected()) {
+                    sshConnection = null;
                 }
                 notifyConnectionDown();
             }
@@ -384,6 +450,9 @@ public class GerritConnection extends Thread implements Connector {
      * @return not null if everything is well, null if connect and reconnect failed.
      */
     private SshConnection connect() {
+        if (sshConnection != null && sshConnection.isConnected()) {
+            return sshConnection;
+        }
         while (!shutdownInProgress) {
             SshConnection ssh = null;
             try {
