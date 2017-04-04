@@ -340,6 +340,7 @@ public class GerritConnection extends Thread implements Connector {
             if (cb.charAt(i) == '\n') {
                 line = getSubSequence(cb, 0, i).toString().trim();
                 cb.position(i + 1);
+                break;
             }
         }
         if (line != null) {

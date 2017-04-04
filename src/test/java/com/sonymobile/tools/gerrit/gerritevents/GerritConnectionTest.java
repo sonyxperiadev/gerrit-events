@@ -28,10 +28,13 @@ package com.sonymobile.tools.gerrit.gerritevents;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -75,6 +78,7 @@ public class GerritConnectionTest {
     private static GerritConnection connection;
     private static PipedOutputStream pipedOutStream;
     private static Reader pipedReader;
+    private static HandlerMock handlerMock;
 
     private static CountDownLatch establishedLatch = new CountDownLatch(1);
     private static CountDownLatch finishLatch = new CountDownLatch(1);
@@ -105,7 +109,8 @@ public class GerritConnectionTest {
         PowerMockito.doReturn(sshConnectionMock).when(SshConnectionFactory.class, "getConnection",
                 isA(String.class), isA(Integer.class), isA(String.class), isA(Authentication.class), any());
         connection = new GerritConnection("", "localhost", 29418, new Authentication(null, ""));
-        connection.setHandler(new HandlerMock());
+        handlerMock = mock(HandlerMock.class);
+        connection.setHandler(handlerMock);
         connection.addListener(new ListenerMock());
         connection.start();
         try {
@@ -200,6 +205,8 @@ public class GerritConnectionTest {
      */
     @Test
     public void testReceiveEvent() throws Exception {
+        doCallRealMethod().when(handlerMock).post(any(String.class), any(Provider.class));
+
         Writer writer = new OutputStreamWriter(pipedOutStream);
         // String
         writer.append("Test\n");
@@ -221,11 +228,18 @@ public class GerritConnectionTest {
         writer.append("\n");
         writer.flush();
         Thread.sleep(500);
+        writer.append("{\"say\":\"hello\"}\n{\"say\":\"hello again\"}\n");
+        writer.flush();
+        Thread.sleep(500);
         // Send finish
         writer.append(FINISH_WORD);
         writer.append("\n");
         writer.flush();
         Thread.sleep(500);
+        verify(handlerMock, times(1)).post(eq("Test"), any(Provider.class));
+        verify(handlerMock, times(2)).post(eq("{\"say\":\"hello\"}"), any(Provider.class));
+        verify(handlerMock, times(1)).post(eq("{\"say\":\"hello again\"}"), any(Provider.class));
+        verify(handlerMock, times(1)).post(eq("Thank You!"), any(Provider.class));
     }
 
     /**
