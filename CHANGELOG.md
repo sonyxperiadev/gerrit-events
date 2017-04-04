@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.10.1 - 2017-04-04
+[Issue 59](https://github.com/sonyxperiadev/gerrit-events/issues/59) Fixed broken JSON when more than one line was received in the buffer. [pull 60](https://github.com/sonyxperiadev/gerrit-events/pull/60)
+
 ## 2.10.0 - 2016-05-18
 Added newRev to change-merged event. [pull 54](https://github.com/sonyxperiadev/gerrit-events/pull/54), [55](https://github.com/sonyxperiadev/gerrit-events/pull/55)
 
