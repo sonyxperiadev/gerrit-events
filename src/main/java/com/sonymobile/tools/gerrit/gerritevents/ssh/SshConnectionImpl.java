@@ -400,6 +400,7 @@ public class SshConnectionImpl implements SshConnection {
             logger.debug("Disconnecting client connection.");
             connectSession.disconnect();
             connectSession = null;
+            authentication.deleteTempKeyFile();
         }
     }
 

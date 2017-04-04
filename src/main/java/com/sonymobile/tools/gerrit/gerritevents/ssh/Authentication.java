@@ -26,6 +26,11 @@
 package com.sonymobile.tools.gerrit.gerritevents.ssh;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents authentication information to an SSH server connection.
@@ -33,11 +38,12 @@ import java.io.File;
  * @see SshConnection
  */
 public class Authentication {
+    private static final Logger logger = LoggerFactory.getLogger(Authentication.class);
     private File privateKeyFile;
     private byte[] privateKeyPhrase;
+    private boolean isTempFile = false;
     private String username;
     private String privateKeyFilePassword;
-
     /**
      * Constructor.
      * @param privateKeyFile the key.
@@ -48,11 +54,24 @@ public class Authentication {
     public Authentication(File privateKeyFile,
             String username,
             String privateKeyFilePassword,
-            byte[] privateKeyPhrase) {
+            byte[] privateKeyPhrase)  {
         this.privateKeyFile = privateKeyFile;
         this.username = username;
         this.privateKeyFilePassword = privateKeyFilePassword;
         this.privateKeyPhrase = privateKeyPhrase;
+    }
+    /**
+     *
+     * @param privateKey raw key with or without password encryption
+     * @param username username to use
+     * @param privateKeyFilePassword password to decrypt file - can be empty or null if none exists
+     */
+    public Authentication(String privateKey,
+            String username,
+            String privateKeyFilePassword) {
+        this.privateKeyFile = this.putToTempFile(privateKey);
+        this.username = username;
+        this.privateKeyFilePassword = privateKeyFilePassword;
     }
 
     /**
@@ -71,8 +90,34 @@ public class Authentication {
      * @param privateKeyFile the key.
      * @param username the username.
      */
-    public Authentication(File privateKeyFile, String username) {
+    public Authentication(File privateKeyFile, String username)  {
         this(privateKeyFile, username, null, null);
+    }
+
+    /**
+     *
+     * @param keyFile key file to create
+     * @return file object for key
+     */
+    private File putToTempFile(String keyFile) {
+        try {
+            File temp = File.createTempFile("gerrit_sshkey", "pem");
+            FileUtils.writeStringToFile(temp, keyFile, Charset.defaultCharset());
+            isTempFile = true;
+            return temp;
+        } catch (IOException io) {
+            logger.error("Error writing key to temp file", io);
+        }
+        return null;
+    }
+
+    /**
+     * Removes private key if temp file was used.
+     */
+    public void deleteTempKeyFile() {
+        if (isTempFile) {
+            FileUtils.deleteQuietly(privateKeyFile);
+        }
     }
 
     /**

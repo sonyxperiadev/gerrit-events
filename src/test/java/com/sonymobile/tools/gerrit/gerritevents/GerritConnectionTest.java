@@ -111,7 +111,7 @@ public class GerritConnectionTest {
         PowerMockito.mockStatic(SshConnectionFactory.class);
         PowerMockito.doReturn(sshConnectionMock).when(SshConnectionFactory.class, "getConnection",
                 isA(String.class), isA(Integer.class), isA(String.class), isA(Authentication.class), any());
-        connection = new GerritConnection("", "localhost", 29418, new Authentication(null, ""));
+        connection = new GerritConnection("", "localhost", 29418, new Authentication(null, "", "", null));
         connection.setSshRxBufferSize(13);
         handlerMock = mock(HandlerMock.class);
         connection.setHandler(handlerMock);
@@ -183,7 +183,7 @@ public class GerritConnectionTest {
     public void testGetAuthentication() {
         assertEquals(null, connection.getAuthentication().getPrivateKeyFile());
         assertEquals("", connection.getAuthentication().getUsername());
-        assertEquals(null, connection.getAuthentication().getPrivateKeyFilePassword());
+        assertEquals("", connection.getAuthentication().getPrivateKeyFilePassword());
     }
 
     /**
