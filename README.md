@@ -57,7 +57,7 @@ All event types can be found in the [com.sonymobile.tools.gerrit.gerritevents.dt
 
 # Environments
 * `linux`
-    * `java-1.6`
+    * `java-1.7`
         * `maven-3.0.4`
 
 The maintainers' development, tests and production environments are
