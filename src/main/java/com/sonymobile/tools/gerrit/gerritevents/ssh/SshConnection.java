@@ -88,6 +88,23 @@ public interface SshConnection {
      */
     ChannelExec executeCommandChannel(String command) throws SshException, IOException;
 
+    //CS IGNORE RedundantThrows FOR NEXT 15 LINES. REASON: Informative.
+
+    /**
+     * Execute an ssh command on the server, without closing the session
+     * so that the caller can get access to all the Channel attributes from
+     * the server. If establishConnection is false, channel connection also
+     * can be handled by the server.
+     *
+     * @param command the command to execute.
+     * @param establishConnection true if establish channel connetction within this method.
+     * @return a Channel with access to all streams and the exit code.
+     * @throws IOException  if it is so.
+     * @throws SshException if there are any ssh problems.
+     * @see #executeCommandReader(String)
+     */
+    ChannelExec executeCommandChannel(String command, Boolean establishConnection) throws SshException, IOException;
+
     /**
      * Connects the connection.
      * @throws IOException if it is so.
