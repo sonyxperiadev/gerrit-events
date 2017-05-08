@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSchException;
 import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -388,11 +389,12 @@ public class GerritConnection extends Thread implements Connector {
             ChannelExec channel = null;
             try {
                 logger.trace("Executing stream-events command.");
-                channel = sshConnection.executeCommandChannel(CMD_STREAM_EVENTS);
+                channel = sshConnection.executeCommandChannel(CMD_STREAM_EVENTS, false);
                 if (channel == null) {
-                    throw new IOException();
+                    throw new IOException("Cannot open SSH channel.");
                 }
                 Reader reader = new InputStreamReader(channel.getInputStream(), "utf-8");
+                channel.connect();
                 CharBuffer cb = CharBuffer.allocate(sshRxBufferSize);
                 notifyConnectionEstablished();
                 Provider provider = new Provider(
@@ -404,7 +406,9 @@ public class GerritConnection extends Thread implements Connector {
                         getGerritVersionString());
                 logger.info("Ready to receive data from Gerrit: " + gerritName);
                 String line;
-                while (reader.read(cb) != -1) {
+                Integer readCount;
+                while ((readCount = reader.read(cb)) != -1) {
+                    logger.debug("Read count from Gerrit stream: {}", String.valueOf(readCount));
                     while ((line = getLine(cb)) != null) {
                         logger.debug("Data-line from Gerrit: {}", line);
                         if (handler != null) {
@@ -414,8 +418,11 @@ public class GerritConnection extends Thread implements Connector {
                     if (shutdownInProgress || interrupted()) {
                         throw new InterruptedException("shutdown requested: " + shutdownInProgress);
                     }
-                    if (watchdog != null) {
+                    if (readCount > 0 && watchdog != null) {
                         watchdog.signal();
+                    }
+                    if (!channel.isConnected() || !sshConnection.isConnected()) {
+                        throw new IllegalStateException("SSH connection is already lost.");
                     }
                     sleep(SSH_RX_SLEEP_MILLIS);
                 }
@@ -425,6 +432,8 @@ public class GerritConnection extends Thread implements Connector {
                 logger.error("Unexpected disconnection occurred after initial moment of connection. ", ex);
             } catch (InterruptedException ex) {
                 logger.error("Interrupted.", ex);
+            } catch (JSchException ex) {
+                logger.error("Error when establishing SSH connection. ", ex);
             } finally {
                 nullifyWatchdog();
                 if (channel != null && !channel.isClosed()) {

@@ -29,6 +29,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -104,6 +105,8 @@ public class GerritConnectionTest {
         ChannelExec channelExecMock = mock(ChannelExec.class);
         when(channelExecMock.isConnected()).thenReturn(true);
         when(sshConnectionMock.executeCommandChannel(eq("gerrit stream-events"))).thenReturn(channelExecMock);
+        when(sshConnectionMock.executeCommandChannel(eq("gerrit stream-events"), anyBoolean()))
+            .thenReturn(channelExecMock);
         when(channelExecMock.getInputStream()).thenReturn(pipedInStream);
         PowerMockito.mockStatic(SshConnectionFactory.class);
         PowerMockito.doReturn(sshConnectionMock).when(SshConnectionFactory.class, "getConnection",
