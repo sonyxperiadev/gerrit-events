@@ -31,6 +31,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.ChangeMerged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.ChangeRestored;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.CommentAdded;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.DraftPublished;
+import com.sonymobile.tools.gerrit.gerritevents.dto.events.HashtagsChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.MergeFailed;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.PatchsetCreated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.RefUpdated;
@@ -384,6 +385,10 @@ public class GerritHandlerTest {
         MergeFailed mergeFailed = new MergeFailed();
         handler.notifyListeners(mergeFailed);
         verify(listenerMock, times(1)).gerritEvent(mergeFailed);
+
+        HashtagsChanged hashtagsChanged = new HashtagsChanged();
+        handler.notifyListeners(hashtagsChanged);
+        verify(listenerMock, times(1)).gerritEvent(hashtagsChanged);
     }
 
     /**
@@ -560,6 +565,22 @@ public class GerritHandlerTest {
             }
         };
         testListenerWithSpecificSignature(mergeFailedListener, new MergeFailed());
+    }
+
+    /**
+     * Tests that HashtagsChanged events are going in the method with
+     * that type as parameter and that other type of events are going
+     * in the default method.
+     */
+    @Test
+    public void testEventNotificationWithListenerHashtagsChangedMethodSignature() {
+        SpecificEventListener hashtagsChangedListener = new SpecificEventListener() {
+            @SuppressWarnings("unused") //method is called by reflection
+            public void gerritEvent(HashtagsChanged event) {
+                specificMethodCalled = true;
+            }
+        };
+        testListenerWithSpecificSignature(hashtagsChangedListener, new HashtagsChanged());
     }
 
     /**

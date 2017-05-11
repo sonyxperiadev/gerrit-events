@@ -257,6 +257,22 @@ public abstract class GerritEventKeys {
      * reason.
      */
     public static final String REASON = "reason";
+    /**
+     * editor.
+     */
+    public static final String EDITOR = "editor";
+    /**
+     * added.
+     */
+    public static final String ADDED = "added";
+    /**
+     * removed.
+     */
+    public static final String REMOVED = "removed";
+    /**
+     * hashtags.
+     */
+    public static final String HASHTAGS = "hashtags";
 
     /**
      * Empty default constructor to hinder instantiation.
