@@ -72,8 +72,8 @@ public class ChangeRestored extends ChangeBasedEvent {
     }
 
     @Override
-    public GerritEventType getEventType() {
-        return GerritEventType.CHANGE_RESTORED;
+    public String getEventType() {
+        return GerritEventType.CHANGE_RESTORED.getTypeValue();
     }
 
     @Override

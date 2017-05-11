@@ -52,8 +52,8 @@ public class RefReplicationDone extends GerritTriggeredEvent {
     private int nodesCount;
 
     @Override
-    public GerritEventType getEventType() {
-        return GerritEventType.REF_REPLICATION_DONE;
+    public String getEventType() {
+        return GerritEventType.REF_REPLICATION_DONE.getTypeValue();
     }
 
     @Override

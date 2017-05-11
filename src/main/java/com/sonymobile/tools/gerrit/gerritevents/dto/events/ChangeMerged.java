@@ -61,8 +61,8 @@ public class ChangeMerged extends ChangeBasedEvent implements RepositoryModified
     }
 
     @Override
-    public GerritEventType getEventType() {
-        return GerritEventType.CHANGE_MERGED;
+    public String getEventType() {
+        return GerritEventType.CHANGE_MERGED.getTypeValue();
     }
 
     @Override

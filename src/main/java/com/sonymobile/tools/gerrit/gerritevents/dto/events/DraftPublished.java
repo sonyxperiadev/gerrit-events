@@ -44,8 +44,8 @@ public class DraftPublished extends ChangeBasedEvent implements RepositoryModifi
     private transient Account uploader;
 
     @Override
-    public GerritEventType getEventType() {
-        return GerritEventType.DRAFT_PUBLISHED;
+    public String getEventType() {
+        return GerritEventType.DRAFT_PUBLISHED.getTypeValue();
     }
 
     @Override

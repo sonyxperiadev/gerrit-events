@@ -33,7 +33,7 @@ public interface GerritEvent {
      * Returns what type of event it is.
      * @return the event type.
      */
-    GerritEventType getEventType();
+    String getEventType();
 
     /**
      * Returns if a score (code review or verify) can be submitted to Gerrit.

@@ -66,8 +66,8 @@ public class RefReplicated extends GerritTriggeredEvent {
     private String targetNode;
 
     @Override
-    public GerritEventType getEventType() {
-        return GerritEventType.REF_REPLICATED;
+    public String getEventType() {
+        return GerritEventType.REF_REPLICATED.getTypeValue();
     }
 
     @Override

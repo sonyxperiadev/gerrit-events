@@ -44,8 +44,8 @@ public class PatchsetCreated extends ChangeBasedEvent implements RepositoryModif
     private transient Account uploader;
 
     @Override
-    public GerritEventType getEventType() {
-        return GerritEventType.PATCHSET_CREATED;
+    public String getEventType() {
+        return GerritEventType.PATCHSET_CREATED.getTypeValue();
     }
 
     @Override

@@ -62,8 +62,8 @@ public class RefUpdated extends GerritTriggeredEvent implements RepositoryModifi
     }
 
     @Override
-    public GerritEventType getEventType() {
-        return GerritEventType.REF_UPDATED;
+    public String getEventType() {
+        return GerritEventType.REF_UPDATED.getTypeValue();
     }
 
     @Override

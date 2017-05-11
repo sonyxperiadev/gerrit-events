@@ -50,8 +50,8 @@ public class CommentAdded extends ChangeBasedEvent {
     private List<Approval> approvals = new ArrayList<Approval>();
 
     @Override
-    public GerritEventType getEventType() {
-        return GerritEventType.COMMENT_ADDED;
+    public String getEventType() {
+        return GerritEventType.COMMENT_ADDED.getTypeValue();
     }
 
     /**

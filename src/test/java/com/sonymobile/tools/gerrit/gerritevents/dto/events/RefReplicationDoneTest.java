@@ -45,7 +45,7 @@ public class RefReplicationDoneTest {
     @Test
     public void shouldBeRefReplicationDoneAsEventType() {
         RefReplicationDone refReplicationDone = new RefReplicationDone();
-        assertEquals(GerritEventType.REF_REPLICATION_DONE, refReplicationDone.getEventType());
+        assertEquals(GerritEventType.REF_REPLICATION_DONE.getTypeValue(), refReplicationDone.getEventType());
     }
 
     /**
