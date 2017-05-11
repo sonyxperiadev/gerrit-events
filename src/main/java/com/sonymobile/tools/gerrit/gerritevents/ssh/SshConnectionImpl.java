@@ -335,14 +335,37 @@ public class SshConnectionImpl implements SshConnection {
      * @see #executeCommandReader(String)
      */
     @Override
-    public synchronized ChannelExec executeCommandChannel(String command) throws SshException, IOException {
+    public ChannelExec executeCommandChannel(String command) throws SshException, IOException {
+        return executeCommandChannel(command, true);
+    }
+
+    //CS IGNORE RedundantThrows FOR NEXT 17 LINES. REASON: Informative.
+
+    /**
+     * This version takes a command to run, and then returns a wrapper instance
+     * that exposes all the standard state of the channel (stdin, stdout,
+     * stderr, exit status, etc). Channel connection is established if establishConnection
+     * is true.
+     *
+     * @param command the command to execute.
+     * @param establishConnection true if establish channel connetction within this method.
+     * @return a Channel with access to all streams and the exit code.
+     * @throws IOException  if it is so.
+     * @throws SshException if there are any ssh problems.
+     * @see #executeCommandReader(String)
+     */
+    @Override
+    public synchronized ChannelExec executeCommandChannel(String command, Boolean establishConnection)
+            throws SshException, IOException {
         if (!isConnected()) {
             throw new IOException("Not connected!");
         }
         try {
             ChannelExec channel = (ChannelExec)connectSession.openChannel("exec");
             channel.setCommand(command);
-            channel.connect();
+            if (establishConnection) {
+                channel.connect();
+            }
             return channel;
         } catch (JSchException ex) {
             throw new SshException(ex);
