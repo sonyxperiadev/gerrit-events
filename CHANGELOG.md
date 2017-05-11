@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.10.2 - 2017-05-11
+[Issue 58](https://github.com/sonyxperiadev/gerrit-events/issues/58) Get out of gerrit event stream loop in illegal state. By adding more connection checks. [pull 62](https://github.com/sonyxperiadev/gerrit-events/pull/62)
+
+
 ## 2.10.1 - 2017-04-04
 [Issue 59](https://github.com/sonyxperiadev/gerrit-events/issues/59) Fixed broken JSON when more than one line was received in the buffer. [pull 60](https://github.com/sonyxperiadev/gerrit-events/pull/60)
 
