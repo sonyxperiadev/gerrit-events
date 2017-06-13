@@ -37,7 +37,7 @@ import java.util.Map;
 /**
  * What to send as input to the actual review.
  *
- * @see <a href="https://gerrit-documentation.storage.googleapis.com/Documentation/2.7/rest-api-changes.html#set-review">Gerrit Documentation</a>
+ * @see Gerrit Documentation <a href="https://gerrit-documentation.storage.googleapis.com/Documentation/2.13/rest-api-changes.html#set-review">1</a>, <a href="https://gerrit-documentation.storage.googleapis.com/Documentation/2.13/rest-api-changes.html#review-input">2</a> 
  */
 public class ReviewInput {
     final String message;
