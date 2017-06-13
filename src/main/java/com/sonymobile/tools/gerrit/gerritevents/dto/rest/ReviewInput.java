@@ -44,6 +44,7 @@ public class ReviewInput {
     final Map<String, Integer> labels = new HashMap<String, Integer>();
     final Map<String, List<LineComment>> comments = new HashMap<String, List<LineComment>>();
     Notify notify;
+    String tag;
 
     /**
      * Standard Constructor.
@@ -115,6 +116,17 @@ public class ReviewInput {
      */
     public ReviewInput setNotify(Notify value) {
         this.notify = value;
+        return this;
+    }
+
+    /**
+     * Sets the 'tag' value.  Defines an optional tag to the review. This enables filtering out automatic comments.
+     *
+     * @param value the value to set.
+     * @return this instance for convenience
+     */
+    public ReviewInput setTag(String value) {
+        this.tag = value;
         return this;
     }
 }
