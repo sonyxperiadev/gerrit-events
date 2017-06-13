@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2.11.0 - 2017-06-13
-Added the 'tag' field to ReviewInput class. [pull 63](https://github.com/sonyxperiadev/gerrit-events/pull/63)
+[JENKINS-43904](https://issues.jenkins-ci.org/browse/JENKINS-43904) Added the 'tag' field to ReviewInput class. [pull 63](https://github.com/sonyxperiadev/gerrit-events/pull/63)
 
 ## 2.10.2 - 2017-05-11
 [Issue 58](https://github.com/sonyxperiadev/gerrit-events/issues/58) Get out of gerrit event stream loop in illegal state. By adding more connection checks. [pull 62](https://github.com/sonyxperiadev/gerrit-events/pull/62)
