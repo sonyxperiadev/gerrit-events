@@ -444,9 +444,15 @@ public class GerritConnection extends Thread implements Connector {
                         logger.warn("Error when disconnecting SSH command channel.", ex);
                     }
                 }
-                if (!sshConnection.isConnected()) {
-                    sshConnection = null;
+
+                try {
+                    sshConnection.disconnect();
+                } catch (Exception ex) {
+                     logger.warn("Error when disconnecting sshConnection.", ex);
                 }
+
+                sshConnection = null;
+
                 notifyConnectionDown();
             }
         } while (!shutdownInProgress);
