@@ -69,7 +69,7 @@ public class GerritConnection extends Thread implements Connector {
      */
     public static final String CMD_STREAM_EVENTS = "gerrit stream-events";
     private static final String GERRIT_VERSION_PREFIX = "gerrit version ";
-    private static final int SSH_RX_BUFFER_SIZE = 16384;
+    private static final int SSH_RX_BUFFER_SIZE = 32768;
     private static final int SSH_RX_SLEEP_MILLIS = 100;
     /**
      * The standard scheme used for stream-events.
