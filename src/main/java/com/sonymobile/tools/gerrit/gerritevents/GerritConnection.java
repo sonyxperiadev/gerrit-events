@@ -94,6 +94,7 @@ public class GerritConnection extends Thread implements Connector {
     private AuthenticationUpdater authenticationUpdater = null;
     private final Set<ConnectionListener> listeners = new CopyOnWriteArraySet<ConnectionListener>();
     private int sshRxBufferSize = SSH_RX_BUFFER_SIZE;
+    private StringBuilder eventBuffer = null;
 
     /**
      * Creates a GerritHandler with all the default values set.
@@ -336,6 +337,7 @@ public class GerritConnection extends Thread implements Connector {
     private String getLine(CharBuffer cb) {
         String line = null;
         int pos = cb.position();
+        int limit = cb.limit();
         cb.flip();
         for (int i = 0; i < cb.length(); i++) {
             if (cb.charAt(i) == '\n') {
@@ -346,8 +348,27 @@ public class GerritConnection extends Thread implements Connector {
         }
         if (line != null) {
             cb.compact();
+            if (eventBuffer != null) {
+                eventBuffer.append(line);
+                String eventString = eventBuffer.toString();
+                eventBuffer = null;
+                return eventString;
+            }
         } else {
-            cb.clear().position(pos);
+            if (cb.length() > 0) {
+                if (cb.length() == cb.capacity()) {
+                    if (eventBuffer == null) {
+                        logger.debug("Encountered big event.");
+                        eventBuffer = new StringBuilder();
+                    }
+                    eventBuffer.append(getSubSequence(cb, 0, pos));
+                } else {
+                    cb.position(pos);
+                    cb.limit(limit);
+                }
+            } else {
+                cb.clear();
+            }
         }
         return line;
     }
