@@ -436,7 +436,7 @@ public class GerritConnection extends Thread implements Connector {
                 logger.error("Error when establishing SSH connection. ", ex);
             } finally {
                 nullifyWatchdog();
-                if (channel != null && !channel.isClosed()) {
+                if (channel != null) {
                     logger.trace("Close channel.");
                     try {
                         channel.disconnect();
@@ -451,7 +451,9 @@ public class GerritConnection extends Thread implements Connector {
                      logger.warn("Error when disconnecting sshConnection.", ex);
                 }
 
-                sshConnection = null;
+                if (!sshConnection.isConnected()) {
+                    sshConnection = null;
+                }
 
                 notifyConnectionDown();
             }
