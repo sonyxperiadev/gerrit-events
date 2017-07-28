@@ -69,7 +69,8 @@ public class GerritConnection extends Thread implements Connector {
      */
     public static final String CMD_STREAM_EVENTS = "gerrit stream-events";
     private static final String GERRIT_VERSION_PREFIX = "gerrit version ";
-    private static final int SSH_RX_BUFFER_SIZE = 32768;
+    private static final String SSH_RX_BUFFER_SIZE_PROPERTY_NAME = "GERRIT_SSH_RX_BUFFER_SIZE";
+    private static final int DEFAULT_SSH_RX_BUFFER_SIZE = 32768;
     private static final int SSH_RX_SLEEP_MILLIS = 100;
     /**
      * The standard scheme used for stream-events.
@@ -93,7 +94,7 @@ public class GerritConnection extends Thread implements Connector {
     private GerritHandler handler;
     private AuthenticationUpdater authenticationUpdater = null;
     private final Set<ConnectionListener> listeners = new CopyOnWriteArraySet<ConnectionListener>();
-    private int sshRxBufferSize = SSH_RX_BUFFER_SIZE;
+    private int sshRxBufferSize = getInitialSshRxBufferSize();
 
     /**
      * Creates a GerritHandler with all the default values set.
@@ -732,5 +733,20 @@ public class GerritConnection extends Thread implements Connector {
     protected void notifyConnectionEstablished() {
         connected = true;
         notifyListeners(GerritConnectionEvent.GERRIT_CONNECTION_ESTABLISHED);
+    }
+
+    /**
+     * Reads the value of {@code GERRIT_SSH_RX_BUFFER_SIZE} property provided to the java process
+     * by passing "-D{@code GERRIT_SSH_RX_BUFFER_SIZE}"
+     *
+     * @return ssh buffer size
+     */
+    private static int getInitialSshRxBufferSize() {
+        String envValue = System.getProperty(SSH_RX_BUFFER_SIZE_PROPERTY_NAME);
+        if (envValue == null) {
+            return DEFAULT_SSH_RX_BUFFER_SIZE;
+        } else {
+            return Integer.parseInt(envValue);
+        }
     }
 }

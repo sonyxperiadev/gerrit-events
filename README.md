@@ -54,6 +54,10 @@ handler.addListener(new MyEventListener());
 
 All event types can be found in the [com.sonymobile.tools.gerrit.gerritevents.dto.events](https://github.com/sonyxperiadev/gerrit-events/tree/master/src/main/java/com/sonymobile/tools/gerrit/gerritevents/dto/events) package.
 
+# Configuration
+You can configure some options using java system properties. All you need is to pass `-D<OPTION_NAME>=<OPTION_VALUE>` to JVM.
+
+* `GERRIT_SSH_RX_BUFFER_SIZE` - the size of charachter buffer for ssh channel [default value: 32768 bytes]
 
 # Environments
 * `linux`
