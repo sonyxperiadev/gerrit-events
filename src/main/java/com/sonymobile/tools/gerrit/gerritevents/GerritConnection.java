@@ -28,14 +28,12 @@ package com.sonymobile.tools.gerrit.gerritevents;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.CharBuffer;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
-import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +44,7 @@ import com.sonymobile.tools.gerrit.gerritevents.ssh.SshAuthenticationException;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.SshConnectException;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.SshConnection;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.SshConnectionFactory;
+import com.sonymobile.tools.gerrit.gerritevents.util.LineQueue;
 import com.sonymobile.tools.gerrit.gerritevents.watchdog.StreamWatchdog;
 import com.sonymobile.tools.gerrit.gerritevents.watchdog.WatchTimeExceptionData;
 
@@ -331,49 +330,6 @@ public class GerritConnection extends Thread implements Connector {
     }
 
     /**
-     * Offers lines in buffer to queue.
-     *
-     * @param cb a buffer to have received text data.
-     * @return the line string. null if no EOL, otherwise buffer is compacted.
-     */
-    private String getLine(CharBuffer cb) {
-        String line = null;
-        int pos = cb.position();
-        cb.flip();
-        for (int i = 0; i < cb.length(); i++) {
-            if (cb.charAt(i) == '\n') {
-                line = getSubSequence(cb, 0, i).toString().trim();
-                cb.position(i + 1);
-                break;
-            }
-        }
-        if (line != null) {
-            cb.compact();
-        } else {
-            cb.clear().position(pos);
-        }
-        return line;
-    }
-
-    /**
-     *  Get sub sequence of buffer.
-     *
-     *  This method avoids error in java-api-check.
-     *  animal-sniffer is confused by the signature of CharBuffer.subSequence()
-     *  due to declaration of this method has been changed since Java7.
-     *  (abstract -> non-abstract)
-     *
-     * @param cb a buffer
-     * @param start start of sub sequence
-     * @param end end of sub sequence
-     * @return sub sequence.
-     */
-    @IgnoreJRERequirement
-    private CharSequence getSubSequence(CharBuffer cb, int start, int end) {
-        return cb.subSequence(start, end);
-    }
-
-    /**
      * Main loop for connecting and reading Gerrit JSON Events and dispatching them to Workers.
      */
     @Override
@@ -398,7 +354,7 @@ public class GerritConnection extends Thread implements Connector {
                 }
                 Reader reader = new InputStreamReader(channel.getInputStream(), "utf-8");
                 channel.connect();
-                CharBuffer cb = CharBuffer.allocate(sshRxBufferSize);
+                LineQueue lq = new LineQueue();
                 notifyConnectionEstablished();
                 Provider provider = new Provider(
                         gerritName,
@@ -410,10 +366,11 @@ public class GerritConnection extends Thread implements Connector {
                 logger.info("Ready to receive data from Gerrit: " + gerritName);
                 String line;
                 Integer readCount;
-                while ((readCount = reader.read(cb)) != -1) {
+                while ((readCount = reader.read(lq.getBuffer())) != -1) {
                     logger.debug("Read count from Gerrit stream: {}", String.valueOf(readCount));
-                    while ((line = getLine(cb)) != null) {
-                        logger.debug("Data-line from Gerrit: {}", line);
+                    lq.commit();
+                    while ((line = lq.poll()) != null) {
+                        logger.info("Data-line from Gerrit: {}", line);
                         if (handler != null) {
                             handler.post(line, provider);
                         }
