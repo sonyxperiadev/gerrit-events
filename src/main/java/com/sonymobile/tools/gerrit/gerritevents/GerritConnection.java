@@ -33,12 +33,12 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSchException;
 import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSchException;
 import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Provider;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.Authentication;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.AuthenticationUpdater;
@@ -341,7 +341,7 @@ public class GerritConnection extends Thread implements Connector {
         cb.flip();
         for (int i = 0; i < cb.length(); i++) {
             if (cb.charAt(i) == '\n') {
-                line = getSubSequence(cb, 0, i).toString().trim();
+                line = getSubSequence(cb, 0, i).toString();
                 cb.position(i + 1);
                 break;
             }
@@ -352,8 +352,9 @@ public class GerritConnection extends Thread implements Connector {
                 eventBuffer.append(line);
                 String eventString = eventBuffer.toString();
                 eventBuffer = null;
-                return eventString;
+                line = eventString;
             }
+            line.trim();
         } else {
             if (cb.length() > 0) {
                 if (cb.length() == cb.capacity()) {
@@ -430,7 +431,9 @@ public class GerritConnection extends Thread implements Connector {
                 Integer readCount;
                 while ((readCount = reader.read(cb)) != -1) {
                     logger.debug("Read count from Gerrit stream: {}", String.valueOf(readCount));
+                    int linecount = 0;
                     while ((line = getLine(cb)) != null) {
+                        linecount++;
                         logger.debug("Data-line from Gerrit: {}", line);
                         if (handler != null) {
                             handler.post(line, provider);
@@ -445,7 +448,9 @@ public class GerritConnection extends Thread implements Connector {
                     if (!channel.isConnected() || !sshConnection.isConnected()) {
                         throw new IllegalStateException("SSH connection is already lost.");
                     }
-                    sleep(SSH_RX_SLEEP_MILLIS);
+                    if (linecount > 0) {
+                        sleep(SSH_RX_SLEEP_MILLIS);
+                    }
                 }
             } catch (IOException ex) {
                 logger.error("Stream events command error. ", ex);

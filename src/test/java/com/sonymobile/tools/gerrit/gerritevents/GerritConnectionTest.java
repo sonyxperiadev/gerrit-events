@@ -26,8 +26,8 @@
 package com.sonymobile.tools.gerrit.gerritevents;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.eq;
@@ -47,7 +47,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.concurrent.CountDownLatch;
 
-import com.jcraft.jsch.ChannelExec;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -57,13 +56,13 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import com.jcraft.jsch.ChannelExec;
 import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Provider;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.Authentication;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.SshConnection;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.SshConnectionFactory;
 
-//CS IGNORE MagicNumber FOR NEXT 200 LINES. REASON: TestData
-
+//CS IGNORE MagicNumber FOR NEXT 300 LINES. REASON: TestData
 
 /**
  * Tests for {@link GerritConnection}.
@@ -86,6 +85,7 @@ public class GerritConnectionTest {
     private static CountDownLatch downLatch = new CountDownLatch(1);
 
     private static final String FINISH_WORD = "FINISH";
+
     /**
      * Creates a SshConnection mock and starts a GerritConnection with that connection-mock.
      *
@@ -112,7 +112,7 @@ public class GerritConnectionTest {
         PowerMockito.doReturn(sshConnectionMock).when(SshConnectionFactory.class, "getConnection",
                 isA(String.class), isA(Integer.class), isA(String.class), isA(Authentication.class), any());
         connection = new GerritConnection("", "localhost", 29418, new Authentication(null, ""));
-        connection.setSshRxBufferSize(20);
+        connection.setSshRxBufferSize(13);
         handlerMock = mock(HandlerMock.class);
         connection.setHandler(handlerMock);
         connection.addListener(new ListenerMock());
@@ -210,6 +210,7 @@ public class GerritConnectionTest {
     @Test
     public void testReceiveEvent() throws Exception {
         doCallRealMethod().when(handlerMock).post(any(String.class), any(Provider.class));
+        String aVeryLongMessage = "This is a very long line.                                             It stands for a commit that contains a very huge commit message. It should be long enough to fill the buffer several times.";
 
         Writer writer = new OutputStreamWriter(pipedOutStream);
         // String
@@ -235,6 +236,9 @@ public class GerritConnectionTest {
         writer.append("{\"say\":\"hello\"}\n{\"say\":\"hello again\"}\n");
         writer.flush();
         Thread.sleep(500);
+        writer.append(aVeryLongMessage + "\n");
+        writer.flush();
+        Thread.sleep(200);
         // Send finish
         writer.append(FINISH_WORD);
         writer.append("\n");
@@ -244,6 +248,8 @@ public class GerritConnectionTest {
         verify(handlerMock, times(2)).post(eq("{\"say\":\"hello\"}"), any(Provider.class));
         verify(handlerMock, times(1)).post(eq("{\"say\":\"hello again\"}"), any(Provider.class));
         verify(handlerMock, times(1)).post(eq("Thank You!"), any(Provider.class));
+        verify(handlerMock, times(1)).post(eq(aVeryLongMessage), any(Provider.class));
+        verify(handlerMock, times(7)).post(any(String.class), any(Provider.class));
     }
 
     /**
