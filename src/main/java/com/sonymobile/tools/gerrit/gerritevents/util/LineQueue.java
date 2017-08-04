@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 public class LineQueue {
 
     private static final int DEFAULT_BUFFER_SIZE = 16384;
-    private static final char LINE_SEPARATOR = "\n".charAt(0);
+    private static final char LINE_SEPARATOR = '\n';
 
 
     private static final Logger logger = LoggerFactory.getLogger(LineQueue.class);
