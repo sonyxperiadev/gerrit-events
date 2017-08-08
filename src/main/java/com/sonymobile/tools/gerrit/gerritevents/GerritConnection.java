@@ -448,7 +448,7 @@ public class GerritConnection extends Thread implements Connector {
                     if (!channel.isConnected() || !sshConnection.isConnected()) {
                         throw new IllegalStateException("SSH connection is already lost.");
                     }
-                    if (linecount > 0) {
+                    if (readCount == 0 || linecount > 0) {
                         sleep(SSH_RX_SLEEP_MILLIS);
                     }
                 }
