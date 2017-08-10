@@ -210,6 +210,7 @@ public class GerritConnectionTest {
     @Test
     public void testReceiveEvent() throws Exception {
         doCallRealMethod().when(handlerMock).post(any(String.class), any(Provider.class));
+        //CS IGNORE LineLength FOR NEXT 1 LINES. REASON: TestData
         String aVeryLongMessage = "This is a very long line.                                             It stands for a commit that contains a very huge commit message. It should be long enough to fill the buffer several times.";
 
         Writer writer = new OutputStreamWriter(pipedOutStream);
