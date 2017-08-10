@@ -33,12 +33,12 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSchException;
 import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSchException;
 import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Provider;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.Authentication;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.AuthenticationUpdater;
@@ -97,6 +97,7 @@ public class GerritConnection extends Thread implements Connector {
     private AuthenticationUpdater authenticationUpdater = null;
     private final Set<ConnectionListener> listeners = new CopyOnWriteArraySet<ConnectionListener>();
     private int sshRxBufferSize = SSH_RX_BUFFER_SIZE;
+    private StringBuilder eventBuffer = null;
 
     /**
      * Creates a GerritHandler with all the default values set.
@@ -339,18 +340,39 @@ public class GerritConnection extends Thread implements Connector {
     private String getLine(CharBuffer cb) {
         String line = null;
         int pos = cb.position();
+        int limit = cb.limit();
         cb.flip();
         for (int i = 0; i < cb.length(); i++) {
             if (cb.charAt(i) == '\n') {
-                line = getSubSequence(cb, 0, i).toString().trim();
+                line = getSubSequence(cb, 0, i).toString();
                 cb.position(i + 1);
                 break;
             }
         }
         if (line != null) {
             cb.compact();
+            if (eventBuffer != null) {
+                eventBuffer.append(line);
+                String eventString = eventBuffer.toString();
+                eventBuffer = null;
+                line = eventString;
+            }
+            line.trim();
         } else {
-            cb.clear().position(pos);
+            if (cb.length() > 0) {
+                if (cb.length() == cb.capacity()) {
+                    if (eventBuffer == null) {
+                        logger.debug("Encountered big event.");
+                        eventBuffer = new StringBuilder();
+                    }
+                    eventBuffer.append(getSubSequence(cb, 0, pos));
+                } else {
+                    cb.position(pos);
+                    cb.limit(limit);
+                }
+            } else {
+                cb.clear();
+            }
         }
         return line;
     }
@@ -412,7 +434,9 @@ public class GerritConnection extends Thread implements Connector {
                 Integer readCount;
                 while ((readCount = reader.read(cb)) != -1) {
                     logger.debug("Read count from Gerrit stream: {}", String.valueOf(readCount));
+                    int linecount = 0;
                     while ((line = getLine(cb)) != null) {
+                        linecount++;
                         logger.debug("Data-line from Gerrit: {}", line);
                         if (handler != null) {
                             handler.post(line, provider);
@@ -427,7 +451,9 @@ public class GerritConnection extends Thread implements Connector {
                     if (!channel.isConnected() || !sshConnection.isConnected()) {
                         throw new IllegalStateException("SSH connection is already lost.");
                     }
-                    sleep(SSH_RX_SLEEP_MILLIS);
+                    if (readCount == 0 || linecount > 0) {
+                        sleep(SSH_RX_SLEEP_MILLIS);
+                    }
                 }
             } catch (IOException ex) {
                 logger.error("Stream events command error. ", ex);
