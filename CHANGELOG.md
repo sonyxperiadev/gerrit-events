@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.11.1 - 2017-08-10
+* [JENKINS-44568](https://issues.jenkins-ci.org/browse/JENKINS-44568), [JENKINS-44414](https://issues.jenkins-ci.org/browse/JENKINS-44414) - Fix _([pull #68](https://github.com/sonyxperiadev/gerrit-events/pull/68))_
+* [JENKINS-44568](https://issues.jenkins-ci.org/browse/JENKINS-44568) - Increase receive buffer size to 256KB _([pull #67](https://github.com/sonyxperiadev/gerrit-events/pull/67))_
+
 ## 2.11.0 - 2017-06-13
 [JENKINS-43904](https://issues.jenkins-ci.org/browse/JENKINS-43904) Added the 'tag' field to ReviewInput class. [pull 63](https://github.com/sonyxperiadev/gerrit-events/pull/63)
 
@@ -58,8 +62,8 @@ Corrected spelling of ```GerritJsonEventFactory.isInteresgingAndUsable``` [pull 
 Updated com.jcraft.jsch to 0.1.51 [pull 32](https://github.com/sonyxperiadev/gerrit-events/pull/32)
 
 ## 2.6.0 - 2015-02-06
-Allow subclasses of [GerritHandler](https://github.com/sonyxperiadev/gerrit-events/blob/master/src/main/java/com/sonymobile/tools/gerrit/gerritevents/GerritHandler.java) 
-to control the creation of [EventThreads](https://github.com/sonyxperiadev/gerrit-events/blob/master/src/main/java/com/sonymobile/tools/gerrit/gerritevents/workers/EventThread.java). 
+Allow subclasses of [GerritHandler](https://github.com/sonyxperiadev/gerrit-events/blob/master/src/main/java/com/sonymobile/tools/gerrit/gerritevents/GerritHandler.java)
+to control the creation of [EventThreads](https://github.com/sonyxperiadev/gerrit-events/blob/master/src/main/java/com/sonymobile/tools/gerrit/gerritevents/workers/EventThread.java).
 [pull 31](https://github.com/sonyxperiadev/gerrit-events/pull/31)
 
 ## 2.5.0 - 2014-12-15
