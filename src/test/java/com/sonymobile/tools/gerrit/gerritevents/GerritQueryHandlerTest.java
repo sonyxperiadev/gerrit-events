@@ -72,7 +72,7 @@ public class GerritQueryHandlerTest {
 
         PowerMockito.mockStatic(SshConnectionFactory.class);
         PowerMockito.doReturn(sshConnectionMock).when(SshConnectionFactory.class, "getConnection",
-                isA(String.class), isA(Integer.class), isA(String.class), isA(Authentication.class));
+                isA(String.class), isA(Integer.class), isA(String.class), isA(Authentication.class), isA(Integer.class));
 
 
         when(sshConnectionMock.executeCommandReader(anyString())).thenAnswer(new Answer<Reader>() {
@@ -83,7 +83,7 @@ public class GerritQueryHandlerTest {
             }
         });
 
-        queryHandler = new GerritQueryHandler("", 0, "", new Authentication(null, ""));
+        queryHandler = new GerritQueryHandler("", 0, "", new Authentication(null, ""), 0);
     }
 
     /**

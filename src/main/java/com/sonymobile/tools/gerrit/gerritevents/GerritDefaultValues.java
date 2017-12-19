@@ -62,6 +62,10 @@ public final class GerritDefaultValues {
      * The default gerrit proxy.
      */
     public static final String DEFAULT_GERRIT_PROXY = "";
+    /**
+     * The default gerrit ssh connection timeout.
+     */
+    public static final int DEFAULT_GERRIT_SSH_CONNECTION_TIMEOUT = 0;
 
     /**
      * The default key-file to use when authenticating to the gerrit server.

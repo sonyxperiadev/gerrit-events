@@ -36,10 +36,10 @@ import java.io.IOException;
 public abstract class SshConnectionFactory {
 
     /**
-     * Private constructor to hinder instansiation.
+     * Private constructor to hinder instantiation.
      */
     private SshConnectionFactory() {
-        throw new UnsupportedOperationException("Cannot instansiate util classes.");
+        throw new UnsupportedOperationException("Cannot instantiate util classes.");
     }
 
     /**
@@ -74,7 +74,26 @@ public abstract class SshConnectionFactory {
      */
     public static SshConnection getConnection(String host, int port, String proxy,
                                               Authentication authentication) throws IOException {
-        return getConnection(host, port, proxy, authentication, null);
+        return getConnection(host, port, proxy, authentication, null, GerritDefaultValues.DEFAULT_GERRIT_SSH_CONNECTION_TIMEOUT);
+    }
+
+    /**
+     * Creates a {@link SshConnection}.
+     *
+     * @param host           the host name
+     * @param port           the port
+     * @param proxy          the proxy url
+     * @param authentication the credentials
+     * @param connectionTimeout the connection timeout
+     * @return a new connection.
+     *
+     * @throws IOException if so.
+     * @see SshConnection
+     * @see SshConnectionImpl
+     */
+    public static SshConnection getConnection(String host, int port, String proxy,
+                                              Authentication authentication, int connectionTimeout) throws IOException {
+        return getConnection(host, port, proxy, authentication, null, connectionTimeout);
     }
 
     /**
@@ -94,7 +113,28 @@ public abstract class SshConnectionFactory {
     public static SshConnection getConnection(String host, int port, String proxy,
                                               Authentication authentication,
                                               AuthenticationUpdater updater) throws IOException {
-        SshConnection connection = new SshConnectionImpl(host, port, proxy, authentication, updater);
+        return getConnection(host, port, proxy, authentication, updater, GerritDefaultValues.DEFAULT_GERRIT_SSH_CONNECTION_TIMEOUT);
+    }
+
+    /**
+     * Creates a {@link SshConnection}.
+     *
+     * @param host           the host name
+     * @param port           the port
+     * @param proxy          the proxy url
+     * @param authentication the credentials
+     * @param updater        the updater.
+     * @param connectionTimeout the connection timeout.
+     * @return a new connection.
+     *
+     * @throws IOException if so.
+     * @see SshConnection
+     * @see SshConnectionImpl
+     */
+    public static SshConnection getConnection(String host, int port, String proxy,
+                                              Authentication authentication,
+                                              AuthenticationUpdater updater, int connectionTimeout) throws IOException {
+        SshConnection connection = new SshConnectionImpl(host, port, proxy, authentication, updater, connectionTimeout);
         connection.connect();
         return connection;
     }
