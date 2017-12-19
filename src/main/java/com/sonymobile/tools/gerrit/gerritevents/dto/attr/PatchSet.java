@@ -160,7 +160,7 @@ public class PatchSet implements GerritJsonDTO {
      *
      * @return the list of approvals
      */
-    public List<Approval> getApprovals() {
+    public List<? extends Approval> getApprovals() {
         return approvals;
     }
 
