@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getBoolean;
 import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getString;
 import static com.sonymobile.tools.gerrit.gerritevents.GerritJsonEventFactory.getDate;
 
@@ -47,7 +48,8 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.SUBJE
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.URL;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.CREATED_ON;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.LAST_UPDATED;
-
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.WIP;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.PRIVATE;
 
 /**
  * Represents a Gerrit JSON Change DTO.
@@ -104,6 +106,17 @@ public class Change implements GerritJsonDTO {
     private Date lastUpdated;
 
     private List<Comment> comments;
+
+    /**
+     * Is this change a Work in progress.
+     */
+    private boolean wip;
+
+    /**
+     * Is this change private.
+     */
+    private boolean isPrivate;
+
     /**
      * Default constructor.
      */
@@ -143,6 +156,8 @@ public class Change implements GerritJsonDTO {
             commitMessage = getString(json, COMMIT_MESSAGE);
         }
         url = getString(json, URL);
+        wip = getBoolean(json, WIP, false);
+        isPrivate = getBoolean(json, PRIVATE, false);
     }
 
     /**
@@ -330,6 +345,30 @@ public class Change implements GerritJsonDTO {
     public void setLastUpdated(Date date) {
         this.lastUpdated = date;
     }
+
+    /**
+     * Is this change a work in progress.
+     * @return change is in WIP state.
+     */
+    public boolean isWip() { return wip; }
+
+    /**
+     * Is this change a work in progress.
+     * @param boolean change is in WIP state.
+     */
+    public void setWip(boolean wip) { this.wip = wip; }
+
+    /**
+     * Is this change private.
+     * @return change is in private state.
+     */
+    public boolean isPrivate() { return isPrivate; }
+
+    /**
+     * Is this change private.
+     * @param boolean change is private.
+     */
+    public void setPrivate(boolean isPrivate) {this.isPrivate = isPrivate; }
 
     @Override
     public boolean equals(Object obj) {
