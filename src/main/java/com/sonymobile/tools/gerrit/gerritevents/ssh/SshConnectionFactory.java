@@ -74,7 +74,8 @@ public abstract class SshConnectionFactory {
      */
     public static SshConnection getConnection(String host, int port, String proxy,
                                               Authentication authentication) throws IOException {
-        return getConnection(host, port, proxy, authentication, null, GerritDefaultValues.DEFAULT_GERRIT_SSH_CONNECTION_TIMEOUT);
+        return getConnection(host, port, proxy, authentication, null,
+                             GerritDefaultValues.DEFAULT_GERRIT_SSH_CONNECTION_TIMEOUT);
     }
 
     /**
@@ -113,7 +114,8 @@ public abstract class SshConnectionFactory {
     public static SshConnection getConnection(String host, int port, String proxy,
                                               Authentication authentication,
                                               AuthenticationUpdater updater) throws IOException {
-        return getConnection(host, port, proxy, authentication, updater, GerritDefaultValues.DEFAULT_GERRIT_SSH_CONNECTION_TIMEOUT);
+        return getConnection(host, port, proxy, authentication, updater,
+                             GerritDefaultValues.DEFAULT_GERRIT_SSH_CONNECTION_TIMEOUT);
     }
 
     /**
