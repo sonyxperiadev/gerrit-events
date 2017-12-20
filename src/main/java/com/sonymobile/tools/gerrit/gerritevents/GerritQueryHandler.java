@@ -52,6 +52,28 @@ public class GerritQueryHandler {
     private final int gerritSshPort;
     private final String gerritProxy;
     private final Authentication authentication;
+    private final int connectionTimeout;
+
+
+    /**
+     * Creates a GerritQueryHandler with the specified values.
+     * @param gerritHostName the hostName
+     * @param gerritSshPort  the ssh port that the gerrit server listens to.
+     * @param gerritProxy    the ssh Proxy url
+     * @param authentication the authentication credentials.
+     * @param connectionTimeout the connection timeout.
+     */
+    public GerritQueryHandler(String gerritHostName,
+                              int gerritSshPort,
+                              String gerritProxy,
+                              Authentication authentication,
+                              int connectionTimeout) {
+        this.gerritHostName = gerritHostName;
+        this.gerritSshPort = gerritSshPort;
+        this.gerritProxy = gerritProxy;
+        this.authentication = authentication;
+        this.connectionTimeout = connectionTimeout;
+    }
 
     /**
      * Creates a GerritQueryHandler with the specified values.
@@ -64,11 +86,8 @@ public class GerritQueryHandler {
                               int gerritSshPort,
                               String gerritProxy,
                               Authentication authentication) {
-        this.gerritHostName = gerritHostName;
-        this.gerritSshPort = gerritSshPort;
-        this.gerritProxy = gerritProxy;
-        this.authentication = authentication;
-
+        this(gerritHostName, gerritSshPort, gerritProxy, authentication,
+                                    GerritDefaultValues.DEFAULT_GERRIT_SSH_CONNECTION_TIMEOUT);
     }
 
     /**
@@ -79,7 +98,8 @@ public class GerritQueryHandler {
         this(config.getGerritHostName(),
                 config.getGerritSshPort(),
                 GerritDefaultValues.DEFAULT_GERRIT_PROXY,
-                config.getGerritAuthentication());
+                config.getGerritAuthentication(),
+                GerritDefaultValues.DEFAULT_GERRIT_SSH_CONNECTION_TIMEOUT);
     }
 
     /**
@@ -91,7 +111,8 @@ public class GerritQueryHandler {
         this(config.getGerritHostName(),
                 config.getGerritSshPort(),
                 config.getGerritProxy(),
-                config.getGerritAuthentication());
+                config.getGerritAuthentication(),
+                GerritDefaultValues.DEFAULT_GERRIT_SSH_CONNECTION_TIMEOUT);
     }
 
     //CS IGNORE RedundantThrows FOR NEXT 18 LINES. REASON: Informative.
@@ -332,7 +353,8 @@ public class GerritQueryHandler {
 
         SshConnection ssh = null;
         try {
-            ssh = SshConnectionFactory.getConnection(gerritHostName, gerritSshPort, gerritProxy, authentication);
+            ssh = SshConnectionFactory.getConnection(gerritHostName, gerritSshPort, gerritProxy,
+                                                                        authentication, connectionTimeout);
             BufferedReader reader = new BufferedReader(ssh.executeCommandReader(str.toString()));
             String incomingLine = null;
             while ((incomingLine = reader.readLine()) != null) {

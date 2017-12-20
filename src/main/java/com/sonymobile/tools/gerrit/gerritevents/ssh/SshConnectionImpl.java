@@ -82,6 +82,7 @@ public class SshConnectionImpl implements SshConnection {
     private String proxy;
     private Authentication authentication;
     private AuthenticationUpdater updater;
+    private int connectionTimeout;
 
     //CS IGNORE RedundantThrows FOR NEXT 30 LINES. REASON: Informative
 
@@ -94,7 +95,8 @@ public class SshConnectionImpl implements SshConnection {
      */
     protected SshConnectionImpl(String host, int port,
                                 Authentication authentication) {
-        this(host, port, GerritDefaultValues.DEFAULT_GERRIT_PROXY, authentication, null);
+        this(host, port, GerritDefaultValues.DEFAULT_GERRIT_PROXY, authentication, null,
+                                                    GerritDefaultValues.DEFAULT_GERRIT_SSH_CONNECTION_TIMEOUT);
     }
 
     /**
@@ -107,7 +109,7 @@ public class SshConnectionImpl implements SshConnection {
      */
     protected SshConnectionImpl(String host, int port, String proxy,
                                 Authentication authentication) {
-        this(host, port, proxy, authentication, null);
+        this(host, port, proxy, authentication, null, GerritDefaultValues.DEFAULT_GERRIT_SSH_CONNECTION_TIMEOUT);
     }
 
     /**
@@ -122,11 +124,28 @@ public class SshConnectionImpl implements SshConnection {
     protected SshConnectionImpl(String host, int port, String proxy,
                                 Authentication authentication,
                                 AuthenticationUpdater updater) {
+        this(host, port, proxy, authentication, updater, GerritDefaultValues.DEFAULT_GERRIT_SSH_CONNECTION_TIMEOUT);
+    }
+
+    /**
+     * Creates and opens a SshConnection.
+     *
+     * @param host           the host to connect to.
+     * @param port           the port.
+     * @param proxy          the proxy url.
+     * @param authentication the authentication-info
+     * @param updater        the authentication updater.
+     * @param connectionTimeout the connection timeout.
+     */
+    protected SshConnectionImpl(String host, int port, String proxy,
+                                Authentication authentication,
+                                AuthenticationUpdater updater, int connectionTimeout) {
         this.host = host;
         this.port = port;
         this.proxy = proxy;
         this.authentication = authentication;
         this.updater = updater;
+        this.connectionTimeout = connectionTimeout;
     }
 
     /**
@@ -174,7 +193,7 @@ public class SshConnectionImpl implements SshConnection {
                     throw new MalformedURLException(proxy);
                 }
             }
-            connectSession.connect();
+            connectSession.connect(this.connectionTimeout);
             logger.debug("Connected: {}", connectSession.isConnected());
             connectSession.setServerAliveInterval(ALIVE_INTERVAL);
         } catch (JSchException ex) {
