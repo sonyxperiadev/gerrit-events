@@ -38,6 +38,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.ReviewerAdded;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.TopicChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.ProjectCreated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.PrivateStateChanged;
+import com.sonymobile.tools.gerrit.gerritevents.dto.events.WipStateChanged;
 
 import org.junit.After;
 import org.junit.Before;
@@ -389,6 +390,10 @@ public class GerritHandlerTest {
         PrivateStateChanged privateStateChanged = new PrivateStateChanged();
         handler.notifyListeners(privateStateChanged);
         verify(listenerMock, times(1).gerritEvent(privateStateChanged));
+
+        WipStateChanged wipStateChanged = new WipStateChanged();
+        handler.notifyListeners(wipStateChanged);
+        verify(listenerMock, times(1).gerritEvent(wipStateChanged));
     }
 
     /**
@@ -584,6 +589,22 @@ public class GerritHandlerTest {
     }
 
     /**
+     * Tests that WipStateChanged events are going in the method with
+     * that type as parameter and that other type of events are going
+     * in the default method.
+     */
+    @Test
+    public void testEventNotificationWithListenerWipStateChangedMethodSignature() {
+        SpecificEventListener stateChangedListener = new SpecificEventListener() {
+            @SuppressWarnings("unused") //method is called by reflection
+            public void gerritEvent(WipStateChanged event) {
+                specificMethodCalled = true;
+            }
+        };
+        testListenerWithSpecificSignature(stateChangedListener, new WipStateChanged());
+    }
+
+    /**
      * Base test listener implementation.
      */
     private abstract static class SpecificEventListener implements GerritEventListener {
@@ -618,7 +639,8 @@ public class GerritHandlerTest {
                                                      new PatchsetCreated(),
                                                      new RefUpdated(),
                                                      new ProjectCreated(),
-                                                     new PrivateStateChanged(),};
+                                                     new PrivateStateChanged(),
+                                                     new WipStateChanged(), };
         handler.addListener(listener);
 
         // Validate that event was sent to the specific method
