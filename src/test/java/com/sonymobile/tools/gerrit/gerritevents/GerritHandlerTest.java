@@ -37,6 +37,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.RefUpdated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.ReviewerAdded;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.TopicChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.ProjectCreated;
+import com.sonymobile.tools.gerrit.gerritevents.dto.events.PrivateStateChanged;
 
 import org.junit.After;
 import org.junit.Before;
@@ -428,6 +429,10 @@ public class GerritHandlerTest {
         MergeFailed mergeFailed = new MergeFailed();
         handler.notifyListeners(mergeFailed);
         verify(listenerMock, times(1)).gerritEvent(mergeFailed);
+
+        PrivateStateChanged privateStateChanged = new PrivateStateChanged();
+        handler.notifyListeners(privateStateChanged);
+        verify(listenerMock, times(1).gerritEvent(privateStateChanged));
     }
 
     /**
@@ -607,6 +612,22 @@ public class GerritHandlerTest {
     }
 
     /**
+     * Tests that PrivateStateChanged events are going in the method with
+     * that type as parameter and that other type of events are going
+     * in the default method.
+     */
+    @Test
+    public void testEventNotificationWithListenerPrivateStateChangedMethodSignature() {
+        SpecificEventListener stateChangedListener = new SpecificEventListener() {
+            @SuppressWarnings("unused") //method is called by reflection
+            public void gerritEvent(PrivateStateChanged event) {
+                specificMethodCalled = true;
+            }
+        };
+        testListenerWithSpecificSignature(stateChangedListener, new PrivateStateChanged());
+    }
+
+    /**
      * Base test listener implementation.
      */
     private abstract static class SpecificEventListener implements GerritEventListener {
@@ -640,7 +661,8 @@ public class GerritHandlerTest {
                                                      new DraftPublished(),
                                                      new PatchsetCreated(),
                                                      new RefUpdated(),
-                                                     new ProjectCreated(), };
+                                                     new ProjectCreated(),
+                                                     new PrivateStateChanged(),};
         handler.addListener(listener);
 
         // Validate that event was sent to the specific method
