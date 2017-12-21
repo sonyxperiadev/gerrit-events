@@ -37,6 +37,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.ReviewerAdded;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.TopicChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.ProjectCreated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.PatchsetNotified;
+import com.sonymobile.tools.gerrit.gerritevents.dto.events.PrivateStateChanged;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -102,7 +103,12 @@ public enum GerritEventType {
     /***
      * A merge-failed event.
      */
-    MERGE_FAILED("merge-failed", true, MergeFailed.class);
+    MERGE_FAILED("merge-failed", true, MergeFailed.class),
+
+    /***
+     * A private state changed event.
+     */
+    PRIVATE_STATE_CHANGED("private-state-changed",true, PrivateStateChanged.class);
 
     private String typeValue;
     private boolean interesting;
