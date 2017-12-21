@@ -38,6 +38,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.TopicChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.ProjectCreated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.PatchsetNotified;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.PrivateStateChanged;
+import com.sonymobile.tools.gerrit.gerritevents.dto.events.WipStateChanged;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -108,7 +109,12 @@ public enum GerritEventType {
     /***
      * A private state changed event.
      */
-    PRIVATE_STATE_CHANGED("private-state-changed",true, PrivateStateChanged.class);
+    PRIVATE_STATE_CHANGED("private-state-changed",true, PrivateStateChanged.class),
+
+    /***
+     * A work in progress state chaned event.
+     */
+    WIP_STATE_CHANGED("wip-state-changed", true, WipStateChanged.class);
 
     private String typeValue;
     private boolean interesting;
