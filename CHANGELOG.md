@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.11.3 - 2018-01-15
+
+* [JENKINS-48943](https://issues.jenkins-ci.org/browse/JENKINS-48943) Whitelist gerrit-events for Jenkins 2.102+
+
 ## 2.11.2 - 2017-12-20
 
 * Allow for propagating timeout for ssh connection from GerritQueryHandler down to jsch.Session. _([pull #72](https://github.com/sonyxperiadev/gerrit-events/pull/72))_
