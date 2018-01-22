@@ -73,6 +73,11 @@ public class GerritHandler implements Coordinator, Handler {
     private final Set<GerritEventListener> gerritEventListeners = new CopyOnWriteArraySet<GerritEventListener>();
     private final List<EventThread> workers;
     private Map<String, String> ignoreEMails = new ConcurrentHashMap<String, String>();
+    /**
+     * The minimum size of the job-queue before monitors should begin to warn the administrator(s).
+     */
+    private static final int WORK_QUEUE_SIZE_WARNING_THRESHOLD =
+            Integer.getInteger("gerritevents.GerritSendCommandQueue.WORK_QUEUE_SIZE_WARNING_THRESHOLD", 40);
 
     /**
      * Creates a GerritHandler with all the default values set.
@@ -177,10 +182,25 @@ public class GerritHandler implements Coordinator, Handler {
         try {
             logger.trace("putting work on queue.");
             workQueue.put(work);
+            checkQueueSize();
         } catch (InterruptedException ex) {
             logger.warn("Interrupted while putting work on queue!", ex);
             //TODO check if shutdown
             //TODO try again since it is important
+        }
+    }
+
+    /**
+     * Checks queue size.
+     */
+    private void checkQueueSize() {
+        int queueSize = workQueue.size();
+        if (WORK_QUEUE_SIZE_WARNING_THRESHOLD > 0 && queueSize >= WORK_QUEUE_SIZE_WARNING_THRESHOLD) {
+            logger.warn("The Gerrit incoming events queue contains {} items!"
+                        + " Something might be stuck, or your system can't process the commands fast enough."
+                        + " Try to increase the number of receiving worker threads."
+                        + " Current thread-pool size: {}",
+                    queueSize, workers.size());
         }
     }
 
@@ -372,12 +392,6 @@ public class GerritHandler implements Coordinator, Handler {
      */
     @Deprecated
     public void triggerEvent(GerritEvent event) {
-        logger.debug("Internally trigger event: {}", event);
-        try {
-            logger.trace("putting work on queue.");
-            workQueue.put(new GerritEventWork(event));
-        } catch (InterruptedException ex) {
-            logger.error("Interrupted while putting work on queue!", ex);
-        }
+        post(event);
     }
 }
