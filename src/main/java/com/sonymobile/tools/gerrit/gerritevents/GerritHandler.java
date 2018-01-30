@@ -322,6 +322,7 @@ public class GerritHandler implements Coordinator, Handler {
                + "Calling default.", ex);
             listener.gerritEvent(event);
         } catch (InvocationTargetException ex) {
+            logger.error("When notifying listener: {} about event: {}", listener, event);
             logger.error("Exception thrown during event handling.", ex);
         } catch (NoSuchMethodException ex) {
             logger.debug("No apropriate method found during reflection. Calling default.", ex);
