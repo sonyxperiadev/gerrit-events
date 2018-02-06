@@ -37,6 +37,7 @@ import com.sonymobile.tools.gerrit.gerritevents.workers.Work;
 
 import net.sf.json.JSONObject;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -334,7 +335,7 @@ public class GerritHandler implements Coordinator, Handler {
     }
 
     /**
-     * Checks if the event should be ignored, due to a circular CommentAdded.
+     * Checks if the event should be ignored.
      * @param event the event to check.
      * @return true if it should be ignored, false if not.
      */
@@ -343,10 +344,16 @@ public class GerritHandler implements Coordinator, Handler {
         if (account == null) {
             return false;
         }
+
+        String accountEmail = account.getEmail();
+        if (StringUtils.isEmpty(accountEmail)) {
+            return false;
+        }
+
         Provider provider = event.getProvider();
         if (provider != null) {
             String ignoreEMail = ignoreEMails.get(provider.getName());
-            if (ignoreEMail != null && ignoreEMail.equals(account.getEmail())) {
+            if (StringUtils.isNotEmpty(ignoreEMail) && accountEmail.endsWith(ignoreEMail)) {
                 return true;
             }
         }
