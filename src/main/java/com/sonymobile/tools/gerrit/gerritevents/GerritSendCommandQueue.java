@@ -59,7 +59,8 @@ public final class GerritSendCommandQueue {
     /**
      * The minimum size of the job-queue before monitors should begin to warn the administrator(s).
      */
-    public static final int SEND_QUEUE_SIZE_WARNING_THRESHOLD = 20;
+    public static final int SEND_QUEUE_SIZE_WARNING_THRESHOLD =
+            Integer.getInteger("gerritevents.GerritSendCommandQueue.SEND_QUEUE_SIZE_WARNING_THRESHOLD", 20);
     private static final int WAIT_FOR_JOBS_SHUTDOWN_TIMEOUT = 30;
 
     /**
@@ -173,10 +174,10 @@ public final class GerritSendCommandQueue {
      */
     private void checkQueueSize() {
         int queueSize = getQueueSize();
-        if (queueSize >= SEND_QUEUE_SIZE_WARNING_THRESHOLD) {
-            logger.warn("The Gerrit-trigger send commands queue contains {} items!"
+        if (SEND_QUEUE_SIZE_WARNING_THRESHOLD > 0 && queueSize >= SEND_QUEUE_SIZE_WARNING_THRESHOLD) {
+            logger.warn("The Gerrit send commands queue contains {} items!"
                     + " Something might be stuck, or your system can't process the commands fast enough."
-                    + " Try to increase the number of sending worker threads on the Gerrit configuration page."
+                    + " Try to increase the number of sending worker threads."
                     + " Current thread-pool size: {}",
                     queueSize, executor.getPoolSize());
             logger.info("Nr of active pool-threads: {}", executor.getActiveCount());
