@@ -42,6 +42,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
@@ -61,6 +62,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.only;
 
 //CS IGNORE MagicNumber FOR NEXT 600 LINES. REASON: Test data.
 
@@ -285,28 +287,70 @@ public class GerritHandlerTest {
     }
 
     /**
-     * Tests that circular CommentAdded events are ignored correctly.
+     * Tests that CommentAdded events are ignored correctly.
      * @throws Exception if so.
      */
     @Test
     public void testIgnoreCommentAdded() throws Exception {
-        String email = "e@mail.com";
         String server = "testserver";
-        handler.setIgnoreEMail(server, email);
+        handler.setIgnoreEMail(server, "ignore-mail.com");
         ListenerMock listenerMock = mock(ListenerMock.class);
-        Collection<GerritEventListener> listeners = new HashSet<GerritEventListener>();
-        listeners.add(listenerMock);
-        handler.addEventListeners(listeners);
-        Account account = new Account("name", email);
+        handler.addListener(listenerMock);
+        Account account = new Account("name", "e@ignore-mail.com");
         Provider provider = new Provider();
         provider.setName(server);
         CommentAdded ca = new CommentAdded();
         ca.setAccount(account);
         ca.setProvider(provider);
+
         handler.notifyListeners(ca);
+
         verifyNoMoreInteractions(listenerMock);
     }
 
+    /**
+     * Tests that CommentAdded events are ignored correctly.
+     * @throws Exception if so.
+     */
+    @Test
+    public void testIgnoreCommentAddedWithNullMail() throws Exception {
+        String server = "testserver";
+        handler.setIgnoreEMail(server, "ignore-mail.com");
+        ListenerMock listenerMock = mock(ListenerMock.class);
+        handler.addListener(listenerMock);
+        Account account = new Account("name", null);
+        Provider provider = new Provider();
+        provider.setName(server);
+        CommentAdded ca = new CommentAdded();
+        ca.setAccount(account);
+        ca.setProvider(provider);
+
+        handler.notifyListeners(ca);
+
+        Mockito.verify(listenerMock, only()).gerritEvent(ca);
+    }
+
+    /**
+     * Tests that CommentAdded events are ignored correctly.
+     * @throws Exception if so.
+     */
+    @Test
+    public void testCommentAddedWithEmptyIgnoreMail() throws Exception {
+        String server = "testserver";
+        handler.setIgnoreEMail(server, "");
+        ListenerMock listenerMock = mock(ListenerMock.class);
+        handler.addListener(listenerMock);
+        Account account = new Account("name", "some@mail.com");
+        Provider provider = new Provider();
+        provider.setName(server);
+        CommentAdded ca = new CommentAdded();
+        ca.setAccount(account);
+        ca.setProvider(provider);
+
+        handler.notifyListeners(ca);
+
+        Mockito.verify(listenerMock, only()).gerritEvent(ca);
+    }
 
     /**
      * A GerritListener mock that can change it's hashCode
