@@ -237,6 +237,21 @@ public class GerritQueryHandler {
         return queryJava(queryString, false, true, true, false);
     }
 
+    //CS IGNORE RedundantThrows FOR NEXT 18 LINES. REASON: Informative.
+    //CS IGNORE JavadocMethod FOR NEXT 17 LINES. REASON: It is there.
+
+    /**
+     * Runs the query and returns the result as a list of Java JSONObjects.
+     * @param queryString the query.
+     * @return the query result as a List of JSONObjects.
+     * @throws GerritQueryException if Gerrit reports an error with the query.
+     * @throws SshException if there is an error in the SSH Connection.
+     * @throws IOException for some other IO problem.
+     */
+    public List<JSONObject> queryCurrentPatchSets(String queryString) throws
+            SshException, IOException, GerritQueryException {
+        return queryJava(queryString, false, true, false, false);
+    }
 
 
     //CS IGNORE RedundantThrows FOR NEXT 17 LINES. REASON: Informative.

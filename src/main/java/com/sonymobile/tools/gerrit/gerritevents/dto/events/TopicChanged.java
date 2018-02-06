@@ -30,6 +30,7 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.OLD_T
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventType;
 import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Account;
 
+import com.sonymobile.tools.gerrit.gerritevents.dto.rest.Topic;
 import net.sf.json.JSONObject;
 
 /**
@@ -39,14 +40,33 @@ import net.sf.json.JSONObject;
 public class TopicChanged  extends ChangeBasedEvent {
 
     /**
-     * The previous topic value.  New topic is in change.topic.
+     * The previous topic name.
      */
-    private String oldTopic;
+    private transient String oldTopic;
+
+    /**
+     * The previous topic object.  New topic is in change.topic.
+     */
+    private Topic oldTopicObject;
 
     /**
      * The user who triggered this event.
      */
     private Account changer;
+
+    /**
+     * Converts old serialized data to newer construct.
+     *
+     * @return itself
+     */
+    @SuppressWarnings("unused")
+    private Object readResolve() {
+        if (oldTopic != null) {
+            oldTopicObject = new Topic(oldTopic);
+            oldTopic = null;
+        }
+        return this;
+    }
 
     /**
      * Set the user who changed the topic.
@@ -64,18 +84,30 @@ public class TopicChanged  extends ChangeBasedEvent {
     }
 
     /**
-     * Set the old topic name.
-     * @param oldTopic the old topic name.
+     * Set the old topic.
+     * @param oldTopic the old topic.
      */
     public void setOldTopic(String oldTopic) {
-        this.oldTopic = oldTopic;
+        this.oldTopicObject = new Topic(oldTopic);
     }
 
     /**
-     * @return the old topic name.
+     * Shortcut for {@code getOldTopicObject() != null ? getOldTopicObject().getName() : null}.
+     * @return the old topic name if exists. null otherwise.
      */
     public String getOldTopic() {
-        return oldTopic;
+        if (oldTopicObject == null) {
+            return null;
+        }
+        return oldTopicObject.getName();
+    }
+
+    /**
+     * The old topic info related to this change. Can be null if there is no old topic.
+     * @return the old topic.
+     */
+    public Topic getOldTopicObject() {
+        return oldTopicObject;
     }
 
     @Override
@@ -96,7 +128,7 @@ public class TopicChanged  extends ChangeBasedEvent {
             this.changer = new Account(json.getJSONObject(CHANGER));
         }
         if (json.containsKey(OLD_TOPIC)) {
-            this.oldTopic = json.getString(OLD_TOPIC);
+            this.oldTopicObject = new Topic(json.getString(OLD_TOPIC));
         }
     }
 

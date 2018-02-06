@@ -24,6 +24,7 @@
 
 package com.sonymobile.tools.gerrit.gerritevents.dto.attr;
 
+import com.sonymobile.tools.gerrit.gerritevents.dto.GerritChangeStatus;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.Before;
@@ -46,6 +47,7 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.MESSA
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.REVIEWER;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.CREATED_ON;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.LAST_UPDATED;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.STATUS;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -204,6 +206,7 @@ public class ChangeTest {
         json.put(NUMBER, "100");
         json.put(SUBJECT, "subject");
         json.put(OWNER, jsonAccount);
+        json.put(STATUS, "NEW");
         json.put(URL, "http://localhost:8080");
         Change change = new Change(json);
 
@@ -215,6 +218,7 @@ public class ChangeTest {
         assertTrue(change.getOwner().equals(account));
         assertEquals(change.getUrl(), "http://localhost:8080");
         assertNull(change.getComments());
+        assertEquals(change.getStatus(), GerritChangeStatus.NEW);
     }
 
     /**
