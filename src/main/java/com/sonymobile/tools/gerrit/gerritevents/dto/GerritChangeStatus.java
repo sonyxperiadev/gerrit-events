@@ -7,29 +7,19 @@ public enum GerritChangeStatus {
     /**
      * Change is open.
      */
-    NEW("NEW"),
+    NEW,
     /**
      * Change was merged.
      */
-    MERGED("MERGED"),
+    MERGED,
     /**
      * Change was abandoned.
      */
-    ABANDONED("ABANDONED"),
+    ABANDONED,
     /**
      * Catch-all type if Gerrit adds a new ChangeStatus we don't know about.
      */
-    UNKNOWN("UNKNOWN");
-
-    private final String status;
-
-    /**
-     * Internal constructor for GerritChangeStatus enum.
-     * @param status string value returned in JSON
-     */
-    GerritChangeStatus(String status) {
-        this.status = status;
-    }
+    UNKNOWN;
 
     /**
      * Look up the GerritChangeStatus from a string representation.
@@ -38,7 +28,7 @@ public enum GerritChangeStatus {
      */
     public static GerritChangeStatus fromString(String status) {
         for (GerritChangeStatus s : GerritChangeStatus.values()) {
-            if (s.status.equals(status)) {
+            if (s.name().equals(status)) {
                 return s;
             }
         }
