@@ -463,6 +463,14 @@ public class Change implements GerritJsonDTO {
     }
 
     /**
+     * Sets the list of the files included in this patch set.
+     * @param files a list of files.
+     */
+    public void setFiles(List<String> files) {
+        this.files = files;
+    }
+
+    /**
      * Queries gerrit for the files included in this patch set.
      *
      * @param gerritQueryHandler the query handler, responsible for the queries to gerrit.

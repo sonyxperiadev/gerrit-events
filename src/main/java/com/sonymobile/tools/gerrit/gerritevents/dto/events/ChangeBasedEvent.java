@@ -50,6 +50,27 @@ public abstract class ChangeBasedEvent extends GerritTriggeredEvent {
     protected PatchSet patchSet;
 
     /**
+     * The changed files in this patchset.
+     */
+    private transient List<String> files;
+
+    /**
+     * Converts old serialized data to newer construct.
+     *
+     * @return itself
+     */
+    @SuppressWarnings("unused")
+    private Object readResolve() {
+        if (files != null) {
+            if (change != null) {
+                change.setFiles(files);
+            }
+            files = null;
+        }
+        return this;
+    }
+
+    /**
      * The Change.
      *
      * @return the change.
@@ -66,8 +87,6 @@ public abstract class ChangeBasedEvent extends GerritTriggeredEvent {
     public void setChange(Change change) {
         this.change = change;
     }
-
-
 
     /**
      * Queries gerrit for the files included in this patch set.
