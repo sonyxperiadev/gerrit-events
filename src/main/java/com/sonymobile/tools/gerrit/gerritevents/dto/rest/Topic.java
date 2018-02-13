@@ -72,7 +72,7 @@ public class Topic {
      */
     public Map<Change, PatchSet> getChanges(GerritQueryHandler gerritQueryHandler) {
         if (changes == null) {
-            changes = new HashMap<Change, PatchSet>();
+            Map<Change, PatchSet> temp = new HashMap<Change, PatchSet>();
             try {
                 List<JSONObject> jsonList = gerritQueryHandler.queryCurrentPatchSets("topic:{" + name + "}");
                 for (JSONObject json : jsonList) {
@@ -81,9 +81,10 @@ public class Topic {
                     }
                     if (json.has("currentPatchSet")) {
                         JSONObject currentPatchSet = json.getJSONObject("currentPatchSet");
-                        changes.put(new Change(json), new PatchSet(currentPatchSet));
+                        temp.put(new Change(json), new PatchSet(currentPatchSet));
                     }
                 }
+                changes = temp;
             } catch (IOException e) {
                 logger.error("IOException occured. ", e);
             } catch (GerritQueryException e) {

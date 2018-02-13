@@ -28,6 +28,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Change;
 import com.sonymobile.tools.gerrit.gerritevents.dto.attr.PatchSet;
 import net.sf.json.JSONObject;
 
+import java.util.Collections;
 import java.util.List;
 
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.CHANGE;
@@ -98,7 +99,11 @@ public abstract class ChangeBasedEvent extends GerritTriggeredEvent {
      */
     @Deprecated
     public List<String> getFiles(GerritQueryHandler gerritQueryHandler) {
-        return change.getFiles(gerritQueryHandler);
+        List<String> files = change.getFiles(gerritQueryHandler);
+        if (files == null) {
+            return Collections.emptyList();
+        }
+        return files;
     }
 
     /**

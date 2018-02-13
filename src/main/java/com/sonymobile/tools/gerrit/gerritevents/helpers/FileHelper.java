@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -29,7 +28,7 @@ public final class FileHelper {
      * Provides list of files related to the change.
      * @param gerritQueryHandler the query handler, responsible for the queries to gerrit.
      * @param changeId the Gerrit change id.
-     * @return list of files from the change.
+     * @return list of files from the change, null in case of errors
      */
     public static List<String> getFilesByChange(GerritQueryHandler gerritQueryHandler, String changeId) {
         try {
@@ -58,10 +57,10 @@ public final class FileHelper {
                 }
             }
         } catch (IOException e) {
-            logger.error("IOException occured. ", e);
+            logger.error("IOException occurred. ", e);
         } catch (GerritQueryException e) {
             logger.error("Bad query. ", e);
         }
-        return Collections.emptyList();
+        return null;
     }
 }
