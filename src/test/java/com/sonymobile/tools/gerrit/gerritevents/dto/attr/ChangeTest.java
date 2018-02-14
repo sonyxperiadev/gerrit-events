@@ -241,6 +241,8 @@ public class ChangeTest {
         change2.setSubject("subject");
         change2.setOwner(account);
         change2.setUrl("http://localhost:8080");
+        change2.setWip(false);
+        change2.setPrivate(false);
 
         assertTrue(change.equals(change2));
     }
