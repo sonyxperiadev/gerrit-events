@@ -23,8 +23,12 @@
  */
 package com.sonymobile.tools.gerrit.gerritevents.dto.attr;
 
+import com.sonymobile.tools.gerrit.gerritevents.GerritQueryHandler;
+import com.sonymobile.tools.gerrit.gerritevents.dto.GerritChangeStatus;
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritJsonDTO;
 
+import com.sonymobile.tools.gerrit.gerritevents.dto.rest.Topic;
+import com.sonymobile.tools.gerrit.gerritevents.helpers.FileHelper;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -47,6 +51,7 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.SUBJE
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.URL;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.CREATED_ON;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.LAST_UPDATED;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.STATUS;
 
 
 /**
@@ -65,9 +70,13 @@ public class Change implements GerritJsonDTO {
      */
     private String branch;
     /**
+     * Topic.
+     */
+    private Topic topicObject;
+    /**
      * Topic name.
      */
-    private String topic;
+    private transient String topic;
     /**
      * Change identifier.
      */
@@ -104,6 +113,31 @@ public class Change implements GerritJsonDTO {
     private Date lastUpdated;
 
     private List<Comment> comments;
+
+    /**
+     * The changed files in this patchset.
+     */
+    private List<String> files;
+
+    /**
+     * The change status.
+     */
+    private GerritChangeStatus status;
+
+    /**
+     * Converts old serialized data to newer construct.
+     *
+     * @return itself
+     */
+    @SuppressWarnings("unused")
+    private Object readResolve() {
+        if (topic != null) {
+            topicObject = new Topic(topic);
+            topic = null;
+        }
+        return this;
+    }
+
     /**
      * Default constructor.
      */
@@ -123,7 +157,6 @@ public class Change implements GerritJsonDTO {
     public void fromJson(JSONObject json) {
         project = getString(json, PROJECT);
         branch = getString(json, BRANCH);
-        topic = getString(json, TOPIC);
         id = getString(json, ID);
         number = getString(json, NUMBER);
         subject = getString(json, SUBJECT);
@@ -142,7 +175,13 @@ public class Change implements GerritJsonDTO {
         if (json.containsKey(COMMIT_MESSAGE)) {
             commitMessage = getString(json, COMMIT_MESSAGE);
         }
+        if (json.containsKey(TOPIC)) {
+            topicObject = new Topic(getString(json, TOPIC));
+        }
+
         url = getString(json, URL);
+
+        status = GerritChangeStatus.fromString(getString(json, STATUS));
     }
 
     /**
@@ -170,19 +209,54 @@ public class Change implements GerritJsonDTO {
     }
 
     /**
-     * Topic name.
-     * @return the topic.
+     * Change status.
+     * @return the change status.
      */
-    public String getTopic() {
-        return topic;
+    public GerritChangeStatus getStatus() {
+        return status;
     }
 
     /**
-     * Topic name.
-     * @param topic the topic.
+     * Sets the change status.
+     * @param status the status.
      */
-    public void setTopic(String topic) {
-        this.topic = topic;
+    public void setStatus(GerritChangeStatus status) {
+        this.status = status;
+    }
+
+    /**
+     * The topic info related to this change. Can be null if there is no topic.
+     * @return the topic.
+     */
+    public Topic getTopicObject() {
+        return topicObject;
+    }
+
+    /**
+     * Shortcut for {@code getTopicObject() != null ? getTopicObject().getName() : null}.
+     * @return the topic name if exists. null otherwise.
+     */
+    public String getTopic() {
+        if (topicObject == null) {
+            return null;
+        }
+        return topicObject.getName();
+    }
+
+    /**
+     * Sets the topic info related to this change.
+     * @param topicName the topic name.
+     */
+    public void setTopic(String topicName) {
+        topicObject = new Topic(topicName);
+    }
+
+    /**
+     * Sets the topic info related to this change.
+     * @param topicObject the topic.
+     */
+    public void setTopicObject(Topic topicObject) {
+        this.topicObject = topicObject;
     }
 
     /**
@@ -386,5 +460,27 @@ public class Change implements GerritJsonDTO {
         s.append("Project: " + getProject() + "  " + getBranch() + "  " + getId() + "\n");
         s.append("Link:    " + getUrl() + "\n");
         return s.toString();
+    }
+
+    /**
+     * Sets the list of the files included in this patch set.
+     * @param files a list of files.
+     */
+    public void setFiles(List<String> files) {
+        this.files = files;
+    }
+
+    /**
+     * Queries gerrit for the files included in this patch set.
+     *
+     * @param gerritQueryHandler the query handler, responsible for the queries to gerrit.
+     * @return a list of files that are part of this patch set.
+     *
+     */
+    public List<String> getFiles(GerritQueryHandler gerritQueryHandler) {
+        if (files == null) {
+            files = FileHelper.getFilesByChange(gerritQueryHandler, id);
+        }
+        return files;
     }
 }

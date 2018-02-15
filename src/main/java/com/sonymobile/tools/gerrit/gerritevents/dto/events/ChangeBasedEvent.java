@@ -23,17 +23,12 @@
  */
 package com.sonymobile.tools.gerrit.gerritevents.dto.events;
 
-import com.sonymobile.tools.gerrit.gerritevents.GerritQueryException;
 import com.sonymobile.tools.gerrit.gerritevents.GerritQueryHandler;
 import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Change;
 import com.sonymobile.tools.gerrit.gerritevents.dto.attr.PatchSet;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.CHANGE;
@@ -45,8 +40,6 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.PATCH
  * @author Tomas Westling &lt;tomas.westling@sonymobile.com&gt;
  */
 public abstract class ChangeBasedEvent extends GerritTriggeredEvent {
-
-    private static final Logger logger = LoggerFactory.getLogger(ChangeBasedEvent.class);
     /**
      * The Gerrit change the event is related to.
      */
@@ -56,6 +49,27 @@ public abstract class ChangeBasedEvent extends GerritTriggeredEvent {
      * Refers to a specific patchset within a change.
      */
     protected PatchSet patchSet;
+
+    /**
+     * The changed files in this patchset.
+     */
+    private transient List<String> files;
+
+    /**
+     * Converts old serialized data to newer construct.
+     *
+     * @return itself
+     */
+    @SuppressWarnings("unused")
+    private Object readResolve() {
+        if (files != null) {
+            if (change != null) {
+                change.setFiles(files);
+            }
+            files = null;
+        }
+        return this;
+    }
 
     /**
      * The Change.
@@ -75,48 +89,22 @@ public abstract class ChangeBasedEvent extends GerritTriggeredEvent {
         this.change = change;
     }
 
-/**
-     * The changed files in this patchset.
-     */
-    private List<String> files;
-
-
-
     /**
      * Queries gerrit for the files included in this patch set.
      *
      * @param gerritQueryHandler the query handler, responsible for the queries to gerrit.
      * @return a list of files that are part of this patch set.
+     *
+     * @deprecated use {@link Change#getFiles(GerritQueryHandler)} instead.
      */
+    @Deprecated
     public List<String> getFiles(GerritQueryHandler gerritQueryHandler) {
+        List<String> files = change.getFiles(gerritQueryHandler);
         if (files == null) {
-            files = new LinkedList<String>();
-            try {
-                List<JSONObject> jsonList = gerritQueryHandler.queryFiles("change:" + getChange().getId());
-                for (JSONObject json : jsonList) {
-                    if (json.has("type") && "stats".equalsIgnoreCase(json.getString("type"))) {
-                        continue;
-                    }
-                    if (json.has("currentPatchSet")) {
-                        JSONObject currentPatchSet = json.getJSONObject("currentPatchSet");
-                        if (currentPatchSet.has("files")) {
-                            JSONArray changedFiles = currentPatchSet.optJSONArray("files");
-                            for (int i = 0; i < changedFiles.size(); i++) {
-                                JSONObject file = changedFiles.getJSONObject(i);
-                                files.add(file.getString("file"));
-                            }
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                logger.error("IOException occured. ", e);
-            } catch (GerritQueryException e) {
-                logger.error("Bad query. ", e);
-            }
+            return Collections.emptyList();
         }
         return files;
     }
-
 
     /**
      * The patchSet.
