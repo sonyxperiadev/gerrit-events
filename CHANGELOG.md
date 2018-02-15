@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.12.0 - 2018-02-15
+* Bumped json lib to 2.4
+* Some more/better logging _([PR #74](https://github.com/sonyxperiadev/gerrit-events/pull/74), [#75](https://github.com/sonyxperiadev/gerrit-events/pull/75))_
+* Using `endsWith` instead of `equals` to blacklist e-mails. _([PR #76](https://github.com/sonyxperiadev/gerrit-events/pull/76))_
+* Added API to retrive all topic related data from the change and added  change status to the change based events. _([PR #77](https://github.com/sonyxperiadev/gerrit-events/pull/77))_
+
 ## 2.11.3 - 2018-01-15
 
 * [JENKINS-48943](https://issues.jenkins-ci.org/browse/JENKINS-48943) Whitelist gerrit-events for Jenkins 2.102+
