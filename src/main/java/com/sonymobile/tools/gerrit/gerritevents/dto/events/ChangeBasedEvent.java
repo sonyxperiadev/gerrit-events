@@ -99,11 +99,11 @@ public abstract class ChangeBasedEvent extends GerritTriggeredEvent {
      */
     @Deprecated
     public List<String> getFiles(GerritQueryHandler gerritQueryHandler) {
-        List<String> files = change.getFiles(gerritQueryHandler);
-        if (files == null) {
+        List<String> returned = change.getFiles(gerritQueryHandler);
+        if (returned == null) {
             return Collections.emptyList();
         }
-        return files;
+        return returned;
     }
 
     /**
