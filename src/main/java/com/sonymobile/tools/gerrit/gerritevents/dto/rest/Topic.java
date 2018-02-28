@@ -30,10 +30,12 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Change;
 import com.sonymobile.tools.gerrit.gerritevents.dto.attr.PatchSet;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.ChangeBasedEvent;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +73,11 @@ public class Topic {
      * @return the map of pairs change-patchset related to this topic.
      */
     public Map<Change, PatchSet> getChanges(GerritQueryHandler gerritQueryHandler) {
+        if (StringUtils.isEmpty(name)) {
+            logger.error("Topic name can not be empty");
+            return Collections.emptyMap();
+        }
+
         if (changes == null) {
             Map<Change, PatchSet> temp = new HashMap<Change, PatchSet>();
             try {
