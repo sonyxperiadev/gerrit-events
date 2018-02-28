@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.12.1 - 2018-02-28
+* Prevent receiving list of random changes for empty topic name. _([PR #78](https://github.com/sonyxperiadev/gerrit-events/pull/78))_
+
 ## 2.12.0 - 2018-02-15
 * Bumped json lib to 2.4
 * Some more/better logging _([PR #74](https://github.com/sonyxperiadev/gerrit-events/pull/74), [#75](https://github.com/sonyxperiadev/gerrit-events/pull/75))_
