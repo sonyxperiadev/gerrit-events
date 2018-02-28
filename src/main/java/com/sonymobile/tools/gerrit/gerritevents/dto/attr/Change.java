@@ -31,6 +31,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.rest.Topic;
 import com.sonymobile.tools.gerrit.gerritevents.helpers.FileHelper;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -131,10 +132,15 @@ public class Change implements GerritJsonDTO {
      */
     @SuppressWarnings("unused")
     private Object readResolve() {
-        if (topic != null) {
+        if (StringUtils.isNotEmpty(topic)) {
             topicObject = new Topic(topic);
             topic = null;
         }
+
+        if (topicObject != null && StringUtils.isEmpty(topicObject.getName())) {
+            topicObject = null;
+        }
+
         return this;
     }
 
@@ -176,7 +182,10 @@ public class Change implements GerritJsonDTO {
             commitMessage = getString(json, COMMIT_MESSAGE);
         }
         if (json.containsKey(TOPIC)) {
-            topicObject = new Topic(getString(json, TOPIC));
+            String topicName = getString(json, TOPIC);
+            if (StringUtils.isNotEmpty(topicName)) {
+                topicObject = new Topic(topicName);
+            }
         }
 
         url = getString(json, URL);

@@ -32,6 +32,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Account;
 
 import com.sonymobile.tools.gerrit.gerritevents.dto.rest.Topic;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * A DTO representation of the topic-changed Gerrit Event.
@@ -61,10 +62,15 @@ public class TopicChanged  extends ChangeBasedEvent {
      */
     @SuppressWarnings("unused")
     private Object readResolve() {
-        if (oldTopic != null) {
+        if (StringUtils.isNotEmpty(oldTopic)) {
             oldTopicObject = new Topic(oldTopic);
             oldTopic = null;
         }
+
+        if (oldTopicObject != null && StringUtils.isEmpty(oldTopicObject.getName())) {
+            oldTopicObject = null;
+        }
+
         return this;
     }
 
