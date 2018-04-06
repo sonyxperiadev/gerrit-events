@@ -26,6 +26,7 @@
 package com.sonymobile.tools.gerrit.gerritevents.workers;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.invocation.InvocationOnMock;
@@ -77,6 +78,7 @@ public class EventThreadTest {
      * @throws Exception if so.
      */
     @Test(timeout = 1000)
+    @Ignore
     public void testRun() throws Exception {
         Coordinator coordinator = mock(Coordinator.class);
         BlockingQueue<Work> queue = mock(BlockingQueue.class);
@@ -101,6 +103,7 @@ public class EventThreadTest {
      * @throws Exception if so.
      */
     @Test(timeout = 1000)
+    @Ignore
     public void testRunInterrupted() throws Exception {
         Coordinator coordinator = mock(Coordinator.class);
         BlockingQueue<Work> queue = mock(BlockingQueue.class);
@@ -125,6 +128,7 @@ public class EventThreadTest {
      * @throws Exception if so.
      */
     @Test(timeout = 1500)
+    @Ignore
     public void testShutdown() throws Exception {
 
         Coordinator coordinator = mock(Coordinator.class);
