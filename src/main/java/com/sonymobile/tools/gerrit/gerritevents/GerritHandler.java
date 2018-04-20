@@ -183,6 +183,8 @@ public class GerritHandler implements Coordinator, Handler {
 
     /**
      * Returns the largest number of threads that have ever simultaneously been in the pool.
+     * Package visiblity for testing purposes only.
+     *
      * @return number of threads
      */
     int getLargestPoolSize() {
@@ -429,7 +431,6 @@ public class GerritHandler implements Coordinator, Handler {
         this.threadKeepAliveTime = threadKeepAliveTime;
         executor.setKeepAliveTime(threadKeepAliveTime, TimeUnit.SECONDS);
     }
-
 
     /**
      * Notifies all listeners of a Gerrit event. This method is meant to be called by one of the Worker Threads {@link
