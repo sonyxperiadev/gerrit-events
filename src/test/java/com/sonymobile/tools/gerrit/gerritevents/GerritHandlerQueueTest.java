@@ -1,7 +1,10 @@
 package com.sonymobile.tools.gerrit.gerritevents;
 
+import static com.sonymobile.tools.gerrit.gerritevents.GerritDefaultValues.DEFAULT_NR_OF_RECEIVING_WORKER_THREADS;
+
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
+
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -21,7 +24,7 @@ public class GerritHandlerQueueTest {
 
     private GerritHandler handler;
     SlowEventListener listener;
-
+    
     /**
      * Initialize.
      */
@@ -67,7 +70,7 @@ public class GerritHandlerQueueTest {
         handler.addListener(listener);
         postEventsToQueue(5);
         waitForEventsProcessed();
-        assertThat(handler.getLargestPoolSize(), equalTo(3));
+        assertThat(handler.getLargestPoolSize(), equalTo(DEFAULT_NR_OF_RECEIVING_WORKER_THREADS));
     }
 
     /**
@@ -127,7 +130,7 @@ public class GerritHandlerQueueTest {
         waitForEventsProcessed();
         assertThat(handler.getLargestPoolSize(), equalTo(5));
         listener.maxParallel = 0;
-        handler.setNumberOfWorkerThreads(3);
+        handler.setNumberOfWorkerThreads(DEFAULT_NR_OF_RECEIVING_WORKER_THREADS);
         Thread.sleep(1000);
         postEventsToQueue(5);
         waitForEventsProcessed();

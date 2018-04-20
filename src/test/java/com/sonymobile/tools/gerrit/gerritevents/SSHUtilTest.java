@@ -1,11 +1,13 @@
 package com.sonymobile.tools.gerrit.gerritevents;
 
 import java.io.File;
+import java.net.URL;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import com.sonymobile.tools.gerrit.gerritevents.ssh.SshUtil;
 
 /**
@@ -23,7 +25,9 @@ public class SSHUtilTest {
     @Test
     public void testNoPassphraseParsing() throws Exception {
         // Get no-passphrase key resource as file
-        File file = new File("src/test/resources/com/sonymobile/tools/gerrit/gerritevents/id_rsa");
+        URL url = Thread.currentThread().getContextClassLoader().getResource(
+                "com/sonymobile/tools/gerrit/gerritevents/id_rsa");
+        File file = new File(url.getPath());        
 
         boolean tested = SshUtil.checkPassPhrase(file, null);
         assertTrue("Passphrase validation failed to validate null passphrase with none set", tested);
@@ -43,7 +47,9 @@ public class SSHUtilTest {
     public void testPassphraseParsing() throws Exception {
 
         // Get passphrase-encrypted keyfile as file
-        File file = new File("src/test/resources/com/sonymobile/tools/gerrit/gerritevents/id_rsa_passphrase");
+        URL url = Thread.currentThread().getContextClassLoader().getResource(
+                "com/sonymobile/tools/gerrit/gerritevents/id_rsa_passphrase");
+        File file = new File(url.getPath());        
 
         // Fail if invalid passphrase does not fail
         SshUtil.checkPassPhrase(file, "wrongpassphrase");

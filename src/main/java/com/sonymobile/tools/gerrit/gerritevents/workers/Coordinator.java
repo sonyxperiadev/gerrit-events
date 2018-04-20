@@ -33,12 +33,6 @@ import java.util.concurrent.BlockingQueue;
  */
 public interface Coordinator {
     /**
-     * Retrieves the work queue for workers to poll.
-     * @return the queue
-     */
-    BlockingQueue<Work> getWorkQueue();
-
-    /**
      * Notifies the listeners of a GerritEvent.
      * @param event the event to fire.
      */
