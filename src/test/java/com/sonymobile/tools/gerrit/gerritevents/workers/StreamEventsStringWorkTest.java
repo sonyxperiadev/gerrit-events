@@ -90,6 +90,10 @@ public class StreamEventsStringWorkTest {
         Coordinator coordinator = new Coordinator() {
 
             @Override
+            public BlockingQueue<Work> getWorkQueue() {
+                return mock(BlockingQueue.class);
+            }
+            @Override
             public void notifyListeners(GerritEvent event) {
                 notifiedEvent[0] = event;
             }

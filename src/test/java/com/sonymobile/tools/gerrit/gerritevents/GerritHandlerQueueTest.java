@@ -24,7 +24,7 @@ public class GerritHandlerQueueTest {
 
     private GerritHandler handler;
     SlowEventListener listener;
-    
+
     /**
      * Initialize.
      */

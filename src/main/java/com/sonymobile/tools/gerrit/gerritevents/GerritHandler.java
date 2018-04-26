@@ -101,7 +101,7 @@ public class GerritHandler implements Coordinator, Handler {
     }
 
     /**
-     * Create handler with the given number of maximum worker threads
+     * Create handler with the given number of maximum worker threads.
      *
      * @param numberOfWorkerThreads the number of event threads.
      */
@@ -111,19 +111,15 @@ public class GerritHandler implements Coordinator, Handler {
 
     /**
      * Create handler with the given number of maximum worker threads and given thread keep alive
-     * time (not allowing the thread keep alive to become less than 
-     * @see GerritDefaultValues#MIN_RECEIVE_THREAD_KEEP_ALIVE_TIME)
+     * time (not allowing the thread keep alive to become less
+     * than @see GerritDefaultValues#MIN_RECEIVE_THREAD_KEEP_ALIVE_TIME).
      *
      * @param numberOfWorkerThreads the number of event threads.
-     * @param threadKeepAliveTime the number of seconds threads will stay alive. 
+     * @param threadKeepAliveTime the number of seconds threads will stay alive.
      */
     public GerritHandler(int numberOfWorkerThreads, int threadKeepAliveTime) {
         this.numberOfWorkerThreads = numberOfWorkerThreads;
-        if (threadKeepAliveTime < MIN_RECEIVE_THREAD_KEEP_ALIVE_TIME)
-        {
-            threadKeepAliveTime = MIN_RECEIVE_THREAD_KEEP_ALIVE_TIME;
-        }
-        this.threadKeepAliveTime = threadKeepAliveTime;
+        this.threadKeepAliveTime = Math.max(MIN_RECEIVE_THREAD_KEEP_ALIVE_TIME, threadKeepAliveTime);
 
         startQueue();
     }
@@ -183,7 +179,7 @@ public class GerritHandler implements Coordinator, Handler {
 
     /**
      * Returns the largest number of threads that have ever simultaneously been in the pool.
-     * Package visiblity for testing purposes only.
+     * Package visibility for testing purposes only.
      *
      * @return number of threads
      */
@@ -251,7 +247,7 @@ public class GerritHandler implements Coordinator, Handler {
     }
 
     /**
-     * Returns the current queue size if gerrit events.
+     * Returns the current queue size of gerrit events.
      * @return number of events
      */
     public int getQueueSize() {
@@ -430,6 +426,25 @@ public class GerritHandler implements Coordinator, Handler {
     public void setThreadKeepAliveTime(int threadKeepAliveTime) {
         this.threadKeepAliveTime = threadKeepAliveTime;
         executor.setKeepAliveTime(threadKeepAliveTime, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Returns a snapshot of the current state of the queue in the executor and not the Queue itself.
+     * 
+     * {@inheritDoc}
+     */
+    @Override
+    public BlockingQueue<Work> getWorkQueue() {
+
+        BlockingQueue<Work> queue = new LinkedBlockingQueue<Work>();
+        BlockingQueue<Runnable> workQueue = executor.getQueue();
+        for (Runnable r: workQueue) {
+            if (r instanceof EventWorker) {
+                queue.add(((EventWorker)r).work);
+            }
+        }
+
+        return queue;
     }
 
     /**

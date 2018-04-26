@@ -27,7 +27,7 @@ public class SSHUtilTest {
         // Get no-passphrase key resource as file
         URL url = Thread.currentThread().getContextClassLoader().getResource(
                 "com/sonymobile/tools/gerrit/gerritevents/id_rsa");
-        File file = new File(url.getPath());        
+        File file = new File(url.getPath());
 
         boolean tested = SshUtil.checkPassPhrase(file, null);
         assertTrue("Passphrase validation failed to validate null passphrase with none set", tested);
@@ -49,7 +49,7 @@ public class SSHUtilTest {
         // Get passphrase-encrypted keyfile as file
         URL url = Thread.currentThread().getContextClassLoader().getResource(
                 "com/sonymobile/tools/gerrit/gerritevents/id_rsa_passphrase");
-        File file = new File(url.getPath());        
+        File file = new File(url.getPath());
 
         // Fail if invalid passphrase does not fail
         SshUtil.checkPassPhrase(file, "wrongpassphrase");

@@ -91,7 +91,7 @@ public final class GerritDefaultValues {
     /**
      * The minimum keep alive time for receiving threads in seconds.
      */
-    public static final int MIN_RECEIVE_THREAD_KEEP_ALIVE_TIME = 30;
+    public static final int MIN_RECEIVE_THREAD_KEEP_ALIVE_TIME = 10;
     /**
      * The default nr of worker threads that sends approvals/review commands.
      */

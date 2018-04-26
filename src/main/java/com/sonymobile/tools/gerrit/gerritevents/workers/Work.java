@@ -26,7 +26,7 @@
 package com.sonymobile.tools.gerrit.gerritevents.workers;
 
 /**
- * Base work for an {@link EventThread} worker.
+ * Base work for a coordinator
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
 public interface Work {
