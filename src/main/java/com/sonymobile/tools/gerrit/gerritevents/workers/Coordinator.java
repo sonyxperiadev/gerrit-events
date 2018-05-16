@@ -36,7 +36,6 @@ public interface Coordinator {
      * Retrieves the work queue for workers to poll.
      * @return the queue
      */
-    @Deprecated
     BlockingQueue<Work> getWorkQueue();
 
     /**

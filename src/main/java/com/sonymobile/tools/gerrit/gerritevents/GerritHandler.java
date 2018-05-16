@@ -29,6 +29,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Account;
 import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Provider;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.CommentAdded;
 import com.sonymobile.tools.gerrit.gerritevents.workers.Coordinator;
+import com.sonymobile.tools.gerrit.gerritevents.workers.EventThread;
 import com.sonymobile.tools.gerrit.gerritevents.workers.GerritEventWork;
 import com.sonymobile.tools.gerrit.gerritevents.workers.JSONEventWork;
 import com.sonymobile.tools.gerrit.gerritevents.workers.StreamEventsStringWork;
@@ -57,6 +58,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
 
 //CS IGNORE LineLength FOR NEXT 2 LINES. REASON: static import.
 import static com.sonymobile.tools.gerrit.gerritevents.GerritDefaultValues.DEFAULT_NR_OF_RECEIVING_WORKER_THREADS;
@@ -124,6 +126,17 @@ public class GerritHandler implements Coordinator, Handler {
         startQueue();
     }
 
+    /**
+     * Create the Event Thread.
+     * No longer used.
+     *
+     * @param threadName Name of thread to be created.
+     * @return new EventThread to be used by worker
+     */
+    @Deprecated
+    protected EventThread createEventThread(String threadName) {
+        return new EventThread(this, threadName);
+    }
 
     /**
      * Returns a factory for creating worker threads for the receiving queue.
@@ -251,12 +264,8 @@ public class GerritHandler implements Coordinator, Handler {
      * @return number of events
      */
     public int getQueueSize() {
-      if (executor != null) {
-          return executor.getQueue().size();
-      } else {
-          return 0;
-      }
-  }
+        return executor.getQueue().size();
+    }
 
     /**
      * Post work object to work queue.
@@ -424,7 +433,7 @@ public class GerritHandler implements Coordinator, Handler {
      * @param threadKeepAliveTime number of seconds
      */
     public void setThreadKeepAliveTime(int threadKeepAliveTime) {
-        this.threadKeepAliveTime = threadKeepAliveTime;
+        this.threadKeepAliveTime = Math.max(MIN_RECEIVE_THREAD_KEEP_ALIVE_TIME, threadKeepAliveTime);
         executor.setKeepAliveTime(threadKeepAliveTime, TimeUnit.SECONDS);
     }
 
@@ -536,26 +545,24 @@ public class GerritHandler implements Coordinator, Handler {
      * @param join if the method should wait for the thread to finish before returning.
      */
     public void shutdown(boolean join) {
-        if (executor != null) {
-            ThreadPoolExecutor pool = executor;
-            executor = null;
-            pool.shutdown(); // Disable new tasks from being submitted
-            if (join) {
-                try {
-                    // Wait a while for existing tasks to terminate
+        ThreadPoolExecutor pool = executor;
+        executor = null;
+        pool.shutdown(); // Disable new tasks from being submitted
+        if (join) {
+            try {
+                // Wait a while for existing tasks to terminate
+                if (!pool.awaitTermination(WAIT_FOR_JOBS_SHUTDOWN_TIMEOUT, TimeUnit.SECONDS)) {
+                    pool.shutdownNow(); // Cancel currently executing tasks
+                    // Wait a while for tasks to respond to being cancelled
                     if (!pool.awaitTermination(WAIT_FOR_JOBS_SHUTDOWN_TIMEOUT, TimeUnit.SECONDS)) {
-                        pool.shutdownNow(); // Cancel currently executing tasks
-                        // Wait a while for tasks to respond to being cancelled
-                        if (!pool.awaitTermination(WAIT_FOR_JOBS_SHUTDOWN_TIMEOUT, TimeUnit.SECONDS)) {
-                            logger.error("Pool did not terminate");
-                        }
+                        logger.error("Pool did not terminate");
                     }
-                } catch (InterruptedException ie) {
-                    // (Re-)Cancel if current thread also interrupted
-                    pool.shutdownNow();
-                    // Preserve interrupt status
-                    Thread.currentThread().interrupt();
                 }
+            } catch (InterruptedException ie) {
+                // (Re-)Cancel if current thread also interrupted
+                pool.shutdownNow();
+                // Preserve interrupt status
+                Thread.currentThread().interrupt();
             }
         }
     }
