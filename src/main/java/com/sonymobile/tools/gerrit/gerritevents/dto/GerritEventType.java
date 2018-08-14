@@ -109,10 +109,10 @@ public enum GerritEventType {
     /***
      * A private state changed event.
      */
-    PRIVATE_STATE_CHANGED("private-state-changed",true, PrivateStateChanged.class),
+    PRIVATE_STATE_CHANGED("private-state-changed", true, PrivateStateChanged.class),
 
     /***
-     * A work in progress state chaned event.
+     * A work in progress state changed event.
      */
     WIP_STATE_CHANGED("wip-state-changed", true, WipStateChanged.class);
 

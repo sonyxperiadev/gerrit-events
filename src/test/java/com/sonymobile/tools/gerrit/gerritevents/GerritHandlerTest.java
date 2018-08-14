@@ -433,11 +433,11 @@ public class GerritHandlerTest {
 
         PrivateStateChanged privateStateChanged = new PrivateStateChanged();
         handler.notifyListeners(privateStateChanged);
-        verify(listenerMock, times(1).gerritEvent(privateStateChanged));
+        verify(listenerMock, times(1)).gerritEvent(privateStateChanged);
 
         WipStateChanged wipStateChanged = new WipStateChanged();
         handler.notifyListeners(wipStateChanged);
-        verify(listenerMock, times(1).gerritEvent(wipStateChanged));
+        verify(listenerMock, times(1)).gerritEvent(wipStateChanged);
     }
 
     /**

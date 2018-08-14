@@ -24,7 +24,6 @@
 package com.sonymobile.tools.gerrit.gerritevents.dto.events;
 
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventType;
-import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Change;
 
 /**
  * A DTO representation of the wip-state-changed Gerrit Event.
@@ -34,7 +33,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Change;
 public class WipStateChanged extends ChangeBasedEvent {
   @Override
   public GerritEventType getEventType() {
-    return GerritEventType.PRIVATE_STATE_CHANGED;
+    return GerritEventType.WIP_STATE_CHANGED;
   }
 
   @Override

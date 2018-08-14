@@ -436,7 +436,7 @@ public class Change implements GerritJsonDTO {
 
     /**
      * Is this change a work in progress.
-     * @param boolean change is in WIP state.
+     * @param wip change is in WIP state.
      */
     public void setWip(boolean wip) { this.wip = wip; }
 
@@ -448,9 +448,10 @@ public class Change implements GerritJsonDTO {
 
     /**
      * Is this change private.
-     * @param boolean change is private.
+     * @param isPrivate change is private.
      */
-    public void setPrivate(boolean isPrivate) {this.isPrivate = isPrivate; }
+    // CS IGNORE HiddenField FOR NEXT 1 LINES. REASON: Private is a reserved keyword.
+    public void setPrivate(boolean isPrivate) { this.isPrivate = isPrivate; }
 
     @Override
     public boolean equals(Object obj) {
