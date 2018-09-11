@@ -74,6 +74,10 @@ public abstract class GerritEventKeys {
      */
     public static final String OWNER = "owner";
     /**
+     * private.
+     */
+    public static final String PRIVATE = "private";
+    /**
      * project.
      */
     public static final String PROJECT = "project";
@@ -89,6 +93,10 @@ public abstract class GerritEventKeys {
      * subject.
      */
     public static final String SUBJECT = "subject";
+    /**
+     * wip.
+     */
+    public static final String WIP = "wip";
     /**
      * commit message.
      */
