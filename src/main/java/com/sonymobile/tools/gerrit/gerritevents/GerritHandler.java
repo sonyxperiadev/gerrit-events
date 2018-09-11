@@ -439,7 +439,7 @@ public class GerritHandler implements Coordinator, Handler {
 
     /**
      * Returns a snapshot of the current state of the queue in the executor and not the Queue itself.
-     * 
+     *
      * {@inheritDoc}
      */
     @Override

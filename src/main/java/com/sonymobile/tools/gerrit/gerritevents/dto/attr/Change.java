@@ -155,7 +155,8 @@ public class Change implements GerritJsonDTO {
     /**
      * Is this change private.
      */
-    private boolean isPrivate;
+    // CS IGNORE MemberName FOR NEXT 1 LINES. REASON: Private is a reserved keyword.
+    private boolean _private;
 
     /**
      * Default constructor.
@@ -204,7 +205,7 @@ public class Change implements GerritJsonDTO {
         url = getString(json, URL);
         status = GerritChangeStatus.fromString(getString(json, STATUS));
         wip = getBoolean(json, WIP, false);
-        isPrivate = getBoolean(json, PRIVATE, false);
+        _private = getBoolean(json, PRIVATE, false);
     }
 
     /**
@@ -444,14 +445,15 @@ public class Change implements GerritJsonDTO {
      * Is this change private.
      * @return change is in private state.
      */
-    public boolean isPrivate() { return isPrivate; }
+    public boolean isPrivate() { return _private; }
 
     /**
      * Is this change private.
-     * @param isPrivate change is private.
+     * @param _private change is private.
      */
-    // CS IGNORE HiddenField FOR NEXT 1 LINES. REASON: Private is a reserved keyword.
-    public void setPrivate(boolean isPrivate) { this.isPrivate = isPrivate; }
+    // CS IGNORE HiddenField FOR NEXT 2 LINES. REASON: Private is a reserved keyword.
+    // CS IGNORE ParameterName FOR NEXT 1 LINES. REASON: Private is a reserved keyword.
+    public void setPrivate(boolean _private) { this._private = _private; }
 
     @Override
     public boolean equals(Object obj) {
