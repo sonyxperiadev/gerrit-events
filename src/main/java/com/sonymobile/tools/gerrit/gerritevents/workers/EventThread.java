@@ -29,9 +29,12 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A basic event thread.
- * The idea is to split up as much work as possible to be able to quickly handle the next event from Gerrit
+ * The idea is to split up as much work as possible to be able to quickly handle the next event from Gerrit.
+ * This class is no longer used.
+ *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
+@Deprecated
 public class EventThread extends Thread {
 
     private static final Logger logger = LoggerFactory.getLogger(EventThread.class);

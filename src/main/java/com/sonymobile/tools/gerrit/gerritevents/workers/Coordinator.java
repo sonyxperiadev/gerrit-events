@@ -28,7 +28,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.GerritEvent;
 import java.util.concurrent.BlockingQueue;
 
 /**
- * Representation interface of an EventThread workers coordinator.
+ * Representation interface of a Work coordinator.
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
 public interface Coordinator {
