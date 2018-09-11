@@ -25,6 +25,7 @@
 package com.sonymobile.tools.gerrit.gerritevents.dto.rest;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 //CS IGNORE LineLength FOR NEXT 6 LINES. REASON: JavaDoc.
 /**
@@ -41,11 +42,21 @@ public class CommentedFile {
      * Standard Constructor.
      *
      * @param fileName file name
+     */
+    public CommentedFile(String fileName) {
+        this.fileName = fileName;
+        this.comments = new HashSet<LineComment>();
+    }
+
+    /**
+     * Standard Constructor.
+     *
+     * @param fileName file name
      * @param comments comments
      */
     public CommentedFile(String fileName, Collection<LineComment> comments) {
-        this.fileName = fileName;
-        this.comments = comments;
+        this(fileName);
+        this.comments.addAll(comments);
     }
 
     /**
@@ -55,6 +66,16 @@ public class CommentedFile {
      */
     public String getFileName() {
         return fileName;
+    }
+
+    /**
+     * Add a LineComment to this file.
+     *
+     * @param comment the LineComment to add
+     * @return true if the comment was added successfully
+     */
+    public boolean addLineComment(LineComment comment) {
+        return comments.add(comment);
     }
 
     /**

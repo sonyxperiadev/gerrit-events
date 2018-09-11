@@ -24,14 +24,13 @@
  */
 package com.sonymobile.tools.gerrit.gerritevents.dto.rest;
 
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 //CS IGNORE LineLength FOR NEXT 6 LINES. REASON: JavaDoc.
 /**
@@ -42,7 +41,7 @@ import java.util.Map;
 public class ReviewInput {
     final String message;
     final Map<String, Integer> labels = new HashMap<String, Integer>();
-    final Map<String, List<LineComment>> comments = new HashMap<String, List<LineComment>>();
+    final Map<String, Set<LineComment>> comments = new HashMap<String, Set<LineComment>>();
     Notify notify;
     String tag;
 
@@ -102,7 +101,7 @@ public class ReviewInput {
         }
         for (CommentedFile file : commentedFiles) {
             if (!comments.containsKey(file.getFileName())) {
-                comments.put(file.getFileName(), new ArrayList<LineComment>());
+                comments.put(file.getFileName(), new HashSet<LineComment>());
             }
             comments.get(file.getFileName()).addAll(file.getLineComments());
         }
