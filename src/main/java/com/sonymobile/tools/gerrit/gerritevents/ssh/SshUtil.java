@@ -31,7 +31,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 
 /**
- * Base util for connecting, authenticating and doing stuff on an ssh client->server connection.
+ * Base util for connecting, authenticating and doing stuff on an ssh client&rarr;server connection.
  * @author Robert Sandell robert.sandell@sonyericsson.com
  */
 public final class SshUtil {

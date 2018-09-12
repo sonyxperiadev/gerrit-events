@@ -221,7 +221,7 @@ public class WatchTimeExceptionData {
 
         /**
          * If the provided time is within this time span.
-         * <code>time &tg;= from &amp;&amp; time &lt;= to</code>
+         * <code>time &gt;= from &amp;&amp; time &lt;= to</code>
          *
          * @param time the provided time
          * @return true if <code>from &gt;= time &lt;= to</code>
