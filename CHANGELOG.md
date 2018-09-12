@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.13.0 - 2018-09-12
+* Add "private" and "wip" states to Change (Continued) _([PR #81](https://github.com/sonyxperiadev/gerrit-events/pull/81))_
+* [JENKINS-50568](https://issues.jenkins-ci.org/browse/JENKINS-50568) - make receive queue max threads configurable _([PR #79](https://github.com/sonyxperiadev/gerrit-events/pull/79))_
+* Filter out duplicate LineComments _([PR #82](https://github.com/sonyxperiadev/gerrit-events/pull/82))_
+
 ## 2.12.1 - 2018-02-28
 * Prevent receiving list of random changes for empty topic name. _([PR #78](https://github.com/sonyxperiadev/gerrit-events/pull/78))_
 
