@@ -265,6 +265,10 @@ public abstract class GerritEventKeys {
      * reason.
      */
     public static final String REASON = "reason";
+    /**
+     * hashtags.
+     */
+    public static final String HASHTAGS = "hashtags";
 
     /**
      * Empty default constructor to hinder instantiation.
