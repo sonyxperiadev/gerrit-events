@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.14.0 - 2018-10-24
+* Add hashtags-changed event _([PR #83](https://github.com/sonyxperiadev/gerrit-events/pull/83))_
+
 ## 2.13.0 - 2018-09-12
 * Add "private" and "wip" states to Change (Continued) _([PR #81](https://github.com/sonyxperiadev/gerrit-events/pull/81))_
 * [JENKINS-50568](https://issues.jenkins-ci.org/browse/JENKINS-50568) - make receive queue max threads configurable _([PR #79](https://github.com/sonyxperiadev/gerrit-events/pull/79))_
