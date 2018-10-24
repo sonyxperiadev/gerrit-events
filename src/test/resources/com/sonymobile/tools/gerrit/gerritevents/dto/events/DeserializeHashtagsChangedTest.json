@@ -1,0 +1,37 @@
+{
+  "editor": {
+    "name": "Diogo",
+    "email": "diogo@example.org",
+    "username": "defer"
+  },
+  "removed": [
+    "tag"
+  ],
+  "hashtags": [
+    "works",
+    "yolo"
+  ],
+  "change": {
+    "project": "platform/build",
+    "branch": "master",
+    "id": "Icd27d85f4c4bc6e95abe8a514a32a68e6f97f181",
+    "number": 1000,
+    "subject": "Implement things",
+    "owner": {
+      "name": "Diogo",
+      "email": "diogo@example.org",
+      "username": "defer"
+    },
+    "url": "http://gerrit.local/1000",
+    "commitMessage": "Implement things\n\nChange-Id: Icd27d85f4c4bc6e95abe8a514a32a68e6f97f181\n",
+    "createdOn": 1539093819,
+    "status": "NEW"
+  },
+  "project": "platform/build",
+  "refName": "refs/heads/master",
+  "changeKey": {
+    "id": "Icd27d85f4c4bc6e95abe8a514a32a68e6f97f181"
+  },
+  "type": "hashtags-changed",
+  "eventCreatedOn": 1539112429
+}

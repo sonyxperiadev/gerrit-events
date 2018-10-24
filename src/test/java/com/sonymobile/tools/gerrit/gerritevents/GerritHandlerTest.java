@@ -39,6 +39,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.TopicChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.ProjectCreated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.PrivateStateChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.WipStateChanged;
+import com.sonymobile.tools.gerrit.gerritevents.dto.events.HashtagsChanged;
 
 import org.junit.After;
 import org.junit.Before;
@@ -438,6 +439,10 @@ public class GerritHandlerTest {
         WipStateChanged wipStateChanged = new WipStateChanged();
         handler.notifyListeners(wipStateChanged);
         verify(listenerMock, times(1)).gerritEvent(wipStateChanged);
+
+        HashtagsChanged hashtagsChanged = new HashtagsChanged();
+        handler.notifyListeners(hashtagsChanged);
+        verify(listenerMock, times(1)).gerritEvent(hashtagsChanged);
     }
 
     /**
@@ -646,6 +651,22 @@ public class GerritHandlerTest {
             }
         };
         testListenerWithSpecificSignature(stateChangedListener, new WipStateChanged());
+    }
+
+    /**
+     * Tests that HashtagsChanged events are going in the method with
+     * that type as parameter and that other type of events are going
+     * in the default method.
+     */
+    @Test
+    public void testEventNotificationWithListenerHashtagsChangedMethodSignature() {
+        SpecificEventListener stateChangedListener = new SpecificEventListener() {
+            @SuppressWarnings("unused") //method is called by reflection
+            public void gerritEvent(HashtagsChanged event) {
+                specificMethodCalled = true;
+            }
+        };
+        testListenerWithSpecificSignature(stateChangedListener, new HashtagsChanged());
     }
 
     /**

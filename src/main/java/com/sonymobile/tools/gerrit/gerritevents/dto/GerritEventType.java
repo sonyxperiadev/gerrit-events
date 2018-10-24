@@ -39,6 +39,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.ProjectCreated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.PatchsetNotified;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.PrivateStateChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.WipStateChanged;
+import com.sonymobile.tools.gerrit.gerritevents.dto.events.HashtagsChanged;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -114,7 +115,12 @@ public enum GerritEventType {
     /***
      * A work in progress state changed event.
      */
-    WIP_STATE_CHANGED("wip-state-changed", true, WipStateChanged.class);
+    WIP_STATE_CHANGED("wip-state-changed", true, WipStateChanged.class),
+
+    /**
+     * A hashtags changed event.
+     */
+    HASHTAGS_CHANGED("hashtags-changed", true, HashtagsChanged.class);
 
     private String typeValue;
     private boolean interesting;
