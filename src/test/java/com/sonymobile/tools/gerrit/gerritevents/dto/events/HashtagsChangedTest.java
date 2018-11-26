@@ -55,5 +55,9 @@ public class HashtagsChangedTest {
 
         assertTrue("is an HashtagsChanged", evt instanceof HashtagsChanged);
         assertEquals("Hashtags match", Arrays.asList("works", "yolo"), ((HashtagsChanged)evt).getHashtags());
+        assertEquals("Removed hashtags match", Arrays.asList("oldtag", "oldtag2"),
+                ((HashtagsChanged)evt).getRemovedHashtags());
+        assertEquals("Added hashtags match", Arrays.asList("newtag", "newtag2"),
+                ((HashtagsChanged)evt).getAddedHashtags());
     }
 }

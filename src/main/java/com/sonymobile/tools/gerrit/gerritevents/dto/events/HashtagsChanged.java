@@ -29,9 +29,12 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.HASHTAGS;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.HASHTAGS_ADDED;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.HASHTAGS_REMOVED;
 
 /**
  * A DTO representation of the hashtags-changed Gerrit Event.
@@ -39,6 +42,8 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.HASHT
  */
 public class HashtagsChanged extends ChangeBasedEvent {
     private List<String> hashtags;
+    private List<String> removedHashtags;
+    private List<String> addedHashtags;
 
     @Override
     public GerritEventType getEventType() {
@@ -58,17 +63,47 @@ public class HashtagsChanged extends ChangeBasedEvent {
         return hashtags;
     }
 
+    /**
+     * Obtains the list of added hashtags.
+     * @return A list of strings, each containing an added hashtag.
+     */
+    public List<String> getAddedHashtags() {
+        return addedHashtags;
+    }
+
+    /**
+     * Obtains the list of removed hashtags.
+     * @return A list of strings, each containing a removed hashtag.
+     */
+    public List<String> getRemovedHashtags() {
+        return removedHashtags;
+    }
+
     @Override
     public void fromJson(JSONObject json) {
         super.fromJson(json);
 
-        if (json.containsKey(HASHTAGS)) {
-            JSONArray hashtagsArray = json.getJSONArray("hashtags");
+        this.hashtags = hashtagsFromArray(json, HASHTAGS);
+        this.removedHashtags = hashtagsFromArray(json, HASHTAGS_REMOVED);
+        this.addedHashtags = hashtagsFromArray(json, HASHTAGS_ADDED);
+    }
+
+    /**
+     * Converts an array key from JSON into a list of the strings it contains.
+     *
+     * @param json The json object.
+     * @param array The array name within the json object.
+     * @return A list of strings contained in the array or an empty list if the array is not present.
+     */
+    private List<String> hashtagsFromArray(JSONObject json, String array) {
+        if (json.containsKey(array)) {
+            JSONArray hashtagsArray = json.getJSONArray(array);
             List<String> result = new ArrayList<String>(hashtagsArray.size());
             for (Object tag : hashtagsArray) {
                 result.add(tag.toString());
             }
-            this.hashtags = result;
+            return result;
         }
+        return Collections.emptyList();
     }
 }
