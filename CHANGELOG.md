@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.14.1 - 2018-11-29
+* hashtags: Also convey added and removed hashtags _([PR #84](https://github.com/sonyxperiadev/gerrit-events/pull/84))_
+
 ## 2.14.0 - 2018-10-24
 * Add hashtags-changed event _([PR #83](https://github.com/sonyxperiadev/gerrit-events/pull/83))_
 
