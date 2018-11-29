@@ -4,8 +4,13 @@
     "email": "diogo@example.org",
     "username": "defer"
   },
+  "added": [
+    "newtag",
+    "newtag2",
+  ],
   "removed": [
-    "tag"
+    "oldtag",
+    "oldtag2"
   ],
   "hashtags": [
     "works",

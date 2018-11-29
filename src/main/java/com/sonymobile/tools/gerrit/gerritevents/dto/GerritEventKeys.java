@@ -269,6 +269,14 @@ public abstract class GerritEventKeys {
      * hashtags.
      */
     public static final String HASHTAGS = "hashtags";
+    /**
+     * hashtags added.
+     */
+    public static final String HASHTAGS_ADDED = "added";
+    /**
+     * hashtags removed.
+     */
+    public static final String HASHTAGS_REMOVED = "removed";
 
     /**
      * Empty default constructor to hinder instantiation.
