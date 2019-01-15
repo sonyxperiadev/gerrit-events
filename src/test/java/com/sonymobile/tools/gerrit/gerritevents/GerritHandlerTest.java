@@ -45,7 +45,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
@@ -330,7 +329,7 @@ public class GerritHandlerTest {
 
         handler.notifyListeners(ca);
 
-        Mockito.verify(listenerMock, only()).gerritEvent(ca);
+        verify(listenerMock, only()).gerritEvent(ca);
     }
 
     /**
@@ -352,7 +351,7 @@ public class GerritHandlerTest {
 
         handler.notifyListeners(ca);
 
-        Mockito.verify(listenerMock, only()).gerritEvent(ca);
+        verify(listenerMock, only()).gerritEvent(ca);
     }
 
     /**

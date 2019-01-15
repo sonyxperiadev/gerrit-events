@@ -30,7 +30,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -43,10 +42,8 @@ import com.sonymobile.tools.gerrit.gerritevents.ssh.SshException;
 
 
 // CS IGNORE AvoidStarImport FOR NEXT 4 LINES. REASON: Test code.
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
-import static org.mockito.Matchers.*;
-import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.*;
+import static org.hamcrest.Matchers.is;
 
 /**
  * Tests {@link com.sonymobile.tools.gerrit.gerritevents.workers.cmd.AbstractSendCommandJob}.
@@ -78,12 +75,13 @@ public class AbstractSendCommandJobTest {
     public void testSendCommand() throws IOException {
         SshConnection mockSshConnection = mock(SshConnection.class);
         PowerMockito.mockStatic(SshConnectionFactory.class);
-        when(SshConnectionFactory.getConnection(anyString(), anyInt(), anyString(), (Authentication)anyObject()))
+        when(SshConnectionFactory.getConnection(nullable(String.class), anyInt(), nullable(String.class),
+            nullable(Authentication.class)))
             .thenReturn(mockSshConnection);
         AbstractSendCommandJob job = new AbstractSendCommandJobImpl(mockConfig);
         Assert.assertThat(job.sendCommand("test command"), is(true));
-        Mockito.verify(mockSshConnection).executeCommand(anyString());
-        Mockito.verify(mockSshConnection).disconnect();
+        verify(mockSshConnection).executeCommand(anyString());
+        verify(mockSshConnection).disconnect();
     }
 
     /**
@@ -94,7 +92,8 @@ public class AbstractSendCommandJobTest {
     @Test
     public void testSendCommandNoConnection() throws IOException {
         PowerMockito.mockStatic(SshConnectionFactory.class);
-        when(SshConnectionFactory.getConnection(anyString(), anyInt(), anyString(), (Authentication)anyObject()))
+        when(SshConnectionFactory.getConnection(nullable(String.class), anyInt(), nullable(String.class),
+            nullable(Authentication.class)))
             .thenThrow(new IOException());
         AbstractSendCommandJob job = new AbstractSendCommandJobImpl(mockConfig);
         Assert.assertThat(job.sendCommand("test command"), is(false));
@@ -109,13 +108,14 @@ public class AbstractSendCommandJobTest {
     public void testSendCommandWithError() throws IOException {
         PowerMockito.mockStatic(SshConnectionFactory.class);
         SshConnection mockSshConnection = mock(SshConnection.class);
-        when(SshConnectionFactory.getConnection(anyString(), anyInt(), anyString(), (Authentication)anyObject()))
+        when(SshConnectionFactory.getConnection(nullable(String.class), anyInt(), nullable(String.class),
+            nullable(Authentication.class)))
             .thenReturn(mockSshConnection);
         when(mockSshConnection.executeCommand(anyString())).thenThrow(new SshException());
         AbstractSendCommandJob job = new AbstractSendCommandJobImpl(mockConfig);
         Assert.assertThat(job.sendCommand("test command"), is(false));
-        Mockito.verify(mockSshConnection).executeCommand(anyString());
-        Mockito.verify(mockSshConnection).disconnect();
+        verify(mockSshConnection).executeCommand(anyString());
+        verify(mockSshConnection).disconnect();
     }
 
     /**
@@ -128,12 +128,13 @@ public class AbstractSendCommandJobTest {
         SshConnection mockSshConnection = mock(SshConnection.class);
         when(mockSshConnection.executeCommand(anyString())).thenReturn("OK");
         PowerMockito.mockStatic(SshConnectionFactory.class);
-        when(SshConnectionFactory.getConnection(anyString(), anyInt(), anyString(), (Authentication)anyObject()))
+        when(SshConnectionFactory.getConnection(nullable(String.class), anyInt(), nullable(String.class),
+            nullable(Authentication.class)))
             .thenReturn(mockSshConnection);
         AbstractSendCommandJob job = new AbstractSendCommandJobImpl(mockConfig);
         Assert.assertThat(job.sendCommandStr("test command"), is("OK"));
-        Mockito.verify(mockSshConnection).executeCommand(anyString());
-        Mockito.verify(mockSshConnection).disconnect();
+        verify(mockSshConnection).executeCommand(anyString());
+        verify(mockSshConnection).disconnect();
     }
 
     /**
@@ -144,7 +145,8 @@ public class AbstractSendCommandJobTest {
     @Test
     public void testSendCommandStrNoConnection() throws IOException {
         PowerMockito.mockStatic(SshConnectionFactory.class);
-        when(SshConnectionFactory.getConnection(anyString(), anyInt(), anyString(), (Authentication)anyObject()))
+        when(SshConnectionFactory.getConnection(nullable(String.class), anyInt(), nullable(String.class),
+            nullable(Authentication.class)))
             .thenThrow(new IOException());
         AbstractSendCommandJob job = new AbstractSendCommandJobImpl(mockConfig);
         Assert.assertNull(job.sendCommandStr("test command"));
@@ -160,13 +162,14 @@ public class AbstractSendCommandJobTest {
         PowerMockito.mockStatic(SshConnectionFactory.class);
         SshConnection mockSshConnection = mock(SshConnection.class);
         when(mockSshConnection.executeCommand(anyString())).thenReturn("OK");
-        when(SshConnectionFactory.getConnection(anyString(), anyInt(), anyString(), (Authentication)anyObject()))
+        when(SshConnectionFactory.getConnection(nullable(String.class), anyInt(), nullable(String.class),
+            nullable(Authentication.class)))
             .thenReturn(mockSshConnection);
         when(mockSshConnection.executeCommand(anyString())).thenThrow(new SshException());
         AbstractSendCommandJob job = new AbstractSendCommandJobImpl(mockConfig);
         Assert.assertNull(job.sendCommandStr("test command"));
-        Mockito.verify(mockSshConnection).executeCommand(anyString());
-        Mockito.verify(mockSshConnection).disconnect();
+        verify(mockSshConnection).executeCommand(anyString());
+        verify(mockSshConnection).disconnect();
     }
 
     /**
@@ -179,7 +182,8 @@ public class AbstractSendCommandJobTest {
         SshConnection mockSshConnection = mock(SshConnection.class);
         when(mockSshConnection.executeCommand(anyString())).thenReturn("OK");
         PowerMockito.mockStatic(SshConnectionFactory.class);
-        when(SshConnectionFactory.getConnection(anyString(), anyInt(), anyString(), (Authentication)anyObject()))
+        when(SshConnectionFactory.getConnection(nullable(String.class), anyInt(), nullable(String.class),
+          nullable(Authentication.class)))
             .thenReturn(mockSshConnection);
         AbstractSendCommandJob job = new AbstractSendCommandJobImpl(mockConfig);
         String str = null;
@@ -191,8 +195,8 @@ public class AbstractSendCommandJobTest {
         }
         Assert.assertThat(str, is("OK"));
         Assert.assertThat(catched, is(false));
-        Mockito.verify(mockSshConnection).executeCommand(anyString());
-        Mockito.verify(mockSshConnection).disconnect();
+        verify(mockSshConnection).executeCommand(anyString());
+        verify(mockSshConnection).disconnect();
     }
 
     /**
@@ -203,7 +207,8 @@ public class AbstractSendCommandJobTest {
     @Test
     public void testSendCommand2WithNoConnection() throws IOException {
         PowerMockito.mockStatic(SshConnectionFactory.class);
-        when(SshConnectionFactory.getConnection(anyString(), anyInt(), anyString(), (Authentication)anyObject()))
+        when(SshConnectionFactory.getConnection(nullable(String.class), anyInt(), nullable(String.class),
+            nullable(Authentication.class)))
             .thenThrow(new IOException());
         AbstractSendCommandJob job = new AbstractSendCommandJobImpl(mockConfig);
         String str = null;
@@ -227,7 +232,8 @@ public class AbstractSendCommandJobTest {
         PowerMockito.mockStatic(SshConnectionFactory.class);
         SshConnection mockSshConnection = mock(SshConnection.class);
         when(mockSshConnection.executeCommand(anyString())).thenReturn("OK");
-        when(SshConnectionFactory.getConnection(anyString(), anyInt(), anyString(), (Authentication)anyObject()))
+        when(SshConnectionFactory.getConnection(nullable(String.class), anyInt(), nullable(String.class),
+            nullable(Authentication.class)))
             .thenReturn(mockSshConnection);
         when(mockSshConnection.executeCommand(anyString())).thenThrow(new SshException());
         AbstractSendCommandJob job = new AbstractSendCommandJobImpl(mockConfig);
@@ -240,8 +246,8 @@ public class AbstractSendCommandJobTest {
         }
         Assert.assertNull(str);
         Assert.assertThat(catched, is(true));
-        Mockito.verify(mockSshConnection).executeCommand(anyString());
-        Mockito.verify(mockSshConnection).disconnect();
+        verify(mockSshConnection).executeCommand(anyString());
+        verify(mockSshConnection).disconnect();
     }
     /**
      * An implementation class of AbstractSendCommandJob.
