@@ -23,6 +23,24 @@ public class SSHUtilTest {
      * @throws Exception If test fails.
      */
     @Test
+    public void testInvalidKeyFile() throws Exception {
+        File file = new File("missing_file");
+
+        boolean tested = SshUtil.checkPassPhrase(file, null);
+        assertFalse("Passphrase validation failed with missing key file and null passphrase", tested);
+
+        tested = SshUtil.checkPassPhrase(file, "");
+        assertFalse("Passphrase validation failed with missing key file and empty passphrase", tested);
+
+        tested = SshUtil.checkPassPhrase(file, "nope");
+        assertFalse("Passphrase validation failed with missing key file and one passphrase", tested);
+    }
+
+    /**
+     * Test handling of keys with no passphrase set.
+     * @throws Exception If test fails.
+     */
+    @Test
     public void testNoPassphraseParsing() throws Exception {
         // Get no-passphrase key resource as file
         URL url = Thread.currentThread().getContextClassLoader().getResource(

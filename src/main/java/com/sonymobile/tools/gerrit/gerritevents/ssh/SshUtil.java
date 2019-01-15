@@ -24,9 +24,9 @@
  */
 package com.sonymobile.tools.gerrit.gerritevents.ssh;
 
-import com.sshtools.publickey.SshPrivateKeyFile;
-import com.sshtools.publickey.SshPrivateKeyFileFactory;
-import org.apache.commons.io.FileUtils;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.KeyPair;
 
 import java.io.File;
 
@@ -43,52 +43,25 @@ public final class SshUtil {
     }
 
     /**
-     * Does a series of checks in the file to see if it is a valid private key file.
-     * @param keyFile the file
-     * @return true if valid.
-     */
-    public static boolean isPrivateKeyFileValid(File keyFile) {
-        return parsePrivateKeyFile(keyFile) != null;
-    }
-
-    /**
-     * Parses the keyFile hiding any Exceptions that might occur.
-     * @param keyFile the file.
-     * @return the "parsed" file.
-     */
-    private static SshPrivateKeyFile parsePrivateKeyFile(File keyFile) {
-        try {
-            byte[] data = FileUtils.readFileToByteArray(keyFile);
-            SshPrivateKeyFile key =  SshPrivateKeyFileFactory.parse(data);
-            return key;
-        } catch (Exception ex) {
-            return null;
-        }
-    }
-
-    /**
      * Checks to see if the passPhrase is valid for the private key file.
      * @param keyFilePath the private key file.
      * @param passPhrase the password for the file.
      * @return true if it is valid.
      */
     public static boolean checkPassPhrase(File keyFilePath, String passPhrase) {
-
         try {
-            SshPrivateKeyFile key =  parsePrivateKeyFile(keyFilePath);
+            JSch jsch = new JSch();
+            KeyPair key = KeyPair.load(jsch, keyFilePath.getAbsolutePath());
             boolean isValidPhrase = passPhrase != null && !passPhrase.trim().isEmpty();
             if (key == null) {
                 return false;
-            } else if (key.isPassphraseProtected() != isValidPhrase) {
+            } else if (key.isEncrypted() != isValidPhrase) {
                 return false;
-            } else if (key.isPassphraseProtected()) {
-                // Throws an exception if passphrase is invalid
-                key.toKeyPair(passPhrase);
-                return true;
+            } else if (key.isEncrypted()) {
+                return key.decrypt(passPhrase);
             }
             return true;
-
-        } catch (Exception e) {
+        } catch (JSchException e) {
             return false;
         }
     }
