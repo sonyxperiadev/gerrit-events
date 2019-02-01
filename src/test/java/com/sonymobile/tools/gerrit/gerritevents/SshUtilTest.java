@@ -14,9 +14,33 @@ import com.sonymobile.tools.gerrit.gerritevents.ssh.SshUtil;
  * Test that SSH keys are correctly handled for keys with and without passphrases
  * Created by svanoort on 9/11/15.
  */
-public class SSHUtilTest {
+public class SshUtilTest {
 
     static final String PASSPHRASE = "letmein";
+
+    /**
+     * Test basic key file loading.
+     * @throws Exception If test fails.
+     */
+    @Test
+    public void testBasicKeyFileLoading() throws Exception {
+
+        boolean tested = SshUtil.isPrivateKeyFileValid(null);
+        assertFalse("Key file validation failed with null key file", tested);
+
+        tested = SshUtil.isPrivateKeyFileValid(new File("missing_file"));
+        assertFalse("Key file validation failed with missing key file", tested);
+
+        URL url = Thread.currentThread().getContextClassLoader().getResource(
+                "com/sonymobile/tools/gerrit/gerritevents/id_rsa_corrupted");
+        tested = SshUtil.isPrivateKeyFileValid(new File(url.getPath()));
+        assertFalse("Key file validation failed with invalid key file", tested);
+
+        url = Thread.currentThread().getContextClassLoader().getResource(
+                "com/sonymobile/tools/gerrit/gerritevents/id_rsa");
+        tested = SshUtil.isPrivateKeyFileValid(new File(url.getPath()));
+        assertTrue("Key file validation pass with vallid key file", tested);
+    }
 
     /**
      * Test handling of keys with no passphrase set.

@@ -43,26 +43,49 @@ public final class SshUtil {
     }
 
     /**
+     * Does a series of checks in the file to see if it is a valid private key file.
+     * @param keyFile the file
+     * @return true if valid.
+     */
+    public static boolean isPrivateKeyFileValid(File keyFile) {
+        return parsePrivateKeyFile(keyFile) != null;
+    }
+
+    /**
+     * Parses the keyFile hiding any Exceptions that might occur.
+     * @param keyFile the file.
+     * @return the "parsed" file.
+     */
+    private static KeyPair parsePrivateKeyFile(File keyFile) {
+        if (keyFile == null) {
+          return null;
+        }
+
+        try {
+            JSch jsch = new JSch();
+            KeyPair key = KeyPair.load(jsch, keyFile.getAbsolutePath());
+            return key;
+        } catch (JSchException ex) {
+            return null;
+        }
+    }
+
+    /**
      * Checks to see if the passPhrase is valid for the private key file.
      * @param keyFilePath the private key file.
      * @param passPhrase the password for the file.
      * @return true if it is valid.
      */
     public static boolean checkPassPhrase(File keyFilePath, String passPhrase) {
-        try {
-            JSch jsch = new JSch();
-            KeyPair key = KeyPair.load(jsch, keyFilePath.getAbsolutePath());
-            boolean isValidPhrase = passPhrase != null && !passPhrase.trim().isEmpty();
-            if (key == null) {
-                return false;
-            } else if (key.isEncrypted() != isValidPhrase) {
-                return false;
-            } else if (key.isEncrypted()) {
-                return key.decrypt(passPhrase);
-            }
-            return true;
-        } catch (JSchException e) {
+        KeyPair key = parsePrivateKeyFile(keyFilePath);
+        boolean isValidPhrase = passPhrase != null && !passPhrase.trim().isEmpty();
+        if (key == null) {
             return false;
+        } else if (key.isEncrypted() != isValidPhrase) {
+            return false;
+        } else if (key.isEncrypted()) {
+            return key.decrypt(passPhrase);
         }
+        return true;
     }
 }
