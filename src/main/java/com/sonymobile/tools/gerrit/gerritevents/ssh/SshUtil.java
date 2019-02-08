@@ -24,9 +24,9 @@
  */
 package com.sonymobile.tools.gerrit.gerritevents.ssh;
 
-import com.sshtools.publickey.SshPrivateKeyFile;
-import com.sshtools.publickey.SshPrivateKeyFileFactory;
-import org.apache.commons.io.FileUtils;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.KeyPair;
 
 import java.io.File;
 
@@ -56,12 +56,16 @@ public final class SshUtil {
      * @param keyFile the file.
      * @return the "parsed" file.
      */
-    private static SshPrivateKeyFile parsePrivateKeyFile(File keyFile) {
+    private static KeyPair parsePrivateKeyFile(File keyFile) {
+        if (keyFile == null) {
+          return null;
+        }
+
         try {
-            byte[] data = FileUtils.readFileToByteArray(keyFile);
-            SshPrivateKeyFile key =  SshPrivateKeyFileFactory.parse(data);
+            JSch jsch = new JSch();
+            KeyPair key = KeyPair.load(jsch, keyFile.getAbsolutePath());
             return key;
-        } catch (Exception ex) {
+        } catch (JSchException ex) {
             return null;
         }
     }
@@ -73,23 +77,15 @@ public final class SshUtil {
      * @return true if it is valid.
      */
     public static boolean checkPassPhrase(File keyFilePath, String passPhrase) {
-
-        try {
-            SshPrivateKeyFile key =  parsePrivateKeyFile(keyFilePath);
-            boolean isValidPhrase = passPhrase != null && !passPhrase.trim().isEmpty();
-            if (key == null) {
-                return false;
-            } else if (key.isPassphraseProtected() != isValidPhrase) {
-                return false;
-            } else if (key.isPassphraseProtected()) {
-                // Throws an exception if passphrase is invalid
-                key.toKeyPair(passPhrase);
-                return true;
-            }
-            return true;
-
-        } catch (Exception e) {
+        KeyPair key = parsePrivateKeyFile(keyFilePath);
+        boolean isValidPhrase = passPhrase != null && !passPhrase.trim().isEmpty();
+        if (key == null) {
             return false;
+        } else if (key.isEncrypted() != isValidPhrase) {
+            return false;
+        } else if (key.isEncrypted()) {
+            return key.decrypt(passPhrase);
         }
+        return true;
     }
 }
