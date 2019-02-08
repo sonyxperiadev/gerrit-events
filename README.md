@@ -57,10 +57,10 @@ All event types can be found in the [com.sonymobile.tools.gerrit.gerritevents.dt
 
 # Environments
 * `linux`
-    * `java-1.6`
-        * `maven-3.0.4`
+    * `java-1.8`
+        * `maven-3.5.4`
 
-* Java 8 & 9: Works.
+Java 8 & 9: Works.
 
 The maintainers' development, tests and production environments are
 Ubuntu 12.04 so we have no means of detecting or fixing any Windows issues,
