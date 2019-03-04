@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GerritQueryHandler {
 
-    static final Logger logger = LoggerFactory.getLogger(GerritQueryHandler.class);
+    protected static final Logger logger = LoggerFactory.getLogger(GerritQueryHandler.class);
     /**
      * The base of the query ssh command to send to Gerrit.
      */
