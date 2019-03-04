@@ -48,11 +48,11 @@ public class GerritQueryHandler {
      * The base of the query ssh command to send to Gerrit.
      */
     public static final String QUERY_COMMAND = "gerrit query";
-    final String gerritHostName;
-    final int gerritSshPort;
-    final String gerritProxy;
-    final Authentication authentication;
-    final int connectionTimeout;
+    private final String gerritHostName;
+    private final int gerritSshPort;
+    private final String gerritProxy;
+    private final Authentication authentication;
+    private final int connectionTimeout;
 
 
     /**
