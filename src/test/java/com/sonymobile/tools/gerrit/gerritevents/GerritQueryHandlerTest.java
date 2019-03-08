@@ -24,65 +24,32 @@
 package com.sonymobile.tools.gerrit.gerritevents;
 
 import com.sonymobile.tools.gerrit.gerritevents.ssh.Authentication;
-import com.sonymobile.tools.gerrit.gerritevents.ssh.SshConnection;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.SshConnectionFactory;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.io.Reader;
-import java.io.StringReader;
-
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
 /**
  * Tests for {@link com.sonymobile.tools.gerrit.gerritevents.GerritQueryHandler}.
  *
  * @author : slawomir.jaranowski
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(SshConnectionFactory.class)
-@PowerMockIgnore("org.slf4j.*") // Prevent warning about multiple sl4fj binding
-public class GerritQueryHandlerTest {
+public class GerritQueryHandlerTest extends GerritQueryHandlerTestBase {
 
-    private GerritQueryHandler queryHandler;
-
-    private SshConnection sshConnectionMock;
 
     /**
-     * Prepare moc for sshConnection and create GerritQueryHandler for test.
+     * Create GerritQueryHandler for test.
      *
      * @throws Exception when something wrong.
      */
-    @Before
+    @Override
     public void setUp() throws Exception {
-
-        sshConnectionMock = mock(SshConnection.class);
-
-        PowerMockito.mockStatic(SshConnectionFactory.class);
-        PowerMockito.doReturn(sshConnectionMock).when(SshConnectionFactory.class, "getConnection",
-                isA(String.class), isA(Integer.class), isA(String.class), isA(Authentication.class), isA(Integer.class));
-
-
-        when(sshConnectionMock.executeCommandReader(anyString())).thenAnswer(new Answer<Reader>() {
-
-            @Override
-            public Reader answer(InvocationOnMock invocationOnMock) throws Throwable {
-                return new StringReader("{\"project\":\"test\"}");
-            }
-        });
-
+        super.setUp();
         queryHandler = new GerritQueryHandler("", 0, "", new Authentication(null, ""), 0);
     }
 
@@ -199,5 +166,20 @@ public class GerritQueryHandlerTest {
         verify(sshConnectionMock)
                 .executeCommandReader("gerrit query --format=JSON --current-patch-set --files \"X\"");
 
+    }
+
+    /**
+     * Test {@Link GerritQueryHandler.queryJava} creates a new SSH connection each time it is called.
+     *
+     * @throws Exception when something wrong.
+     */
+    @Test
+    public void sshConnectionIsRecreatedForEachQuery() throws Exception {
+
+        queryHandler.queryJava("X");
+        queryHandler.queryJava("Y");
+
+        verifyStatic(SshConnectionFactory.class, times(2));
+        SshConnectionFactory.getConnection(anyString(), anyInt(), anyString(), any(Authentication.class), anyInt());
     }
 }

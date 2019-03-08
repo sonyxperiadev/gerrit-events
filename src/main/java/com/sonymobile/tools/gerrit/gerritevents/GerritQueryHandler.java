@@ -43,7 +43,11 @@ import org.slf4j.LoggerFactory;
  */
 public class GerritQueryHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(GerritQueryHandler.class);
+    /**
+     * Logger instance.
+     * Set protected to allow it  to be used in subclasses.
+     */
+    protected static final Logger logger = LoggerFactory.getLogger(GerritQueryHandler.class);
     /**
      * The base of the query ssh command to send to Gerrit.
      */
@@ -368,8 +372,7 @@ public class GerritQueryHandler {
 
         SshConnection ssh = null;
         try {
-            ssh = SshConnectionFactory.getConnection(gerritHostName, gerritSshPort, gerritProxy,
-                                                                        authentication, connectionTimeout);
+            ssh = getConnection();
             BufferedReader reader = new BufferedReader(ssh.executeCommandReader(str.toString()));
             String incomingLine = null;
             while ((incomingLine = reader.readLine()) != null) {
@@ -379,9 +382,29 @@ public class GerritQueryHandler {
             logger.trace("Closing reader.");
             reader.close();
         } finally {
-            if (ssh != null) {
-                ssh.disconnect();
-            }
+            cleanupConnection(ssh);
+        }
+    }
+
+    /**
+     * Creates a new SSH connection used to execute the queries.
+     *
+     * @return a fresh instance of {@link SshConnection}
+     * @throws IOException for IO issues
+     */
+    protected SshConnection getConnection() throws IOException {
+        return SshConnectionFactory.getConnection(gerritHostName, gerritSshPort, gerritProxy,
+                authentication, connectionTimeout);
+    }
+
+    /**
+     * Cleans up the SSH connection.
+     *
+     * @param ssh the SSH connection
+     */
+    protected void cleanupConnection(SshConnection ssh) {
+        if (ssh != null) {
+            ssh.disconnect();
         }
     }
 
