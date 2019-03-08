@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.15.0 - 2019-03-08
+* Option to Cache the existing SSH connection for GerritQueryHandler _([PR #86](https://github.com/sonyxperiadev/gerrit-events/pull/86))_
+* Minimum Java 8, updated dependencies and allow packaging with JDK 9 _([PR #85](https://github.com/sonyxperiadev/gerrit-events/pull/85))_
+
 ## 2.14.1 - 2018-11-29
 * hashtags: Also convey added and removed hashtags _([PR #84](https://github.com/sonyxperiadev/gerrit-events/pull/84))_
 
