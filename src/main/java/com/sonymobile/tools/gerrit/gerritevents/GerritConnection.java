@@ -30,6 +30,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.CharBuffer;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -39,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
+import com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventType;
 import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Provider;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.Authentication;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.AuthenticationUpdater;
@@ -311,6 +313,20 @@ public class GerritConnection extends Thread implements Connector {
      */
     public Set<ConnectionListener> getListenersView() {
         return Collections.unmodifiableSet(listeners);
+    }
+
+    /**
+     * Set if gerrit event type is intresting or not.
+     * @param eventFilter the event filter.
+     */
+    public void setEventFilter(List<String> eventFilter) {
+        for (GerritEventType type : GerritEventType.values()) {
+            if (eventFilter != null) {
+                type.setIntresting(eventFilter.contains(type.getTypeValue()));
+            } else {
+                type.setIntresting(true);
+            }
+        }
     }
 
     /**
