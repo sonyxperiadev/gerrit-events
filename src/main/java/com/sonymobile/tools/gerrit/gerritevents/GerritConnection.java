@@ -316,15 +316,17 @@ public class GerritConnection extends Thread implements Connector {
     }
 
     /**
-     * Set if gerrit event type is intresting or not.
+     * Set if gerrit event type is interesting or not.
+     * The list is made up of events that are interesting, if an event doesn't match
+     * it will be set to false and if filter is null all events will be interesting.
      * @param eventFilter the event filter.
      */
     public void setEventFilter(List<String> eventFilter) {
         for (GerritEventType type : GerritEventType.values()) {
             if (eventFilter != null) {
-                type.setIntresting(eventFilter.contains(type.getTypeValue()));
+                type.setInteresting(eventFilter.contains(type.getTypeValue()));
             } else {
-                type.setIntresting(true);
+                type.setInteresting(true);
             }
         }
     }

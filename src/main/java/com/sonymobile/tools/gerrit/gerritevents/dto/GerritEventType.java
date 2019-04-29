@@ -159,8 +159,8 @@ public enum GerritEventType {
      * Set if event type is intresting or not.
      * @param intresting true if intresting, false otherwise.
      */
-    public void setIntresting(boolean intresting) {
-        this.interesting = intresting;
+    public void setInteresting(boolean interesting) {
+        this.interesting = interesting;
     }
 
     /**
