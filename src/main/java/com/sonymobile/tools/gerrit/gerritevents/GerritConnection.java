@@ -326,6 +326,8 @@ public class GerritConnection extends Thread implements Connector {
             if (eventFilter != null) {
                 type.setInteresting(eventFilter.contains(type.getTypeValue()));
             } else {
+                // TODO if an event type is added with a default other than true
+                // in the future then this needs to be updated.
                 type.setInteresting(true);
             }
         }
