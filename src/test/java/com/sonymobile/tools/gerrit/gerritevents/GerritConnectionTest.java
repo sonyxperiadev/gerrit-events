@@ -45,8 +45,6 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.junit.AfterClass;
@@ -59,7 +57,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.jcraft.jsch.ChannelExec;
-import com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventType;
 import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Provider;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.Authentication;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.SshConnection;
@@ -254,31 +251,6 @@ public class GerritConnectionTest {
         verify(handlerMock, times(1)).post(eq("Thank You!"), any(Provider.class));
         verify(handlerMock, times(1)).post(eq(aVeryLongMessage), any(Provider.class));
         verify(handlerMock, times(7)).post(any(String.class), any(Provider.class));
-    }
-
-    /**
-     * Tests {@link GerritConnection#setEventFilter(List)}.
-     */
-    @Test
-    public void testSetEventFilter() {
-        GerritEventType[] eventTypes;
-        String[] events = {"change-abandoned", "change-merged", "change-restored"};
-        List<String> eventFilter = Arrays.asList(events);
-
-        connection.setEventFilter(eventFilter);
-        eventTypes = GerritEventType.values();
-        for (GerritEventType type : eventTypes) {
-            if (eventFilter.contains(type.getTypeValue())) {
-                assertEquals(true, type.isInteresting());
-            } else {
-                assertEquals(false, type.isInteresting());
-            }
-        }
-        connection.setEventFilter(null);
-        eventTypes = GerritEventType.values();
-        for (GerritEventType type : eventTypes) {
-            assertEquals(true, type.isInteresting());
-        }
     }
 
     /**
