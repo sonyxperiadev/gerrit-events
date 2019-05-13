@@ -9,9 +9,13 @@ public class GerritEventTypeTest {
     @Test
     public void testSetInteresting() {
         GerritEventType type = GerritEventType.CHANGE_MERGED;
-        type.setInteresting(false);
-        assertEquals(false, type.isInteresting());
-        type.setInteresting(true);
-        assertEquals(true, type.isInteresting());
+        try {
+            type.setInteresting(false);
+            assertEquals(false, type.isInteresting());
+            type.setInteresting(true);
+            assertEquals(true, type.isInteresting());
+        } finally {
+            type.setInteresting(true);
+        }
     }
 }
