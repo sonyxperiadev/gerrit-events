@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.16.0 - 2019-05-24
+* Add capability to modify which events are interesting _([PR #87](https://github.com/sonyxperiadev/gerrit-events/pull/87))_
+
 ## 2.15.0 - 2019-03-08
 * Option to Cache the existing SSH connection for GerritQueryHandler _([PR #86](https://github.com/sonyxperiadev/gerrit-events/pull/86))_
 * Minimum Java 8, updated dependencies and allow packaging with JDK 9 _([PR #85](https://github.com/sonyxperiadev/gerrit-events/pull/85))_
