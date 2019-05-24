@@ -156,6 +156,14 @@ public enum GerritEventType {
     }
 
     /**
+     * Set if event type is intresting or not.
+     * @param interesting true if intresting, false otherwise.
+     */
+    public void setInteresting(boolean interesting) {
+        this.interesting = interesting;
+    }
+
+    /**
      * Gets the DTO class that represents this kind of event.
      * @return the class object.
      */
