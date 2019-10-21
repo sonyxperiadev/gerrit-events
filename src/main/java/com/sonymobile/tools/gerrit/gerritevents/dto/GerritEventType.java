@@ -40,6 +40,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.PatchsetNotified;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.PrivateStateChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.WipStateChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.HashtagsChanged;
+import com.sonymobile.tools.gerrit.gerritevents.dto.events.VoteDeleted;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -120,7 +121,12 @@ public enum GerritEventType {
     /**
      * A hashtags changed event.
      */
-    HASHTAGS_CHANGED("hashtags-changed", true, HashtagsChanged.class);
+    HASHTAGS_CHANGED("hashtags-changed", true, HashtagsChanged.class),
+
+    /**
+     * A vote deleted event.
+     */
+    VOTE_DELETED("vote-deleted", true, VoteDeleted.class);
 
     private String typeValue;
     private boolean interesting;
