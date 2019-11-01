@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.17.0 - 2019-11-01
+* Added vote-deleted event _([PR #89](https://github.com/sonyxperiadev/gerrit-events/pull/89))_
+
 ## 2.16.0 - 2019-05-24
 * Add capability to modify which events are interesting _([PR #87](https://github.com/sonyxperiadev/gerrit-events/pull/87))_
 
