@@ -1,0 +1,64 @@
+{
+  "type": "vote-deleted",
+  "change": {
+    "project": "project-test",
+    "branch": "master",
+    "id": "Ibafad9613934fdec650d6186dc1021bc2cf5d2f5",
+    "number": "654",
+    "subject": "Mon Dec 8 20:53:56 EST 2019",
+    "owner": {
+      "name": "Ioana",
+      "email": "ioana@company.com",
+      "username": "ioana"
+    },
+    "url": "http://localhost:9090/654",
+    "commitMessage": "Mon Dec 8 20:53:56 EST 2019\n\nChange-Id: Ibafad9613934fdec650d6186dc1021bc2cf5d2f5\n",
+    "status": "NEW"
+  },
+  "patchSet": {
+    "number": "1",
+    "revision": "b2b5f7c8fb8f96312d629d4d4f379f34f5b9b651",
+    "parents": [
+      "6cf2d28cc07d22a49e0e614c7bde0a4e5fd0c8f5"
+    ],
+    "ref": "refs/changes/54/654/1",
+    "uploader": {
+      "name": "Ioana",
+      "email": "ioana@company.com",
+      "username": "ioana"
+    },
+    "createdOn": 1418090036,
+    "author": {
+      "name": "Ioana",
+      "email": "ioana@company.com",
+      "username": "ioana"
+    },
+    "isDraft": false,
+    "sizeInsertions": 1,
+    "sizeDeletions": 0
+  },
+  "remover": {
+    "name": "Evil",
+    "email": "evil@company.com",
+    "username": "evil"
+  },
+  "reviewer": {
+    "name": "Evil",
+    "email": "evil@company.com",
+    "username": "evil"
+  },
+  "approvals": [{
+    "type": "Validated",
+    "description": "Test Description",
+    "value": "0",
+    "oldValue": "-2",
+    "grantedOn": 1418133772,
+    "by": {
+		"name": "Builder",
+		"email": "bot@company.com",
+		"username": "builder"
+	}
+  }],
+  "comment": "Removed Validated",
+  "eventCreatedOn": 1418133772
+}

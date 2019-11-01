@@ -40,6 +40,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.ProjectCreated;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.PrivateStateChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.WipStateChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.HashtagsChanged;
+import com.sonymobile.tools.gerrit.gerritevents.dto.events.VoteDeleted;
 
 import org.junit.After;
 import org.junit.Before;
@@ -442,6 +443,10 @@ public class GerritHandlerTest {
         HashtagsChanged hashtagsChanged = new HashtagsChanged();
         handler.notifyListeners(hashtagsChanged);
         verify(listenerMock, times(1)).gerritEvent(hashtagsChanged);
+
+        VoteDeleted voteDeleted = new VoteDeleted();
+        handler.notifyListeners(voteDeleted);
+        verify(listenerMock, times(1)).gerritEvent(voteDeleted);
     }
 
     /**
@@ -669,6 +674,22 @@ public class GerritHandlerTest {
     }
 
     /**
+     * Tests that VoteDeleted events are going in the method with
+     * that type as parameter and that other type of events are going
+     * in the default method.
+     */
+    @Test
+    public void testEventNotificationWithListenerVoteDeletedMethodSignature() {
+        SpecificEventListener stateChangedListener = new SpecificEventListener() {
+            @SuppressWarnings("unused") //method is called by reflection
+            public void gerritEvent(VoteDeleted event) {
+                specificMethodCalled = true;
+            }
+        };
+        testListenerWithSpecificSignature(stateChangedListener, new VoteDeleted());
+    }
+
+    /**
      * Base test listener implementation.
      */
     private abstract static class SpecificEventListener implements GerritEventListener {
@@ -704,7 +725,8 @@ public class GerritHandlerTest {
                                                      new RefUpdated(),
                                                      new ProjectCreated(),
                                                      new PrivateStateChanged(),
-                                                     new WipStateChanged(), };
+                                                     new WipStateChanged(),
+                                                     new VoteDeleted(), };
         handler.addListener(listener);
 
         // Validate that event was sent to the specific method
