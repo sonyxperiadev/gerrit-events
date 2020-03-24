@@ -37,6 +37,13 @@ import net.sf.json.JSONObject;
  */
 public class StreamEventsStringWork extends AbstractJsonObjectWork {
 
+    /**
+     * @return the line
+     */
+    public String getLine() {
+        return line;
+    }
+
     private String line;
     private Provider provider;
 
@@ -62,7 +69,7 @@ public class StreamEventsStringWork extends AbstractJsonObjectWork {
 
     @Override
     public void perform(Coordinator coordinator) {
-        JSONObject obj = GerritJsonEventFactory.getJsonObjectIfInterestingAndUsable(line);
+        JSONObject obj = GerritJsonEventFactory.getJsonObjectIfInterestingAndUsable(getLine());
         if (obj != null) {
             perform(obj, coordinator, provider);
         }
@@ -73,7 +80,7 @@ public class StreamEventsStringWork extends AbstractJsonObjectWork {
         StringBuilder str = new StringBuilder("[");
         str.append(getClass().getSimpleName());
         str.append(": \"");
-        str.append(line);
+        str.append(getLine());
         str.append("\"]");
         return str.toString();
     }

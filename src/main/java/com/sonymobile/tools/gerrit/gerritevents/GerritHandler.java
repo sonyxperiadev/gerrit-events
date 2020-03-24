@@ -45,6 +45,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -58,7 +59,15 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ScheduledExecutorService;
 
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.PROJECT;
+import static java.util.concurrent.TimeUnit.MINUTES;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 //CS IGNORE LineLength FOR NEXT 2 LINES. REASON: static import.
 import static com.sonymobile.tools.gerrit.gerritevents.GerritDefaultValues.DEFAULT_NR_OF_RECEIVING_WORKER_THREADS;
@@ -85,7 +94,11 @@ public class GerritHandler implements Coordinator, Handler {
     private int threadKeepAliveTime = DEFAULT_RECEIVE_THREAD_KEEP_ALIVE_TIME;
     private static final String THREAD_PREFIX = "Gerrit Worker EventThread_";
     private static final int WAIT_FOR_JOBS_SHUTDOWN_TIMEOUT = 30;
-
+    private final ScheduledExecutorService whitelistScheduler = Executors.newScheduledThreadPool(1);
+    private final String whitelistLocation = "gerrit.whitelist.location";
+    private final String whitelistTimeout = "gerrit.whitelist.timeout";
+    private final String whitelistTimeoutDefault = "30";
+    private static volatile HashMap<String, Object> whitelist = new HashMap<String, Object>();
     /**
      * The minimum size of the job-queue before monitors should begin to warn the administrator(s).
      */
@@ -109,6 +122,7 @@ public class GerritHandler implements Coordinator, Handler {
      */
     public GerritHandler(int numberOfWorkerThreads) {
         this(numberOfWorkerThreads, DEFAULT_RECEIVE_THREAD_KEEP_ALIVE_TIME);
+        this.scheduleGerritWhitelistRead();
     }
 
     /**
@@ -289,6 +303,7 @@ public class GerritHandler implements Coordinator, Handler {
 
         /**
          * creates a new new EventWorker
+         *
          * @param work the work to do
          * @param coordinator the coordinator
          */
@@ -299,7 +314,75 @@ public class GerritHandler implements Coordinator, Handler {
 
         @Override
         public void run() {
-            work.perform(coordinator);
+            //Check if we want to actually perform any further work on this.
+            if (work instanceof StreamEventsStringWork) {
+                workEvent(((StreamEventsStringWork)work).getLine());
+            } else if (work instanceof JSONEventWork) {
+                logger.debug("JSON project: {}", ((JSONEventWork)work).getJson());
+                workEvent(((JSONEventWork)work).getJson().toString());
+            } else {
+                work.perform(coordinator);
+            }
+        }
+
+        /**
+         * Check String and carry out work if in whitelist.
+         * @param line - string of json to look at
+         */
+        private void workEvent(String line) {
+            logger.debug("Line for project evaluation{},line");
+            String project = getProjectNameFromJsonString(line);
+            logger.debug("Project before filter: {}", project);
+            if (isValidProject(project)) {
+                work.perform(coordinator);
+            } else {
+                logger.debug("Ignoring event from: {}", project);
+            }
+        }
+
+        /**
+         * Checks if project is in hash list or list is empty(default to true)
+         * @param project - project id
+         * @return boolean if project is in
+         */
+        private boolean isValidProject(String project) {
+            // If whitelist is empty, either on purpose or because whitelist file is
+            // missing,
+            // treat everything as valid.
+            if (getWhitelist().isEmpty()) {
+                return true;
+            }
+            return getWhitelist().containsKey(project);
+        }
+
+        /**
+        * Helper method to parse Strings of json. Problem is project key might be
+        * nested under another json object, so parsing the json is recursive. This
+        * method should be sub-linear.
+         *
+        * project could be "foo" and could also be "foo/bar". Because of this I added
+        * the logic for nextSeparator and nextQuote. We will only match on the "foo"
+        * value in both of the preceding examples.
+         *
+         * @param data incoming json string from from project
+         * @return the json project string
+         */
+        String getProjectNameFromJsonString(String data) {
+            int indexOf = data.indexOf(PROJECT);
+            if (indexOf >= 0) {
+                indexOf += PROJECT.length();
+                indexOf = data.indexOf(':', indexOf);
+                indexOf = data.indexOf('"', indexOf);
+                indexOf++;
+                int nextSeparator = data.indexOf('/', indexOf);
+                int nextQuote = data.indexOf('"', indexOf);
+                if (nextSeparator > 0 && nextSeparator < nextQuote) {
+                    return data.substring(indexOf, nextSeparator);
+                }
+                return data.substring(indexOf, nextQuote);
+            } else {
+                return "";
+            }
         }
     }
 
@@ -505,7 +588,7 @@ public class GerritHandler implements Coordinator, Handler {
             logger.error("When notifying listener: {} about event: {}", listener, event);
             logger.error("Exception thrown during event handling.", ex);
         } catch (NoSuchMethodException ex) {
-            logger.debug("No apropriate method found during reflection. Calling default.", ex);
+            logger.debug("No appropriate method found during reflection. Calling default.", ex);
             listener.gerritEvent(event);
         } catch (SecurityException ex) {
             logger.debug("Not allowed to reflect/invoke a method on this listener (DESIGN BUG). Calling default", ex);
@@ -576,5 +659,60 @@ public class GerritHandler implements Coordinator, Handler {
     @Deprecated
     public void triggerEvent(GerritEvent event) {
         post(event);
+    }
+
+    /**
+     * Schedule whitelist read from system property.
+     */
+    public void scheduleGerritWhitelistRead() {
+        scheduleGerritWhitelistRead(System.getProperty(whitelistLocation));
+    }
+
+    /**
+     * schedules update of list from provided string.
+     * @param location - location of file to read whitelist from.
+     */
+    public void scheduleGerritWhitelistRead(String location) {
+        if (StringUtils.isEmpty(location)) {
+            logger.info("config file for whitelist not found; will not filter events for processing");
+            return;
+        }
+
+        final Runnable whitelistReader = new Runnable() {
+            @Override
+            public void run() {
+                String fileName = location;
+                logger.debug("reading config file");
+                try {
+                    HashMap newWhitelist = new HashMap<String, Object>();
+                    BufferedReader in = new BufferedReader(new FileReader(fileName));
+                    String readLine = in.readLine();
+                    while (StringUtils.isNotEmpty(readLine)) {
+                        logger.debug("whitelisting: {}", readLine);
+                        newWhitelist.put(readLine, null);
+                        readLine = in.readLine();
+                    }
+                    // overwrite whitelist last in case reading the file fails for some reason.
+                    whitelist = newWhitelist;
+
+                } catch (FileNotFoundException ex) {
+                    logger.error("Exception thrown during whitelist file read. File does not exist", ex);
+                } catch (IOException ex) {
+                    logger.error("Exception thrown during whitelist file read.", ex);
+                }
+            }
+        };
+        String whitelistTimeoutString = System.getProperty(whitelistTimeout);
+        if (StringUtils.isEmpty(whitelistTimeoutString)) {
+            whitelistTimeoutString = whitelistTimeoutDefault;
+        }
+        whitelistScheduler.scheduleAtFixedRate(whitelistReader, 0, Integer.parseInt(whitelistTimeoutString), MINUTES);
+    }
+
+    /**
+     * @return the whitelist
+     */
+    public static HashMap<String, Object> getWhitelist() {
+        return whitelist;
     }
 }

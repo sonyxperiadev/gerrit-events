@@ -35,6 +35,13 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Provider;
  */
 public class JSONEventWork extends AbstractJsonObjectWork {
 
+    /**
+     * @return the json
+     */
+    public JSONObject getJson() {
+        return json;
+    }
+
     private JSONObject json;
     private Provider provider;
 
@@ -60,8 +67,8 @@ public class JSONEventWork extends AbstractJsonObjectWork {
 
     @Override
     public void perform(Coordinator coordinator) {
-        if (GerritJsonEventFactory.isInterestingAndUsable(json)) {
-            perform(json, coordinator, provider);
+        if (GerritJsonEventFactory.isInterestingAndUsable(getJson())) {
+            perform(getJson(), coordinator, provider);
         }
     }
 
@@ -70,7 +77,7 @@ public class JSONEventWork extends AbstractJsonObjectWork {
         StringBuilder str = new StringBuilder("[");
         str.append(getClass().getSimpleName());
         str.append(": \"");
-        str.append(json.toString());
+        str.append(getJson().toString());
         if (provider != null) {
             str.append(", " + provider.toString());
         }
