@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.18.0 - 2020-07-10
+* Adding ability for external json config file to ignore incoming events _([PR #93](https://github.com/sonyxperiadev/gerrit-events/pull/93))_
+
 ## 2.17.0 - 2019-11-01
 * Added vote-deleted event _([PR #89](https://github.com/sonyxperiadev/gerrit-events/pull/89))_
 
