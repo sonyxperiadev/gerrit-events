@@ -33,6 +33,13 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.GerritEvent;
  */
 public class GerritEventWork extends AbstractGerritEventWork {
 
+    /**
+     * @return the event
+     */
+    public GerritEvent getEvent() {
+        return event;
+    }
+
     private GerritEvent event;
 
     /**
@@ -45,7 +52,7 @@ public class GerritEventWork extends AbstractGerritEventWork {
 
     @Override
     public void perform(Coordinator coordinator) {
-        perform(event, coordinator);
+        perform(getEvent(), coordinator);
     }
 
 }

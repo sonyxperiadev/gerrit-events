@@ -55,12 +55,14 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import net.sf.json.JSONObject;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIn.isIn;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import org.mockito.Mockito;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -310,7 +312,7 @@ public class GerritHandlerTest {
 
         verifyNoMoreInteractions(listenerMock);
     }
-
+    
     /**
      * Tests that CommentAdded events are ignored correctly.
      * @throws Exception if so.
@@ -381,6 +383,31 @@ public class GerritHandlerTest {
     }
 
     /**
+     * 
+     * Tests posting two events, one which gets ignored by the whitelist.
+     * 
+     * @throws Exception thread related
+     */
+    @Test
+    public void testWhitelistIgnore() throws Exception {
+        String server = "testserver";
+        GerritEventListener listenerMock = mock(GerritEventListener.class);
+        handler.addListener(listenerMock);
+        handler.scheduleGerritWhitelistRead(Thread.currentThread().getContextClassLoader().getResource("com/sonymobile/tools/gerrit/gerritevents/whitelist").getPath());
+        String stringTest01 = "{\"uploader\":{\"name\":\"Foo, Bar\",\"email\":\"Foo@Bar.com\",\"username\":\"foobar\"},\"patchSet\":{\"number\":\"1\",\"revision\":\"8bd741fd301701b1a70b4cfb4d33dac3349b6796\",\"parents\":[\"8bd741fd301701b1a70b4cfb4d33dac3349b6797\"],\"ref\":\"refs/changes/1/1234567/1\",\"uploader\":{\"name\":\"Foo Bar\",\"email\":\"Foo@Bar.com\",\"username\":\"foobar\"},\"createdOn\":1527883364,\"author\":{\"name\":\"Foo Bar\",\"email\":\"Foo@Bar.com\",\"username\":\"foobar\"},\"isDraft\":false,\"kind\":\"REWORK\",\"sizeInsertions\":2,\"sizeDeletions\":-2},\"change\":{\"project\":\"Foo/Bar\",\"branch\":\"Foo\",\"id\":\"8bd741fd301701b1a70b4cfb4d33dac3349b6796\",\"number\":\"351587\",\"subject\":\"Foo Bar\",\"owner\":{\"name\":\"Foo Bar\",\"email\":\"foo@bar.com\",\"username\":\"foobar\"},\"url\":\"https://Foo.bar/com/gerrit/351587\",\"commitMessage\":\"Foo Changes\\n\\nChange-Id: I4a0ca0ddbbe86258c162f1528f89632113758a9d\\n\",\"status\":\"NEW\"},\"project\":\"Foo/Bar\",\"refName\":\"refs/heads/FOOMAIN\",\"changeKey\":{\"id\":\"I4a0ca0ddbbe86258c162f1528f89632113758a9d\"},\"type\":\"patchset-created\",\"eventCreatedOn\":1527883364}";
+        String stringTest02 = "{\"uploader\":{\"name\":\"Foo, Bar\",\"email\":\"Foo@Bar.com\",\"username\":\"foobar\"},\"patchSet\":{\"number\":\"1\",\"revision\":\"8bd741fd301701b1a70b4cfb4d33dac3349b6796\",\"parents\":[\"8bd741fd301701b1a70b4cfb4d33dac3349b6797\"],\"ref\":\"refs/changes/1/1234567/1\",\"uploader\":{\"name\":\"Foo Bar\",\"email\":\"Foo@Bar.com\",\"username\":\"foobar\"},\"createdOn\":1527883364,\"author\":{\"name\":\"Foo Bar\",\"email\":\"Foo@Bar.com\",\"username\":\"foobar\"},\"isDraft\":false,\"kind\":\"REWORK\",\"sizeInsertions\":2,\"sizeDeletions\":-2},\"change\":{\"project\":\"BAR/Bar\",\"branch\":\"Foo\",\"id\":\"8bd741fd301701b1a70b4cfb4d33dac3349b6796\",\"number\":\"351587\",\"subject\":\"Foo Bar\",\"owner\":{\"name\":\"Foo Bar\",\"email\":\"foo@bar.com\",\"username\":\"foobar\"},\"url\":\"https://Foo.bar/com/gerrit/351587\",\"commitMessage\":\"Foo Changes\\n\\nChange-Id: I4a0ca0ddbbe86258c162f1528f89632113758a9d\\n\",\"status\":\"NEW\"},\"project\":\"NOTAREALPROJECT/Bar\",\"refName\":\"refs/heads/FOOMAIN\",\"changeKey\":{\"id\":\"I4a0ca0ddbbe86258c162f1528f89632113758a9d\"},\"type\":\"patchset-created\",\"eventCreatedOn\":1527883364}";
+        handler.post(stringTest01);
+        handler.post(stringTest02);
+        JSONObject jsonTest01 = JSONObject.fromObject("{\"uploader\":{\"name\":\"Foo, Bar\",\"email\":\"Foo@Bar.com\",\"username\":\"foobar\"},\"patchSet\":{\"number\":\"1\",\"revision\":\"8bd741fd301701b1a70b4cfb4d33dac3349b6796\",\"parents\":[\"8bd741fd301701b1a70b4cfb4d33dac3349b6797\"],\"ref\":\"refs/changes/1/1234567/1\",\"uploader\":{\"name\":\"Foo Bar\",\"email\":\"Foo@Bar.com\",\"username\":\"foobar\"},\"createdOn\":1527883364,\"author\":{\"name\":\"Foo Bar\",\"email\":\"Foo@Bar.com\",\"username\":\"foobar\"},\"isDraft\":false,\"kind\":\"REWORK\",\"sizeInsertions\":2,\"sizeDeletions\":-2},\"change\":{\"project\":\"Foo/Bar\",\"branch\":\"Foo\",\"id\":\"8bd741fd301701b1a70b4cfb4d33dac3349b6796\",\"number\":\"351587\",\"subject\":\"Foo Bar\",\"owner\":{\"name\":\"Foo Bar\",\"email\":\"foo@bar.com\",\"username\":\"foobar\"},\"url\":\"https://Foo.bar/com/gerrit/351587\",\"commitMessage\":\"Foo Changes\\n\\nChange-Id: I4a0ca0ddbbe86258c162f1528f89632113758a9d\\n\",\"status\":\"NEW\"},\"project\":\"Foo/Bar\",\"refName\":\"refs/heads/FOOMAIN\",\"changeKey\":{\"id\":\"I4a0ca0ddbbe86258c162f1528f89632113758a9d\"},\"type\":\"patchset-created\",\"eventCreatedOn\":1527883364}");
+        JSONObject jsonTest02 = JSONObject.fromObject("{\"uploader\":{\"name\":\"Foo, Bar\",\"email\":\"Foo@Bar.com\",\"username\":\"foobar\"},\"patchSet\":{\"number\":\"1\",\"revision\":\"8bd741fd301701b1a70b4cfb4d33dac3349b6796\",\"parents\":[\"8bd741fd301701b1a70b4cfb4d33dac3349b6797\"],\"ref\":\"refs/changes/1/1234567/1\",\"uploader\":{\"name\":\"Foo Bar\",\"email\":\"Foo@Bar.com\",\"username\":\"foobar\"},\"createdOn\":1527883364,\"author\":{\"name\":\"Foo Bar\",\"email\":\"Foo@Bar.com\",\"username\":\"foobar\"},\"isDraft\":false,\"kind\":\"REWORK\",\"sizeInsertions\":2,\"sizeDeletions\":-2},\"change\":{\"project\":\"BAR/Bar\",\"branch\":\"Foo\",\"id\":\"8bd741fd301701b1a70b4cfb4d33dac3349b6796\",\"number\":\"351587\",\"subject\":\"Foo Bar\",\"owner\":{\"name\":\"Foo Bar\",\"email\":\"foo@bar.com\",\"username\":\"foobar\"},\"url\":\"https://Foo.bar/com/gerrit/351587\",\"commitMessage\":\"Foo Changes\\n\\nChange-Id: I4a0ca0ddbbe86258c162f1528f89632113758a9d\\n\",\"status\":\"NEW\"},\"project\":\"NOTAREALPROJECT/Bar\",\"refName\":\"refs/heads/FOOMAIN\",\"changeKey\":{\"id\":\"I4a0ca0ddbbe86258c162f1528f89632113758a9d\"},\"type\":\"patchset-created\",\"eventCreatedOn\":1527883364}");
+        handler.post(jsonTest01);
+        handler.post(jsonTest02);
+        //The worker threads take a moment to process the work from the queue
+        Thread.sleep(1000);
+        verify(listenerMock, times(2)).gerritEvent(Mockito.any());
+    }
+
+   /**
      * Tests that event notification using the default method.
      */
     @Test
@@ -745,5 +772,4 @@ public class GerritHandlerTest {
             }
         }
     }
-
 }

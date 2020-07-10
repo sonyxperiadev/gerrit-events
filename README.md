@@ -67,6 +67,23 @@ Ubuntu 12.04 so we have no means of detecting or fixing any Windows issues,
 but there are no specific reasons why it shouldn't run on Windows
 and some kind contributors provide win fixes every now and then.
 
+# Discarding events
+You can create a whitelist of projects from which you want to consider events from. This will prevent operations on projects that you do not wish to view events from taking up resources. This is especially useful when a large Gerrit server is used and you are only trying to evaluate events for a small subset of projects. 
+
+You can set where the file is expected by setting the environment variable **gerrit.whitelist.location** to the file location. 
+
+ An example file: 
+ 
+ ```ini
+#simple txt file with each project on newline
+foo
+```
+
+This will result in only events from the foo project being evaluated further. 
+
+The file can be updated and is polled every 30 minutes by default. This polling interval can be set with **gerrit.whitelist.timeout**. 
+
+
 # Build
 You build using maven
 
