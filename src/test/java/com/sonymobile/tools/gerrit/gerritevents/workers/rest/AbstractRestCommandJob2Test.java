@@ -36,6 +36,7 @@ import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.Test;
 
@@ -118,7 +119,7 @@ public class AbstractRestCommandJob2Test {
         return new AbstractRestCommandJob2(new RestConnectionConfig() {
             @Override
             public String getGerritFrontEndUrl() {
-                return "http://localhost:" + server.getConnectors()[0].getLocalPort();
+                return "http://localhost:" + ((ServerConnector)server.getConnectors()[0]).getLocalPort();
             }
 
             @Override
