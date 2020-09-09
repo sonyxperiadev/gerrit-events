@@ -105,4 +105,22 @@ public class CommentAdded extends ChangeBasedEvent {
             }
         }
     }
+
+    @Override
+    public int hashCode() {
+        return 31 * super.hashCode() + (comment != null ? comment.hashCode() : 0);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        CommentAdded event = (CommentAdded)o;
+        if (comment == null) {
+            return event.comment == null;
+        }
+        return comment.equals(event.comment);
+    }
 }
