@@ -108,7 +108,11 @@ public class CommentAdded extends ChangeBasedEvent {
 
     @Override
     public int hashCode() {
-        return 31 * super.hashCode() + (comment != null ? comment.hashCode() : 0);
+        int a = 0;
+        if (comment != null) {
+            a = comment.hashCode();
+        }    
+        return super.hashCode() + a;
     }
 
     @Override
