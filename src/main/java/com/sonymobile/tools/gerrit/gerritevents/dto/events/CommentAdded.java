@@ -111,7 +111,7 @@ public class CommentAdded extends ChangeBasedEvent {
         int a = 0;
         if (comment != null) {
             a = comment.hashCode();
-        }    
+        }
         return super.hashCode() + a;
     }
 
