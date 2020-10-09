@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.18.1 - 2020-10-09
+* Fixed [Issue #90](https://github.com/sonyxperiadev/gerrit-events/issues/90). Now uses comment equality in CommentAdded events _([PR #98](https://github.com/sonyxperiadev/gerrit-events/pull/98))_
+
 ## 2.18.0 - 2020-07-10
 * Adding ability for external json config file to ignore incoming events _([PR #93](https://github.com/sonyxperiadev/gerrit-events/pull/93))_
 
