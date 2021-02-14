@@ -32,6 +32,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 import org.slf4j.Logger;
@@ -420,4 +422,26 @@ public class GerritQueryHandler {
          */
         void visit(String line) throws GerritQueryException;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof GerritQueryHandler)) {
+            return false;
+        }
+        GerritQueryHandler gerritQueryHandler = (GerritQueryHandler)o;
+        return Objects.equals(gerritHostName, gerritQueryHandler.gerritHostName)
+                && gerritSshPort == gerritQueryHandler.gerritSshPort
+                && Objects.equals(gerritProxy, gerritQueryHandler.gerritProxy)
+                && Objects.equals(authentication, gerritQueryHandler.authentication)
+                && connectionTimeout == gerritQueryHandler.connectionTimeout;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(gerritHostName, gerritSshPort, gerritProxy, authentication, connectionTimeout);
+    }
+
 }

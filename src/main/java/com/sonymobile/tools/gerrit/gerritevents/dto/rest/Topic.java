@@ -47,7 +47,7 @@ public class Topic {
     private static final Logger logger = LoggerFactory.getLogger(ChangeBasedEvent.class);
 
     private final String name;
-    private Map<Change, PatchSet> changes = null;
+    private Map<GerritQueryHandler, Map<Change, PatchSet>> changes = null;
 
     /**
      * Standard Constructor.
@@ -56,6 +56,7 @@ public class Topic {
      */
     public Topic(String name) {
         this.name = name;
+        this.changes = new HashMap<GerritQueryHandler, Map<Change, PatchSet>>();
     }
 
     /**
@@ -66,6 +67,38 @@ public class Topic {
     }
 
     /**
+     * Query all change-patchset pairs related to this topic.
+     *
+     * @param gerritQueryHandler the query handler, responsible for the queries to gerrit.
+     * @return the map of pairs change-patchset related to this topic.
+     */
+    public Map<Change, PatchSet> queryChanges(GerritQueryHandler gerritQueryHandler) {
+        if (StringUtils.isEmpty(name)) {
+            logger.error("Topic name can not be empty");
+            return Collections.emptyMap();
+        }
+
+        Map<Change, PatchSet> result = new HashMap<Change, PatchSet>();
+        try {
+            List<JSONObject> jsonList = gerritQueryHandler.queryCurrentPatchSets("topic:{" + name + "}");
+            for (JSONObject json : jsonList) {
+                if (json.has("type") && "stats".equalsIgnoreCase(json.getString("type"))) {
+                    continue;
+                }
+                if (json.has("currentPatchSet")) {
+                    JSONObject currentPatchSet = json.getJSONObject("currentPatchSet");
+                    result.put(new Change(json), new PatchSet(currentPatchSet));
+                }
+            }
+        } catch (IOException e) {
+            logger.error("IOException occured. ", e);
+        } catch (GerritQueryException e) {
+            logger.error("Bad query. ", e);
+        }
+        return result;
+    }
+
+    /**
      * Gets all change-patchset pairs related to this topic.
      * After first call data is cached.
      *
@@ -73,32 +106,12 @@ public class Topic {
      * @return the map of pairs change-patchset related to this topic.
      */
     public Map<Change, PatchSet> getChanges(GerritQueryHandler gerritQueryHandler) {
-        if (StringUtils.isEmpty(name)) {
-            logger.error("Topic name can not be empty");
-            return Collections.emptyMap();
+        if (changes.containsKey(gerritQueryHandler)) {
+            return changes.get(gerritQueryHandler);
         }
-
-        if (changes == null) {
-            Map<Change, PatchSet> temp = new HashMap<Change, PatchSet>();
-            try {
-                List<JSONObject> jsonList = gerritQueryHandler.queryCurrentPatchSets("topic:{" + name + "}");
-                for (JSONObject json : jsonList) {
-                    if (json.has("type") && "stats".equalsIgnoreCase(json.getString("type"))) {
-                        continue;
-                    }
-                    if (json.has("currentPatchSet")) {
-                        JSONObject currentPatchSet = json.getJSONObject("currentPatchSet");
-                        temp.put(new Change(json), new PatchSet(currentPatchSet));
-                    }
-                }
-                changes = temp;
-            } catch (IOException e) {
-                logger.error("IOException occured. ", e);
-            } catch (GerritQueryException e) {
-                logger.error("Bad query. ", e);
-            }
-        }
-        return changes;
+        Map<Change, PatchSet> result = queryChanges(gerritQueryHandler);
+        changes.put(gerritQueryHandler, result);
+        return result;
     }
 
     @Override
