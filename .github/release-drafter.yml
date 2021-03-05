@@ -1,0 +1,62 @@
+# Configuration for Release Drafter: https://github.com/toolmantim/release-drafter
+name-template: $NEXT_MINOR_VERSION
+tag-template: $NEXT_MINOR_VERSION
+# Uses a more common 2-digit versioning in Jenkins plugins. Can be replaced by semver: $MAJOR.$MINOR.$PATCH
+version-template: $MAJOR.$MINOR.$PATCH
+
+# Emoji reference: https://gitmoji.carloscuesta.me/
+# If adding categories, please also update: https://github.com/jenkins-infra/jenkins-maven-cd-action/blob/master/action.yaml#L16
+categories:
+  - title: 💥 Breaking changes
+    labels: 
+      - breaking
+  - title: 🚨 Removed
+    label: removed
+  - title: 🎉 Major features and improvements
+    labels:
+      - major-enhancement
+      - major-rfe
+  - title: 🐛 Major bug fixes
+    labels:
+      - major-bug
+  - title: ⚠️ Deprecated
+    label: deprecated
+  - title: 🚀 New features and improvements
+    labels:
+      - enhancement
+      - feature
+      - rfe
+  - title: 🐛 Bug fixes
+    labels:
+      - bug
+      - fix
+      - bugfix
+      - regression
+  - title: 👷 Changes for developers
+    labels:
+      - developer 
+  # Default label used by Dependabot
+  - title: 📦 Dependency updates
+    label: dependencies
+  - title: 📝 Documentation updates
+    label: documentation
+  - title: 👻 Maintenance
+    labels: 
+      - chore
+      - internal
+  - title: 🚦 Tests
+    labels: 
+      - test
+      - tests
+exclude-labels:
+  - reverted
+  - no-changelog
+  - skip-changelog
+  - invalid
+
+template: |
+  <!-- Optional: add a release summary here -->
+  $CHANGES
+replacers:
+  - search: '/\[*JENKINS-(\d+)\]*\s*-*\s*/g'
+    replace: '[JENKINS-$1](https://issues.jenkins-ci.org/browse/JENKINS-$1) - '
