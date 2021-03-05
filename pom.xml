@@ -3,7 +3,7 @@
     <groupId>com.sonymobile.tools.gerrit</groupId>
     <artifactId>gerrit-events</artifactId>
     <packaging>jar</packaging>
-    <version>2.18.3</version>
+    <version>2.18.2-SNAPSHOT</version>
     <name>Gerrit Events Client library</name>
     <description>
         Java client library for receiving stream-events from Gerrit code review.
