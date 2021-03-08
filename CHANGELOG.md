@@ -1,5 +1,7 @@
 # Changelog
 
+Newer releases are listed in [GitHub Releases](https://github.com/sonyxperiadev/gerrit-events/releases)
+
 ## 2.18.1 - 2020-10-09
 * Fixed [Issue #90](https://github.com/sonyxperiadev/gerrit-events/issues/90). Now uses comment equality in CommentAdded events _([PR #98](https://github.com/sonyxperiadev/gerrit-events/pull/98))_
 
