@@ -41,6 +41,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.PrivateStateChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.WipStateChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.HashtagsChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.VoteDeleted;
+import com.sonymobile.tools.gerrit.gerritevents.dto.events.RerunCheck;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -126,7 +127,12 @@ public enum GerritEventType {
     /**
      * A vote deleted event.
      */
-    VOTE_DELETED("vote-deleted", true, VoteDeleted.class);
+    VOTE_DELETED("vote-deleted", true, VoteDeleted.class),
+
+    /**
+     * A rerun-check event.
+     */
+    RERUN_CHECK("rerun-check", true, RerunCheck.class);
 
     private String typeValue;
     private boolean interesting;
