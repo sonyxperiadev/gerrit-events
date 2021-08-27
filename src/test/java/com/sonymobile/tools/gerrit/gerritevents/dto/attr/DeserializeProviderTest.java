@@ -52,6 +52,7 @@ public class DeserializeProviderTest {
         XStream x = new XStream();
         x.aliasPackage("com.sonyericsson.hudson.plugins.gerrit.gerritevents",
                 "com.sonymobile.tools.gerrit.gerritevents");
+        x.allowTypesByWildcard(new String[]{"com.sonymobile.tools.gerrit.gerritevents.dto.**"});
         PatchsetCreated event = (PatchsetCreated)x.fromXML(getClass()
                 .getResourceAsStream("DeserializeProviderTest.xml"));
         Provider provider = event.getProvider();

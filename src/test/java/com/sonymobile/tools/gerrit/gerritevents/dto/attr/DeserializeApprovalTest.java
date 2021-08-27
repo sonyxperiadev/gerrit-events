@@ -49,6 +49,7 @@ public class DeserializeApprovalTest {
     @Test
     public void testApprovalUsernameMigration() throws IOException {
         XStream x = new XStream();
+        x.allowTypesByWildcard(new String[]{"com.sonymobile.tools.gerrit.gerritevents.dto.**"});
         Approval approval = (Approval)x.fromXML(getClass().getResourceAsStream("DeserializeApprovalTest.xml"));
         assertNotNull(approval.getBy());
         assertEquals("uname", approval.getBy().getUsername());
