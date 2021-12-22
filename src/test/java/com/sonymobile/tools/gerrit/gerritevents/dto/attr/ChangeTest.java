@@ -30,6 +30,7 @@ import net.sf.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -48,6 +49,7 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.REVIE
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.CREATED_ON;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.LAST_UPDATED;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.STATUS;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.HASHTAGS;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -208,6 +210,10 @@ public class ChangeTest {
         json.put(OWNER, jsonAccount);
         json.put(STATUS, "NEW");
         json.put(URL, "http://localhost:8080");
+        JSONArray hashtags = new JSONArray();
+        hashtags.add("first");
+        hashtags.add("second");
+        json.put(HASHTAGS, hashtags);
         Change change = new Change(json);
 
         assertEquals(change.getProject(), "project");
@@ -219,6 +225,7 @@ public class ChangeTest {
         assertEquals(change.getUrl(), "http://localhost:8080");
         assertNull(change.getComments());
         assertEquals(change.getStatus(), GerritChangeStatus.NEW);
+        assertEquals(change.getHashtags(), Arrays.asList("first", "second"));
     }
 
     /**
