@@ -3,7 +3,7 @@
     <groupId>com.sonymobile.tools.gerrit</groupId>
     <artifactId>gerrit-events</artifactId>
     <packaging>jar</packaging>
-    <version>2.20.0</version>
+    <version>2.20.1-SNAPSHOT</version>
     <name>Gerrit Events Client library</name>
     <description>
         Java client library for receiving stream-events from Gerrit code review.
@@ -268,7 +268,7 @@
         <connection>scm:git:ssh://github.com/sonyxperiadev/gerrit-events.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/sonyxperiadev/gerrit-events.git</developerConnection>
         <url>https://github.com/sonyxperiadev/gerrit-events</url>
-      <tag>gerrit-events-2.20.0</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <profiles>
