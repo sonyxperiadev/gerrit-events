@@ -34,6 +34,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -45,6 +46,7 @@ import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.BRANC
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.COMMENTS;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.COMMIT_MESSAGE;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.TOPIC;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.HASHTAGS;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.ID;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.NUMBER;
 import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.OWNER;
@@ -81,6 +83,10 @@ public class Change implements GerritJsonDTO {
      * Topic name.
      */
     private transient String topic;
+    /**
+     * Hashtags.
+     */
+    private List<String> hashtags;
     /**
      * Change identifier.
      */
@@ -202,6 +208,16 @@ public class Change implements GerritJsonDTO {
             }
         }
 
+        if (json.containsKey(HASHTAGS)) {
+            JSONArray tags = json.getJSONArray(HASHTAGS);
+            hashtags = new ArrayList<String>(tags.size());
+            for (int i = 0; i < tags.size(); i++) {
+                hashtags.add(tags.getString(i));
+            }
+        } else {
+            hashtags = Collections.emptyList();
+        }
+
         url = getString(json, URL);
         status = GerritChangeStatus.fromString(getString(json, STATUS));
         wip = getBoolean(json, WIP, false);
@@ -281,6 +297,22 @@ public class Change implements GerritJsonDTO {
      */
     public void setTopicObject(Topic topicObject) {
         this.topicObject = topicObject;
+    }
+
+    /**
+     * Change hashtags.
+     * @return the hashtags.
+     */
+    public List<String> getHashtags() {
+        return hashtags;
+    }
+
+    /**
+     * Sets the hashtags to this change.
+     * @param hashtags the hashtags.
+     */
+    public void setHashtags(List<String> hashtags) {
+        this.hashtags = hashtags;
     }
 
     /**
