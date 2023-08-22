@@ -43,6 +43,11 @@ public enum GerritChangeKind {
      */
     NO_CODE_CHANGE("NO_CODE_CHANGE"),
     /**
+     * No changes (same parent tree, same code delta, same commit message,
+     * only the patch set SHA-1 is different).
+     */
+    NO_CHANGE("NO_CHANGE"),
+    /**
      * Catch-all type if Gerrit adds a new ChangeKind we don't know about.
      */
     UNKNOWN("UNKNOWN");
