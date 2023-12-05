@@ -14,6 +14,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <powermock.version>2.0.0</powermock.version>
+        <mwiede.jsch.version>0.2.24</mwiede.jsch.version>
+        <apache.sshd.version>2.15.0</apache.sshd.version>
     </properties>
 
     <licenses>
@@ -54,20 +56,10 @@
     </developers>
 
     <dependencies>
-        <!-- <dependency>
-            <groupId>org.apache.mina</groupId>
-            <artifactId>mina-core</artifactId>
-            <version>1.1.7</version>
-        </dependency>
         <dependency>
-            <groupId>org.apache.sshd</groupId>
-            <artifactId>apache-sshd</artifactId>
-            <version>0.3.0</version>
-        </dependency>-->
-        <dependency>
-            <groupId>com.jcraft</groupId>
+            <groupId>com.github.mwiede</groupId>
             <artifactId>jsch</artifactId>
-            <version>0.1.55</version>
+            <version>${mwiede.jsch.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -140,7 +132,7 @@
         <dependency>
             <groupId>org.apache.sshd</groupId>
             <artifactId>sshd-core</artifactId>
-            <version>0.8.0</version>
+            <version>${apache.sshd.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

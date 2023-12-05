@@ -30,8 +30,9 @@ import com.sonymobile.tools.gerrit.gerritevents.GerritConnection;
 import com.sonymobile.tools.gerrit.gerritevents.GerritHandler;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.Authentication;
 import com.sonymobile.tools.gerrit.gerritevents.mock.SshdServerMock;
-import org.apache.sshd.SshServer;
 import org.apache.sshd.server.Environment;
+import org.apache.sshd.server.SshServer;
+import org.apache.sshd.server.channel.ChannelSession;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -203,7 +204,7 @@ public class StreamWatchdogTest {
         }
 
         @Override
-        public void start(Environment environment) throws IOException {
+        public void start(ChannelSession channel, Environment environment) throws IOException {
             thread = new Thread(this, "WaitLongTimeCommand " + this.command);
             thread.setDaemon(true);
             thread.start();
