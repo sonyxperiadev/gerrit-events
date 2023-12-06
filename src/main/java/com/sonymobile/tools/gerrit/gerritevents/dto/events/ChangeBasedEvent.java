@@ -95,7 +95,7 @@ public abstract class ChangeBasedEvent extends GerritTriggeredEvent {
      * @param gerritQueryHandler the query handler, responsible for the queries to gerrit.
      * @return a list of files that are part of this patch set.
      *
-     * @deprecated use {@link Change#getFiles(GerritQueryHandler)} instead.
+     * @Deprecated use {@link Change#getFiles(GerritQueryHandler)} instead.
      */
     @Deprecated
     public List<String> getFiles(GerritQueryHandler gerritQueryHandler) {

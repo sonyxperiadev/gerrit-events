@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -343,7 +342,7 @@ public class GerritConnection extends Thread implements Connector {
         cb.flip();
         for (int i = 0; i < cb.length(); i++) {
             if (cb.charAt(i) == '\n') {
-                line = getSubSequence(cb, 0, i).toString();
+                line = cb.subSequence(0, i).toString();
                 cb.position(i + 1);
                 break;
             }
@@ -364,7 +363,7 @@ public class GerritConnection extends Thread implements Connector {
                         logger.debug("Encountered big event.");
                         eventBuffer = new StringBuilder();
                     }
-                    eventBuffer.append(getSubSequence(cb, 0, pos));
+                    eventBuffer.append(cb.subSequence(0, pos));
                 } else {
                     cb.position(pos);
                     cb.limit(limit);
@@ -374,24 +373,6 @@ public class GerritConnection extends Thread implements Connector {
             }
         }
         return line;
-    }
-
-    /**
-     *  Get sub sequence of buffer.
-     *
-     *  This method avoids error in java-api-check.
-     *  animal-sniffer is confused by the signature of CharBuffer.subSequence()
-     *  due to declaration of this method has been changed since Java7.
-     *  (abstract -> non-abstract)
-     *
-     * @param cb a buffer
-     * @param start start of sub sequence
-     * @param end end of sub sequence
-     * @return sub sequence.
-     */
-    @IgnoreJRERequirement
-    private CharSequence getSubSequence(CharBuffer cb, int start, int end) {
-        return cb.subSequence(start, end);
     }
 
     /**
@@ -722,7 +703,7 @@ public class GerritConnection extends Thread implements Connector {
     public void notifyListeners(GerritConnectionEvent event) {
         for (ConnectionListener listener : listeners) {
             try {
-                switch(event) {
+                switch (event) {
                 case GERRIT_CONNECTION_ESTABLISHED:
                     listener.connectionEstablished();
                     break;
