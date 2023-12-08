@@ -144,7 +144,7 @@ public enum GerritEventType {
      * @param interesting If this event type is interesting from a functionality perspective.
      * @param eventRepresentative the DTO class that represents this kind of event.
      */
-    private GerritEventType(String typeValue, boolean interesting,
+    GerritEventType(String typeValue, boolean interesting,
                             Class<? extends GerritJsonEvent> eventRepresentative) {
         this.typeValue = typeValue;
         this.interesting = interesting;

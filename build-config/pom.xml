@@ -13,20 +13,24 @@
     </parent>
 
     <properties>
+        <project.build.outputEncoding>UTF-8</project.build.outputEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.net.id>rsandell</java.net.id>
+        <mwiede.jsch.version>0.2.13</mwiede.jsch.version>
+        <apache.sshd.version>2.11.0</apache.sshd.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.sshd</groupId>
             <artifactId>sshd-core</artifactId>
-            <version>0.8.0</version>
+            <version>${apache.sshd.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.jcraft</groupId>
+            <groupId>com.github.mwiede</groupId>
             <artifactId>jsch</artifactId>
-            <version>0.1.50</version>
+            <version>${mwiede.jsch.version}</version>
         </dependency>
     </dependencies>
 

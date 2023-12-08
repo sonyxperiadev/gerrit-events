@@ -26,6 +26,7 @@ package com.sonymobile.tools.gerrit.gerritevents;
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventType;
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritJsonEvent;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -77,14 +78,17 @@ public final class GerritJsonEventFactory {
         if (event == null) {
             logger.debug("Trying default constructor.");
             try {
-                event = clazz.newInstance();
+                event = clazz.getDeclaredConstructor().newInstance();
                 event.fromJson(jsonObject);
                 logger.trace("Event created from default constructor");
-            } catch (InstantiationException ex) {
+            } catch (InstantiationException
+                | IllegalAccessException
+                | IllegalArgumentException
+                | InvocationTargetException
+                | NoSuchMethodException
+                | SecurityException
+                ex) {
                 logger.error("Could not create an interesting GerritJsonEvent via default constructor "
-                        + "(DESIGN ERROR).", ex);
-            } catch (IllegalAccessException ex) {
-                logger.error("Could not create an interesting GerritJsonEvent via default constructor"
                         + "(DESIGN ERROR).", ex);
             }
         }

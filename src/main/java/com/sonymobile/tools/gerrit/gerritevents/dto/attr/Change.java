@@ -334,7 +334,7 @@ public class Change implements GerritJsonDTO {
     /**
      * Change number (deprecated).
      * @return the change number.
-     * @deprecated because the Gerrit documentation says so.
+     * @Deprecated because the Gerrit documentation says so.
      */
     public String getNumber() {
         return number;
@@ -343,7 +343,7 @@ public class Change implements GerritJsonDTO {
     /**
      * Change number (deprecated).
      * @param number the change number.
-     * @deprecated because the Gerrit documentation says so.
+     * @Deprecated because the Gerrit documentation says so.
      */
     public void setNumber(String number) {
         this.number = number;
@@ -465,19 +465,25 @@ public class Change implements GerritJsonDTO {
      * Is this change a work in progress.
      * @return change is in WIP state.
      */
-    public boolean isWip() { return wip; }
+    public boolean isWip() {
+        return wip;
+    }
 
     /**
      * Is this change a work in progress.
      * @param wip change is in WIP state.
      */
-    public void setWip(boolean wip) { this.wip = wip; }
+    public void setWip(boolean wip) {
+        this.wip = wip;
+    }
 
     /**
      * Is this change private.
      * @return change is in private state.
      */
-    public boolean isPrivate() { return _private; }
+    public boolean isPrivate() {
+        return _private;
+    }
 
     /**
      * Is this change private.
@@ -485,7 +491,9 @@ public class Change implements GerritJsonDTO {
      */
     // CS IGNORE HiddenField FOR NEXT 2 LINES. REASON: Private is a reserved keyword.
     // CS IGNORE ParameterName FOR NEXT 1 LINES. REASON: Private is a reserved keyword.
-    public void setPrivate(boolean _private) { this._private = _private; }
+    public void setPrivate(boolean _private) {
+        this._private = _private;
+    }
 
     @Override
     public boolean equals(Object obj) {

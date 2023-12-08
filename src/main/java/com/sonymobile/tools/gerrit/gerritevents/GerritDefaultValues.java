@@ -71,7 +71,7 @@ public final class GerritDefaultValues {
      * The default key-file to use when authenticating to the gerrit server.
      */
     public static final File DEFAULT_GERRIT_AUTH_KEY_FILE = new File(new File(System.getProperty("user.home"), ".ssh"),
-                                                              "id_rsa");
+                                                              "id_ed25519");
     /**
      * The default password for the private key-file.
      */

@@ -32,12 +32,12 @@ public class SshUtilTest {
         assertFalse("Key file validation failed with missing key file", tested);
 
         URL url = Thread.currentThread().getContextClassLoader().getResource(
-                "com/sonymobile/tools/gerrit/gerritevents/id_rsa_corrupted");
+                "com/sonymobile/tools/gerrit/gerritevents/id_ed25519_corrupted");
         tested = SshUtil.isPrivateKeyFileValid(new File(url.getPath()));
         assertFalse("Key file validation failed with invalid key file", tested);
 
         url = Thread.currentThread().getContextClassLoader().getResource(
-                "com/sonymobile/tools/gerrit/gerritevents/id_rsa");
+                "com/sonymobile/tools/gerrit/gerritevents/id_ed25519");
         tested = SshUtil.isPrivateKeyFileValid(new File(url.getPath()));
         assertTrue("Key file validation pass with vallid key file", tested);
     }
@@ -68,7 +68,7 @@ public class SshUtilTest {
     public void testNoPassphraseParsing() throws Exception {
         // Get no-passphrase key resource as file
         URL url = Thread.currentThread().getContextClassLoader().getResource(
-                "com/sonymobile/tools/gerrit/gerritevents/id_rsa");
+                "com/sonymobile/tools/gerrit/gerritevents/id_ed25519");
         File file = new File(url.getPath());
 
         boolean tested = SshUtil.checkPassPhrase(file, null);
@@ -90,7 +90,7 @@ public class SshUtilTest {
 
         // Get passphrase-encrypted keyfile as file
         URL url = Thread.currentThread().getContextClassLoader().getResource(
-                "com/sonymobile/tools/gerrit/gerritevents/id_rsa_passphrase");
+                "com/sonymobile/tools/gerrit/gerritevents/id_ed25519_passphrase");
         File file = new File(url.getPath());
 
         // Fail if invalid passphrase does not fail

@@ -177,7 +177,7 @@ public class Provider implements GerritJsonDTO {
      * Get protocol scheme.
      *
      * @return the scheme.
-     * @deprecated use getSecheme instead.
+     * @Deprecated use getSecheme instead.
      */
     public String getProto() {
         return getScheme();
@@ -187,7 +187,7 @@ public class Provider implements GerritJsonDTO {
      * Set protocol scheme.
      *
      * @param proto the scheme.
-     * @deprecated use setScheme instead.
+     * @Deprecated use setScheme instead.
      */
     public void setProto(String proto) {
         setScheme(proto);

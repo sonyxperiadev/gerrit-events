@@ -109,8 +109,12 @@ public class ProjectCreated extends GerritTriggeredEvent implements RepositoryMo
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ProjectCreated that = (ProjectCreated)o;
         return projectName.equals(that.projectName);
     }

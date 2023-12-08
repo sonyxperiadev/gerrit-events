@@ -307,7 +307,7 @@ public class GerritHandler implements Coordinator, Handler {
          * @param work the work to do
          * @param coordinator the coordinator
          */
-        public EventWorker(Work work, Coordinator coordinator) {
+        EventWorker(Work work, Coordinator coordinator) {
             this.work = work;
             this.coordinator = coordinator;
         }
@@ -683,9 +683,8 @@ public class GerritHandler implements Coordinator, Handler {
             public void run() {
                 String fileName = location;
                 logger.debug("reading config file");
-                try {
-                    HashMap newWhitelist = new HashMap<String, Object>();
-                    BufferedReader in = new BufferedReader(new FileReader(fileName));
+                HashMap<String, Object> newWhitelist = new HashMap<>();
+                try (BufferedReader in = new BufferedReader(new FileReader(fileName))) {
                     String readLine = in.readLine();
                     while (StringUtils.isNotEmpty(readLine)) {
                         logger.debug("whitelisting: {}", readLine);
@@ -694,7 +693,6 @@ public class GerritHandler implements Coordinator, Handler {
                     }
                     // overwrite whitelist last in case reading the file fails for some reason.
                     whitelist = newWhitelist;
-
                 } catch (FileNotFoundException ex) {
                     logger.error("Exception thrown during whitelist file read. File does not exist", ex);
                 } catch (IOException ex) {

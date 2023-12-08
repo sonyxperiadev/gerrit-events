@@ -1,8 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
- * Copyright 2013 Sony Mobile Communications AB. All rights reserved.
+ * Copyright (c) 2011, 2014 Sony Mobile Communications Inc. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,18 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+/*
+ * This file comes from the gerrit-trigger-plugin
+ * https://github.com/jenkinsci/gerrit-trigger-plugin
+ * commit: c563987
+ */
 package com.sonymobile.tools.gerrit.gerritevents.mock;
 
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
-import org.apache.sshd.SshServer;
-import org.apache.sshd.server.Command;
-import org.apache.sshd.server.CommandFactory;
+
+import org.apache.sshd.server.SshServer;
+import org.apache.sshd.server.auth.UserAuthNoneFactory;
+import org.apache.sshd.server.channel.ChannelSession;
+import org.apache.sshd.server.command.Command;
+import org.apache.sshd.server.command.CommandFactory;
+import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
-import org.apache.sshd.server.PublickeyAuthenticator;
-import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
-import org.apache.sshd.server.session.ServerSession;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -43,14 +48,41 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 import com.jcraft.jsch.KeyPair;
 
-import java.security.PublicKey;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.APPROVALS;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.AUTHOR;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.BRANCH;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.COMMIT_MESSAGE;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.CREATED_ON;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.EMAIL;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.ID;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.LAST_UPDATED;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.NAME;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.NUMBER;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.OWNER;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.PARENTS;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.PROJECT;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.REF;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.REVISION;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.STATUS;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.SUBJECT;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.TYPE;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.UPLOADER;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.URL;
+import static com.sonymobile.tools.gerrit.gerritevents.dto.GerritEventKeys.VALUE;
 
 /**
  * The beginning of a mock of a sshd server. When it is done the idea is to use this to send in stream-events over the
@@ -88,7 +120,7 @@ public class SshdServerMock implements CommandFactory {
     private List<CommandLookup> commandLookups;
 
     @Override
-    public Command createCommand(String s) {
+    public Command createCommand(ChannelSession channel, String s) {
         CommandMock command = findAndCreateCommand(s);
         return setCurrentCommand(command);
     }
@@ -99,7 +131,7 @@ public class SshdServerMock implements CommandFactory {
      * @param s the command line to match.
      * @return a command.
      *
-     * @see #createCommand(String)
+     * @see #createCommand(ChannelSession, String)
      * @see CommandLookup
      */
     private CommandMock findAndCreateCommand(String s) {
@@ -145,21 +177,50 @@ public class SshdServerMock implements CommandFactory {
     }
 
     /**
-     * Gets the first running command that matches the given regular expression.
+     * Get the command history.
+     *
+     * @return the command history.
+     */
+    public List<CommandMock> getCommandHistory() {
+        return commandHistory;
+    }
+
+    /**
+     * Find the first command that matches the given regular expression.
      *
      * @param commandSearch the regular expression to match.
      * @return the found command or null.
      */
-    public synchronized CommandMock getRunningCommand(String commandSearch) {
+    public synchronized CommandMock findCommand(String commandSearch) {
         if (commandHistory != null) {
             Pattern p = Pattern.compile(commandSearch);
             for (CommandMock command : commandHistory) {
-                if (!command.isDestroyed() && p.matcher(command.getCommand()).find()) {
+                if (p.matcher(command.getCommand()).find()) {
                     return command;
                 }
             }
         }
         return null;
+    }
+
+    /**
+     * Gets the number of commands that match the given regular expression from the command history.
+     *
+     * @param commandSearch the regular expression to match.
+     * @return number of found commands.
+     */
+    public synchronized int getNrCommandsHistory(String commandSearch) {
+        int matches = 0;
+        if (commandHistory != null) {
+            Pattern p = Pattern.compile(commandSearch, Pattern.MULTILINE);
+            for (CommandMock command : commandHistory) {
+                Matcher matcher = p.matcher(command.getCommand());
+                if (matcher.find()) {
+                    matches++;
+                }
+            }
+        }
+        return matches;
     }
 
     /**
@@ -232,7 +293,7 @@ public class SshdServerMock implements CommandFactory {
             if (System.currentTimeMillis() - startTime >= timeout) {
                 throw new RuntimeException("Timeout!");
             }
-            command = getRunningCommand(commandSearch);
+            command = findCommand(commandSearch);
             if (command == null) {
                 try {
                     Thread.sleep(MIN_SLEEP);
@@ -246,45 +307,59 @@ public class SshdServerMock implements CommandFactory {
     }
 
     /**
+     * Waits for number of commands matching the provided regular expression to appear in the command history.
+     *
+     * @param commandSearch a regular expression.
+     * @param need          the number of occurrences to wait for.
+     * @param timeout       the maximum time to wait for the command in ms.
+     * @return true if the nr of needed commands was found.
+     */
+    public boolean waitForNrCommands(String commandSearch, int need, int timeout) {
+        long startTime = System.currentTimeMillis();
+        int got = 0;
+        do {
+            if (System.currentTimeMillis() - startTime >= timeout) {
+                throw new RuntimeException("Timeout!");
+            }
+            got = getNrCommandsHistory(commandSearch);
+            if (got != need) {
+                try {
+                    Thread.sleep(MIN_SLEEP);
+                    //CS IGNORE EmptyBlock FOR NEXT 2 LINES. REASON: not needed.
+                } catch (InterruptedException e) {
+                }
+            }
+        } while (got != need);
+        return true;
+    }
+
+    /**
      * Starts a ssh server on the provided port.
      *
-     * @param port the port to listen to.
+     * @param sshPort port to start the server on
      * @param server the server mock to start
      *
      * @return the server.
      * @throws IOException if so.
      */
-    public static SshServer startServer(int port, SshdServerMock server) throws IOException {
+    public static SshServer startServer(int sshPort, SshdServerMock server) throws IOException {
+        File hostKey = new File(System.getProperty("java.io.tmpdir") + "/hostkey.ser");
         SshServer sshd = SshServer.setUpDefaultServer();
-        sshd.setPort(port);
-        sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider("hostkey.ser", "RSA"));
-        sshd.setPublickeyAuthenticator(new PublickeyAuthenticator() {
-            @Override
-            public boolean authenticate(String s, PublicKey publicKey, ServerSession serverSession) {
-                return true;
-            }
-        });
+        sshd.setPort(sshPort);
+        // Lifted entirely from
+        // ssh-agent-plugin/src/test/java/com/cloudbees/jenkins/plugins/sshagent/SSHAgentBase.java
+        SimpleGeneratorHostKeyProvider hostKeyProvider =
+                new SimpleGeneratorHostKeyProvider(Paths.get(hostKey.getPath()));
+//        hostKeyProvider.setAlgorithm("EdDSA");
+        sshd.setKeyPairProvider(hostKeyProvider);
+        sshd.setUserAuthFactories(List.of(new UserAuthNoneFactory()));
         sshd.setCommandFactory(server);
         sshd.start();
         return sshd;
     }
 
-
     /**
-     * Starts a ssh server on the standard Gerrit port.
-     *
-     * @param server the server mock to start
-     *
-     * @return the server.
-     * @throws IOException if so.
-     * @see #GERRIT_SSH_PORT
-     */
-    public static SshServer startServer(SshdServerMock server) throws IOException {
-        return startServer(GERRIT_SSH_PORT, server);
-    }
-
-    /**
-     * Generates a rsa key-pair in /tmp/jenkins-testkey for use with authenticating the trigger against the mock
+     * Generates a ed25519 key-pair in /tmp/jenkins-testkey for use with authenticating the trigger against the mock
      * server.
      *
      * @return the path to the private key file
@@ -294,9 +369,14 @@ public class SshdServerMock implements CommandFactory {
      * @throws JSchException        if creation of the keys goes wrong.
      */
     public static KeyPairFiles generateKeyPair() throws IOException, InterruptedException, JSchException {
-        File tmp = new File(System.getProperty("java.io.tmpdir")).getCanonicalFile();
+        // Can't use java.io.tmp: '/tmp' is explicitely set in some XML config files.`
+        File tmp = new File("/tmp");
+        if (!tmp.exists()) {
+            tmp.mkdirs();
+        }
         File priv = new File(tmp, "jenkins-testkey");
         File pub = new File(tmp, "jenkins-testkey.pub");
+        final KeyPairFiles sshKey;
         if (!(priv.exists() && pub.exists())) {
             if (priv.exists()) {
                 if (!priv.delete()) {
@@ -310,17 +390,19 @@ public class SshdServerMock implements CommandFactory {
             }
             System.out.println("Generating test key-pair.");
             JSch jsch = new JSch();
-            KeyPair kpair = KeyPair.genKeyPair(jsch, KeyPair.RSA);
+            KeyPair kpair = KeyPair.genKeyPair(jsch, KeyPair.ED25519);
 
             kpair.writePrivateKey(new FileOutputStream(priv));
             kpair.writePublicKey(new FileOutputStream(pub), "Test");
             System.out.println("Finger print: " + kpair.getFingerPrint());
             kpair.dispose();
-            return new KeyPairFiles(priv, pub);
+            sshKey = new KeyPairFiles(priv, pub);
         } else {
             System.out.println("Test key-pair seems to already exist.");
-            return new KeyPairFiles(priv, pub);
+            sshKey = new KeyPairFiles(priv, pub);
         }
+
+        return sshKey;
     }
 
     /**
@@ -363,7 +445,7 @@ public class SshdServerMock implements CommandFactory {
     /**
      * A mocked ssh command.
      *
-     * @see SshdServerMock#createCommand(String)
+     * @see SshdServerMock#createCommand(ChannelSession, String)
      */
     public static class CommandMock implements Command {
 
@@ -413,11 +495,12 @@ public class SshdServerMock implements CommandFactory {
         /**
          * Default implementation just waits for the command to be destroyed.
          *
+         * @param channel channel
          * @param environment env.
          * @throws IOException if so.
          */
         @Override
-        public void start(Environment environment) throws IOException {
+        public void start(ChannelSession channel, Environment environment) throws IOException {
             System.out.println("Starting command: " + command);
             //Default implementation just waits for a disconnect
             while (!isDestroyed()) {
@@ -441,7 +524,7 @@ public class SshdServerMock implements CommandFactory {
         }
 
         @Override
-        public void destroy() {
+        public void destroy(ChannelSession channel) {
             synchronized (this) {
                 destroyed = true;
                 notifyAll();
@@ -511,7 +594,7 @@ public class SshdServerMock implements CommandFactory {
         }
 
         @Override
-        public void start(Environment environment) throws IOException {
+        public void start(ChannelSession channel, Environment environment) throws IOException {
             System.out.println("Starting EOF-command: " + getCommand());
             this.stop(0);
         }
@@ -555,7 +638,7 @@ public class SshdServerMock implements CommandFactory {
         }
 
         @Override
-        public void start(final Environment environment) throws IOException {
+        public void start(final ChannelSession channel, final Environment environment) throws IOException {
             System.out.println("Starting PL-command: " + getCommand());
             while (!isNow()) {
                 synchronized (this) {
@@ -566,17 +649,425 @@ public class SshdServerMock implements CommandFactory {
                     }
                 }
             }
-            try {
-                PrintWriter out = new PrintWriter(new BufferedWriter(
-                        new OutputStreamWriter(getOutputStream(), "UTF-8")));
+            try (PrintWriter out = new PrintWriter(new BufferedWriter(
+                    new OutputStreamWriter(getOutputStream(), StandardCharsets.UTF_8)))) {
                 for (String line : lines) {
                     System.out.println("Sending: " + line);
                     out.println(line);
-                    out.flush();
                 }
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
             }
+        }
+    }
+
+    /**
+     * A Command that prints a version and then exits with 0.
+     */
+    public static class SendVersionCommand extends CommandMock {
+
+        /**
+         * Standard constructor.
+         *
+         * @param command the command
+         */
+        public SendVersionCommand(String command) {
+            super(command);
+        }
+
+        @Override
+        public void start(final ChannelSession channel, final Environment environment) throws IOException {
+            String line = "gerrit version 2.11.4";
+            System.out.println("Starting PL-command: " + getCommand());
+            try (PrintWriter out = new PrintWriter(new BufferedWriter(
+                        new OutputStreamWriter(getOutputStream(), StandardCharsets.UTF_8)))) {
+                System.out.println("Sending: " + line);
+                out.println(line);
+            }
+            this.stop(0);
+        }
+    }
+
+    /**
+     * A Command that returns last patcheset with approvals.
+     */
+    public static class SendQueryLastPatchSet extends CommandMock {
+
+        /**
+         * Standard constructor.
+         *
+         * @param command the command
+         */
+        public SendQueryLastPatchSet(String command) {
+            super(command);
+        }
+
+        @Override
+        public void start(final ChannelSession channel, final Environment environment) throws IOException {
+
+            final int createdOn1 = 1449170072;
+            final int createdOn2 = 1449168976;
+            final int lastUpdated = 1449170950;
+
+            JSONObject jsonAccount = new JSONObject();
+            jsonAccount.put(EMAIL, "EngyCZ@gmail.com");
+            jsonAccount.put(NAME, "Engy");
+
+            JSONArray parents = new JSONArray();
+            parents.add("31581608d63510c13d7cb12d3e9a245ca4f72a62");
+
+            JSONObject currentPatchSet = new JSONObject();
+            currentPatchSet.put(NUMBER, "2");
+            currentPatchSet.put(REVISION, "87861b77a7614f8e6da19b017c588b741911983c");
+            currentPatchSet.put(PARENTS, parents);
+            currentPatchSet.put(REF, "refs/changes/00/100/2");
+            currentPatchSet.put(UPLOADER, jsonAccount);
+            currentPatchSet.put(CREATED_ON, createdOn1);
+            currentPatchSet.put(AUTHOR, jsonAccount);
+
+            JSONArray approvals = new JSONArray();
+
+            JSONObject crw = new JSONObject();
+            crw.put(TYPE, "Code-Review");
+            crw.put(VALUE, "2");
+            approvals.add(crw);
+
+            crw = new JSONObject();
+            crw.put(TYPE, "Code-Review");
+            crw.put(VALUE, "1");
+            approvals.add(crw);
+
+            crw = new JSONObject();
+            crw.put(TYPE, "Code-Review");
+            crw.put(VALUE, "-1");
+            approvals.add(crw);
+
+            crw = new JSONObject();
+            crw.put(TYPE, "Verified");
+            crw.put(VALUE, "2");
+            approvals.add(crw);
+
+            crw = new JSONObject();
+            crw.put(TYPE, "Verified");
+            crw.put(VALUE, "1");
+            approvals.add(crw);
+
+            crw = new JSONObject();
+            crw.put(TYPE, "Verified");
+            crw.put(VALUE, "-1");
+            approvals.add(crw);
+
+            currentPatchSet.put(APPROVALS, approvals);
+
+            JSONObject change = new JSONObject();
+            change.put(PROJECT, "project");
+            change.put(BRANCH, "branch");
+            change.put(ID, "I2343434344");
+            change.put(NUMBER, "100");
+            change.put(SUBJECT, "subject");
+            change.put(OWNER, jsonAccount);
+            change.put(URL, "http://localhost:8080");
+            change.put(COMMIT_MESSAGE, "Change");
+            change.put(CREATED_ON, createdOn2);
+            change.put(LAST_UPDATED, lastUpdated);
+            change.put("open", true);
+            change.put(STATUS, "NEW");
+            change.put("currentPatchSet", currentPatchSet);
+
+            System.out.println("Starting QueryLastPatchSet: " + getCommand());
+            try (PrintWriter out = new PrintWriter(new BufferedWriter(
+                        new OutputStreamWriter(getOutputStream(), StandardCharsets.UTF_8)))) {
+                System.out.println("Sending: " + change);
+                out.println(change);
+            }
+            this.stop(0);
+        }
+    }
+
+    /**
+     * A Command that returns last patcheset with approvals.
+     */
+    public static class SendQueryAllPatchSets extends CommandMock {
+
+        /**
+         * Standard constructor.
+         *
+         * @param command the command
+         */
+        public SendQueryAllPatchSets(String command) {
+            super(command);
+        }
+
+        @Override
+        public void start(final ChannelSession channel, final Environment environment) throws IOException {
+            final int createdOn1 = 1449170072;
+            final int createdOn2 = 1449168976;
+            final int lastUpdated = 1449170950;
+
+            JSONObject jsonAccount = new JSONObject();
+            jsonAccount.put(EMAIL, "EngyCZ@gmail.com");
+            jsonAccount.put(NAME, "Engy");
+
+            JSONArray parents = new JSONArray();
+            parents.add("31581608d63510c13d7cb12d3e9a245ca4f72a62");
+
+            JSONObject currentPatchSet = new JSONObject();
+            currentPatchSet.put(NUMBER, "2");
+            currentPatchSet.put(REVISION, "87861b77a7614f8e6da19b017c588b741911983c");
+            currentPatchSet.put(PARENTS, parents);
+            currentPatchSet.put(REF, "refs/changes/00/100/2");
+            currentPatchSet.put(UPLOADER, jsonAccount);
+            currentPatchSet.put(CREATED_ON, createdOn1);
+            currentPatchSet.put(AUTHOR, jsonAccount);
+
+            JSONArray approvals = new JSONArray();
+
+            JSONObject crw = new JSONObject();
+            crw.put(TYPE, "Code-Review");
+            crw.put(VALUE, "2");
+            approvals.add(crw);
+
+            crw = new JSONObject();
+            crw.put(TYPE, "Code-Review");
+            crw.put(VALUE, "1");
+            approvals.add(crw);
+
+            crw = new JSONObject();
+            crw.put(TYPE, "Code-Review");
+            crw.put(VALUE, "-1");
+            approvals.add(crw);
+
+            crw = new JSONObject();
+            crw.put(TYPE, "Verified");
+            crw.put(VALUE, "2");
+            approvals.add(crw);
+
+            crw = new JSONObject();
+            crw.put(TYPE, "Verified");
+            crw.put(VALUE, "1");
+            approvals.add(crw);
+
+            crw = new JSONObject();
+            crw.put(TYPE, "Verified");
+            crw.put(VALUE, "-1");
+            approvals.add(crw);
+
+            currentPatchSet.put(APPROVALS, approvals);
+
+            JSONObject patchSet1 = new JSONObject();
+            patchSet1.put(NUMBER, "1");
+            patchSet1.put(REVISION, "009365b77a69cd5ecd05a699b19213682f7f8d79");
+            patchSet1.put(PARENTS, parents);
+            patchSet1.put(REF, "refs/changes/00/100/1");
+            patchSet1.put(UPLOADER, jsonAccount);
+            patchSet1.put(CREATED_ON, createdOn2);
+            patchSet1.put(AUTHOR, jsonAccount);
+
+            JSONObject patchSet2 = new JSONObject();
+            patchSet2.put(NUMBER, "2");
+            patchSet2.put(REVISION, "87861b77a7614f8e6da19b017c588b741911983c");
+            patchSet2.put(PARENTS, parents);
+            patchSet2.put(REF, "refs/changes/00/100/1");
+            patchSet2.put(UPLOADER, jsonAccount);
+            patchSet2.put(CREATED_ON, createdOn1);
+            patchSet2.put(AUTHOR, jsonAccount);
+
+            JSONArray patchSets = new JSONArray();
+            patchSets.add(patchSet1);
+            patchSets.add(patchSet2);
+
+            JSONObject change = new JSONObject();
+            change.put(PROJECT, "project");
+            change.put(BRANCH, "branch");
+            change.put(ID, "I2343434344");
+            change.put(NUMBER, "100");
+            change.put(SUBJECT, "subject");
+            change.put(OWNER, jsonAccount);
+            change.put(URL, "http://localhost:8080");
+            change.put(COMMIT_MESSAGE, "Change");
+            change.put(CREATED_ON, createdOn2);
+            change.put(LAST_UPDATED, lastUpdated);
+            change.put("open", true);
+            change.put(STATUS, "NEW");
+            change.put("currentPatchSet", currentPatchSet);
+            change.put("patchSets", patchSets);
+
+            System.out.println("Starting QueryAllPatchSets: " + getCommand());
+            try (PrintWriter out = new PrintWriter(new BufferedWriter(
+                        new OutputStreamWriter(getOutputStream(), StandardCharsets.UTF_8)))) {
+                System.out.println("Sending: " + change);
+                out.println(change);
+            }
+            this.stop(0);
+        }
+    }
+
+    /**
+     * A Command that returns patchesets with the same topic.
+     */
+    public static class SendQueryTopic extends CommandMock {
+
+        /**
+         * Standard constructor.
+         *
+         * @param command the command
+         */
+        public SendQueryTopic(String command) {
+            super(command);
+        }
+
+        @Override
+        public void start(final ChannelSession channel, final Environment environment) throws IOException {
+            final int createdOn1 = 1449170072;
+            final int createdOn2 = 1449168976;
+            final int lastUpdated = 1449170950;
+
+            JSONObject jsonAccount = new JSONObject();
+            jsonAccount.put(EMAIL, "EngyCZ@gmail.com");
+            jsonAccount.put(NAME, "Engy");
+
+            JSONArray parents = new JSONArray();
+            parents.add("31581608d63510c13d7cb12d3e9a245ca4f72a62");
+
+            JSONArray approvals = new JSONArray();
+
+            JSONObject crw = new JSONObject();
+            crw.put(TYPE, "Code-Review");
+            crw.put(VALUE, "2");
+            approvals.add(crw);
+
+            crw = new JSONObject();
+            crw.put(TYPE, "Code-Review");
+            crw.put(VALUE, "1");
+            approvals.add(crw);
+
+            crw = new JSONObject();
+            crw.put(TYPE, "Code-Review");
+            crw.put(VALUE, "-1");
+            approvals.add(crw);
+
+            crw = new JSONObject();
+            crw.put(TYPE, "Verified");
+            crw.put(VALUE, "2");
+            approvals.add(crw);
+
+            crw = new JSONObject();
+            crw.put(TYPE, "Verified");
+            crw.put(VALUE, "1");
+            approvals.add(crw);
+
+            crw = new JSONObject();
+            crw.put(TYPE, "Verified");
+            crw.put(VALUE, "-1");
+            approvals.add(crw);
+
+            JSONObject patchSet1 = new JSONObject();
+            patchSet1.put(NUMBER, "1");
+            patchSet1.put(REVISION, "009365b77a69cd5ecd05a699b19213682f7f8d79");
+            patchSet1.put(PARENTS, parents);
+            patchSet1.put(REF, "refs/changes/00/100/1");
+            patchSet1.put(UPLOADER, jsonAccount);
+            patchSet1.put(CREATED_ON, createdOn2);
+            patchSet1.put(AUTHOR, jsonAccount);
+            patchSet1.put(APPROVALS, approvals);
+
+            parents = new JSONArray();
+            parents.add("31581608d63510c13d7cb12d3e9a245ca4f72a66");
+            JSONObject patchSet2 = new JSONObject();
+            patchSet2.put(NUMBER, "1");
+            patchSet2.put(REVISION, "87861b77a7614f8e6da19b017c588b741911983c");
+            patchSet2.put(PARENTS, parents);
+            patchSet2.put(REF, "refs/changes/00/101/1");
+            patchSet2.put(UPLOADER, jsonAccount);
+            patchSet2.put(CREATED_ON, createdOn1);
+            patchSet2.put(AUTHOR, jsonAccount);
+            patchSet2.put(APPROVALS, approvals);
+
+            JSONObject change = new JSONObject();
+            change.put(PROJECT, "project");
+            change.put(BRANCH, "branch");
+            change.put(ID, "I2343434344");
+            change.put(NUMBER, "100");
+            change.put(SUBJECT, "subject");
+            change.put(OWNER, jsonAccount);
+            change.put(URL, "http://localhost:8080");
+            change.put(COMMIT_MESSAGE, "Change");
+            change.put(CREATED_ON, createdOn2);
+            change.put(LAST_UPDATED, lastUpdated);
+            change.put("open", true);
+            change.put(STATUS, "NEW");
+            change.put("currentPatchSet", patchSet1);
+            change.put("topic", "topic");
+
+            System.out.println("Starting QueryTopic: " + getCommand());
+            try (PrintWriter out = new PrintWriter(new BufferedWriter(
+                        new OutputStreamWriter(getOutputStream(), StandardCharsets.UTF_8)))) {
+                System.out.println("Sending: " + change);
+                out.println(change);
+                change.put(PROJECT, "project2");
+                change.put(ID, "I2343434345");
+                change.put(NUMBER, "101");
+                change.put("currentPatchSet", patchSet2);
+                System.out.println("Sending: " + change);
+                out.println(change);
+            }
+            this.stop(0);
+        }
+    }
+
+    /**
+     * A Command that prints a project and then exits with 0 and is destroyed.
+     */
+    public static class SendOneProjectCommand extends CommandMock {
+
+        /**
+         * Standard constructor.
+         *
+         * @param command the command
+         */
+        public SendOneProjectCommand(String command) {
+            super(command);
+        }
+
+        @Override
+        public void start(final ChannelSession channel, final Environment environment) throws IOException {
+            String line = "abcProject";
+            System.out.println("Starting PL-command: " + getCommand());
+            try (PrintWriter out = new PrintWriter(new BufferedWriter(
+                        new OutputStreamWriter(getOutputStream(), StandardCharsets.UTF_8)))) {
+                System.out.println("Sending: " + line);
+                out.println(line);
+            }
+            this.stop(0);
+            this.destroy(channel);
+        }
+    }
+
+    /**
+     * A Command that prints 2 projects and then exits with 0.
+     */
+    public static class SendTwoProjectsCommand extends CommandMock {
+
+        /**
+         * Standard constructor.
+         *
+         * @param command the command
+         */
+        public SendTwoProjectsCommand(String command) {
+            super(command);
+        }
+
+        @Override
+        public void start(final ChannelSession channel, final Environment environment) throws IOException {
+            String line = "abcProject";
+            String line2 = "defProject";
+            System.out.println("Starting PL-command: " + getCommand());
+            try (PrintWriter out = new PrintWriter(new BufferedWriter(
+                        new OutputStreamWriter(getOutputStream(), StandardCharsets.UTF_8)))) {
+                System.out.println("Sending: " + line);
+                out.println(line);
+                System.out.println("Sending: " + line2);
+                out.println(line2);
+            }
+            this.stop(0);
         }
     }
 
