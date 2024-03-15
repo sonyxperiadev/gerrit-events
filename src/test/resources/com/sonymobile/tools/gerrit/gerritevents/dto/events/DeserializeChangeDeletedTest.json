@@ -1,0 +1,14 @@
+{ "type":"change-deleted",
+  "deleter":{"name":"Administrator","email":"admin@example.com","username":"admin"},
+  "change":{"project":"bwnUVH","branch":"main",
+    "id":"I85153d869e3c9e6ea38f03ddabae36686805ecd2",
+    "number":3,"subject":"a Test Change",
+    "owner":{"name":"Administrator",
+      "email":"admin@example.com","username":"admin"},
+    "url":"http://testGerrit/c/bwnUVH/+/3",
+    "commitMessage":"a Test Change\n\nChange-Id: I85153d869e3c9e6ea38f03ddabae36686805ecd2\n",
+    "createdOn":1710524728,"status":"NEW"},
+  "project":"bwnUVH","refName":"refs/heads/main",
+  "changeKey":{"id":"I85153d869e3c9e6ea38f03ddabae36686805ecd2"},
+  "eventCreatedOn":1710524800
+}
