@@ -33,6 +33,10 @@ public abstract class GerritEventKeys {
      */
     public static final String ABANDONER = "abandoner";
     /**
+     * deleter.
+     */
+    public static final String DELETER = "deleter";
+    /**
      * change.
      */
     public static final String CHANGE = "change";

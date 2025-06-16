@@ -42,6 +42,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.WipStateChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.HashtagsChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.VoteDeleted;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.RerunCheck;
+import com.sonymobile.tools.gerrit.gerritevents.dto.events.ChangeDeleted;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -72,6 +73,10 @@ public enum GerritEventType {
      * A change-restored event.
      */
     CHANGE_RESTORED("change-restored", true, ChangeRestored.class),
+    /**
+     * A change-deleted event.
+     */
+    CHANGE_DELETED("change-deleted", true, ChangeDeleted.class),
     /**
      * A comment-added event.
      */
