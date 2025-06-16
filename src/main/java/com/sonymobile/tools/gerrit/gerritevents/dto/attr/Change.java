@@ -334,7 +334,7 @@ public class Change implements GerritJsonDTO {
     /**
      * Change number (deprecated).
      * @return the change number.
-     * @Deprecated because the Gerrit documentation says so.
+     * @deprecated because the Gerrit documentation says so.
      */
     public String getNumber() {
         return number;
@@ -343,7 +343,7 @@ public class Change implements GerritJsonDTO {
     /**
      * Change number (deprecated).
      * @param number the change number.
-     * @Deprecated because the Gerrit documentation says so.
+     * @deprecated because the Gerrit documentation says so.
      */
     public void setNumber(String number) {
         this.number = number;

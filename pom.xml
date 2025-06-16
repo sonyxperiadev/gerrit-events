@@ -177,6 +177,7 @@
                     <configuration>
                         <quiet>true</quiet>
                         <locale>en_US</locale>
+                        <source>8</source>
                     </configuration>
                 </plugin>
                 <plugin>
