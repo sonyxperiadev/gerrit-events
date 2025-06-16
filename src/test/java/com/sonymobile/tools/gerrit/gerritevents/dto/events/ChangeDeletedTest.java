@@ -36,11 +36,14 @@ import java.io.InputStream;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Tests that changeDeleted events are parsed correctly from file.
+ */
 public class ChangeDeletedTest {
 
     /**
-     * Tests that changeDeleted events are parsed correctly from
-     * file
+     * Tests that changeDeleted events are parsed correctly from file.
+     *
      * @throws IOException if we cannot load json from file.
      */
     @Test
@@ -51,7 +54,7 @@ public class ChangeDeletedTest {
         GerritEvent evt = GerritJsonEventFactory.getEvent(jsonObject);
         GerritTriggeredEvent gEvt = (GerritTriggeredEvent)evt;
         assertEquals(GerritEventType.CHANGE_DELETED, gEvt.getEventType());
-        ChangeDeleted deleted = (ChangeDeleted) gEvt;
+        ChangeDeleted deleted = (ChangeDeleted)gEvt;
         assertEquals("admin", deleted.getDeleter().getUsername());
         assertEquals("bwnUVH", deleted.change.getProject());
     }
