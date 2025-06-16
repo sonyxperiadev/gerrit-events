@@ -169,7 +169,7 @@ public class Approval implements GerritJsonDTO {
      *  @return true if approval score changed, false otherwise
      *         null if Gerrit does not support this attribute
      *
-     * @deprecated use {@link #isUpdated()} instead.
+     * @Deprecated use {@link #isUpdated()} instead.
      */
     @Deprecated
     public Boolean getUpdated() {

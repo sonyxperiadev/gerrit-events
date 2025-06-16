@@ -3,7 +3,7 @@
     <groupId>com.sonymobile.tools.gerrit</groupId>
     <artifactId>gerrit-events</artifactId>
     <packaging>jar</packaging>
-    <version>2.21.1-SNAPSHOT</version>
+    <version>2.22.0-SNAPSHOT</version>
     <name>Gerrit Events Client library</name>
     <description>
         Java client library for receiving stream-events from Gerrit code review.
@@ -12,8 +12,35 @@
     <url>https://github.com/sonyxperiadev/gerrit-events/</url>
 
     <properties>
+        <project.build.outputEncoding>UTF-8</project.build.outputEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <powermock.version>2.0.0</powermock.version>
+        <maven.compiler.release>11</maven.compiler.release>
+        <maven.compiler.testRelease>${maven.compiler.release}</maven.compiler.testRelease>
+
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
+        <maven-surefire-plugin.version>3.2.2</maven-surefire-plugin.version>
+        <maven-checkstyle-plugin.version>2.16</maven-checkstyle-plugin.version><!-- TODO: update to latest -->
+        <maven-release-plugin.version>2.5.3</maven-release-plugin.version><!-- TODO: update to latest -->
+        <maven-source-plugin.version>2.4</maven-source-plugin.version><!-- TODO: update to latest -->
+        <maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version><!-- TODO: update to latest -->
+        <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version><!-- TODO: update to latest -->
+        <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
+        
+        <slf4j.version>1.7.36</slf4j.version><!-- TODO: update to latest -->
+        <hamcrest.version>2.2</hamcrest.version>
+        <powermock.version>2.0.9</powermock.version>
+        <mockito.version>2.28.2</mockito.version><!-- TODO: update to latest -->        
+        <junit.version>4.13.2</junit.version><!-- TODO: update to latest -->
+
+        <mwiede.jsch.version>0.2.24</mwiede.jsch.version>
+        <apache.sshd.version>2.15.0</apache.sshd.version>
+        <httpclient.version>4.5.14</httpclient.version><!-- TODO: update to latest -->
+        <jetty-server.version>9.4.57.v20241219</jetty-server.version><!-- TODO: update to latest -->
+        <commons-io.version>2.15.1</commons-io.version>
+        <xstream.version>1.4.21</xstream.version>
+        <gson.version>2.10.1</gson.version>
+        <json-lib.version>2.4</json-lib.version><!-- TODO: find replacement -->
     </properties>
 
     <licenses>
@@ -54,69 +81,53 @@
     </developers>
 
     <dependencies>
-        <!-- <dependency>
-            <groupId>org.apache.mina</groupId>
-            <artifactId>mina-core</artifactId>
-            <version>1.1.7</version>
-        </dependency>
         <dependency>
-            <groupId>org.apache.sshd</groupId>
-            <artifactId>apache-sshd</artifactId>
-            <version>0.3.0</version>
-        </dependency>-->
-        <dependency>
-            <groupId>com.jcraft</groupId>
+            <groupId>com.github.mwiede</groupId>
             <artifactId>jsch</artifactId>
-            <version>0.1.55</version>
+            <version>${mwiede.jsch.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.6.1</version>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
-            <version>1.6.1</version>
+            <version>${slf4j.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.sf.json-lib</groupId>
             <artifactId>json-lib</artifactId>
             <classifier>jdk15</classifier>
-            <version>2.4</version>
+            <version>${json-lib.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.13</version>
+            <version>${httpclient.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
+            <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>1.3.2</version>
+            <version>${commons-io.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.8.9</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>animal-sniffer-annotations</artifactId>
-            <version>1.15</version>
-            <optional>true</optional>
+            <version>${gson.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.1</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>2.23.4</version>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -134,51 +145,64 @@
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest</artifactId>
-            <version>2.1</version>
+            <version>${hamcrest.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.sshd</groupId>
             <artifactId>sshd-core</artifactId>
-            <version>0.8.0</version>
+            <version>${apache.sshd.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.4.41.v20210516</version>
+            <version>${jetty-server.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
-            <version>1.4.19</version>
+            <version>${xstream.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${maven-javadoc-plugin.version}</version>
+                    <configuration>
+                        <quiet>true</quiet>
+                        <locale>en_US</locale>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>${maven-enforcer-plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.16</version>
+                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
-                    <forkMode>always</forkMode>
+                    <reuseForks>false</reuseForks>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
+                <version>${maven-compiler-plugin.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
@@ -190,10 +214,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.11</version>
+                <version>${maven-checkstyle-plugin.version}</version>
                 <configuration>
-                    <configLocation>build-config/swe_checkstyle.xml</configLocation>
-                    <suppressionsLocation>build-config/checkstyle-suppressions.xml</suppressionsLocation>
+                    <configLocation>file:${project.basedir}/build-config/swe_checkstyle.xml</configLocation>
+                    <suppressionsLocation>file:${project.basedir}/build-config/checkstyle-suppressions.xml</suppressionsLocation>
                     <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
                     <includeTestSourceDirectory>true</includeTestSourceDirectory>
                     <consoleOutput>true</consoleOutput>
@@ -213,7 +237,7 @@
                         </goals>
                         <phase>test</phase>
                         <configuration>
-                            <violationSeverity>info</violationSeverity>
+                            <violationSeverity>warning</violationSeverity>
                         </configuration>
                     </execution>
                 </executions>
@@ -221,7 +245,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.5</version>
+                <version>${maven-release-plugin.version}</version>
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <useReleaseProfile>false</useReleaseProfile>
@@ -229,27 +253,123 @@
                     <goals>deploy</goals>
                 </configuration>
             </plugin>
+<!-- from jenkins plugin-pom -->
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>animal-sniffer-maven-plugin</artifactId>
-                <version>1.16</version>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>extra-enforcer-rules</artifactId>
+                        <version>1.7.0</version>
+                    </dependency>
+                </dependencies>
                 <executions>
-                    <execution>
-                        <id>check-java-api</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <configuration>
-                            <signature>
-                                <groupId>org.codehaus.mojo.signature</groupId>
-                                <artifactId>java18</artifactId>
-                                <version>1.0</version>
-                            </signature>
-                        </configuration>
-                    </execution>
+                  <execution>
+                    <id>display-info</id>
+                    <goals>
+                      <goal>enforce</goal>
+                    </goals>
+                    <phase>validate</phase>
+                    <configuration>
+                      <rules>
+                        <requireMavenVersion>
+                          <version>[3.8.1,)</version>
+                          <message>3.8.1 required to no longer download dependencies via HTTP (use HTTPS instead).</message>
+                        </requireMavenVersion>
+                        <requireJavaVersion>
+                          <version>[${maven.compiler.release},)</version>
+                        </requireJavaVersion>
+                        <!-- TODO failing during incrementals deploy: MENFORCER-281
+                        <requirePluginVersions>
+                          <banSnapshots>false</banSnapshots>
+                        </requirePluginVersions>
+                        -->
+                        <enforceBytecodeVersion>
+                          <maxJdkVersion>${maven.compiler.release}</maxJdkVersion>
+                          <ignoredScopes>
+                            <ignoredScope>test</ignoredScope>
+                          </ignoredScopes>
+                          <!-- To add exclusions in a Jenkins plugin, use:
+                          <plugin>
+                              <artifactId>maven-enforcer-plugin</artifactId>
+                              <executions>
+                                  <execution>
+                                      <id>display-info</id>
+                                      <configuration>
+                                          <rules>
+                                              <enforceBytecodeVersion>
+                                                  <excludes combine.children="append">
+                                                      <exclude>…</exclude>
+                                                  </excludes>
+                                              </enforceBytecodeVersion>
+                                          </rules>
+                                      </configuration>
+                                  </execution>
+                              </executions>
+                          </plugin>
+                          -->
+                        </enforceBytecodeVersion>
+                        <bannedDependencies>
+                          <excludes>
+<!--                            <exclude>javax.servlet:javax.servlet-api</exclude>
+                            <exclude>javax.servlet:servlet-api</exclude> -->
+                            <exclude>org.sonatype.sisu:sisu-guice</exclude>
+                            <exclude>log4j:log4j:*:jar:compile</exclude>
+                            <exclude>log4j:log4j:*:jar:runtime</exclude>
+<!--                            <exclude>commons-logging:commons-logging:*:jar:compile</exclude>
+                            <exclude>commons-logging:commons-logging:*:jar:runtime</exclude> -->
+	        
+                            <!-- CVE-2021-44228 -->
+                            <exclude>org.apache.logging.log4j:*:(,2.15.0-rc1]</exclude>
+	        
+                            <!-- PowerMock has been abandoned and does not work on newer Java versions. -->
+                        <!--    <exclude>org.powermock:powermock-api-easymock</exclude>
+                            <exclude>org.powermock:powermock-api-mockito2</exclude>
+                            <exclude>org.powermock:powermock-api-support</exclude>
+                            <exclude>org.powermock:powermock-classloading-base</exclude>
+                            <exclude>org.powermock:powermock-classloading-objenesis</exclude>
+                            <exclude>org.powermock:powermock-classloading-xstream</exclude>
+                            <exclude>org.powermock:powermock-core</exclude>
+                            <exclude>org.powermock:powermock-module-javaagent</exclude>
+                            <exclude>org.powermock:powermock-module-junit4</exclude>
+                            <exclude>org.powermock:powermock-module-junit4-common</exclude>
+                            <exclude>org.powermock:powermock-module-junit4-legacy</exclude>
+                            <exclude>org.powermock:powermock-module-junit4-rule</exclude>
+                            <exclude>org.powermock:powermock-module-junit4-rule-agent</exclude>
+                            <exclude>org.powermock:powermock-module-testng</exclude>
+                            <exclude>org.powermock:powermock-module-testng-agent</exclude>
+                            <exclude>org.powermock:powermock-module-testng-common</exclude> -->
+	        
+                            <!-- Jenkins Test Harness is based on JUnit. Adding TestNG dependency would disable some of its functionality. -->
+                            <exclude>org.testng:testng</exclude>
+                          </excludes>
+                        </bannedDependencies>
+                      </rules>
+                    </configuration>
+                  </execution>
+                  <execution>
+                    <id>no-snapshots-in-release</id>
+                    <goals>
+                      <goal>enforce</goal>
+                    </goals>
+                    <phase>validate</phase>
+                    <configuration>
+                      <rules>
+                        <!-- 
+                          this causes fails the incrementals IT to fail as the parent is a snapshot and the incremental is a release
+                          so this is a separate execution so that it can be skipped in that specific IT
+                          -->
+                        <requireReleaseDeps>
+                          <message>No SNAPSHOT versions are allowed for releases</message>
+                          <onlyWhenRelease>true</onlyWhenRelease>
+                          <!--  whilst we generally want this this allows for easier testing of the plugin-pom in incrementals -->
+                          <failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>
+                        </requireReleaseDeps>
+                      </rules>
+                    </configuration>
+                  </execution>
                 </executions>
-            </plugin>
+              </plugin>
         </plugins>
     </build>
 
@@ -268,8 +388,8 @@
         <connection>scm:git:ssh://github.com/sonyxperiadev/gerrit-events.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/sonyxperiadev/gerrit-events.git</developerConnection>
         <url>https://github.com/sonyxperiadev/gerrit-events</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <profiles>
         <profile>
@@ -279,7 +399,7 @@
                   <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>2.2.1</version>
+                    <version>${maven-source-plugin.version}</version>
                     <executions>
                       <execution>
                         <id>attach-sources</id>
@@ -292,7 +412,6 @@
                   <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.9.1</version>
                     <executions>
                       <execution>
                         <id>attach-javadocs</id>
@@ -305,7 +424,7 @@
                   <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
-                    <version>1.6</version>
+                    <version>${maven-gpg-plugin.version}</version>
                     <executions>
                       <execution>
                         <id>sign-artifacts</id>

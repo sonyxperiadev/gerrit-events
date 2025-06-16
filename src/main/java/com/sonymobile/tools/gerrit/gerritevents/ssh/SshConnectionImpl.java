@@ -164,6 +164,12 @@ public class SshConnectionImpl implements SshConnection {
         }
         try {
             client = new JSch();
+//            String kex = "curve25519-sha256@libssh.org,"
+//                    + "curve25519-sha256,"
+//                    + "diffie-hellman-group16-sha512,"
+//                    + "diffie-hellman-group18-sha512";
+//            JSch.setConfig("kex", kex);
+
             if (auth.getPrivateKeyPhrase() == null) {
                 client.addIdentity(auth.getPrivateKeyFile().getAbsolutePath(),
                         auth.getPrivateKeyFilePassword());
