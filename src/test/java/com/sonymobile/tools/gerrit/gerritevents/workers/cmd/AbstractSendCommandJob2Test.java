@@ -29,10 +29,7 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.MockedStatic;
 
 import com.sonymobile.tools.gerrit.gerritevents.GerritConnectionConfig2;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.Authentication;
@@ -51,8 +48,6 @@ import static org.hamcrest.Matchers.containsString;
  * Tests {@link com.sonymobile.tools.gerrit.gerritevents.workers.cmd.AbstractSendCommandJob}.
  * @author rinrinne (rinrin.ne@gmail.com)
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(SshConnectionFactory.class)
 public class AbstractSendCommandJob2Test {
     private static GerritConnectionConfig2 mockConfig;
 
@@ -77,14 +72,15 @@ public class AbstractSendCommandJob2Test {
     public void testSendCommand() throws IOException {
         SshConnection mockSshConnection = mock(SshConnection.class);
         when(mockSshConnection.executeCommand(anyString())).thenReturn("OK");
-        PowerMockito.mockStatic(SshConnectionFactory.class);
-        when(SshConnectionFactory.getConnection(nullable(String.class), anyInt(), nullable(String.class),
-            nullable(Authentication.class)))
-            .thenReturn(mockSshConnection);
-        AbstractSendCommandJob2 job = new AbstractSendCommandJob2Impl(mockConfig);
-        Assert.assertThat(job.call(), containsString("OK"));
-        verify(mockSshConnection).executeCommand(anyString());
-        verify(mockSshConnection).disconnect();
+        try (MockedStatic<SshConnectionFactory> factory = mockStatic(SshConnectionFactory.class)) {
+            factory.when(() -> SshConnectionFactory.getConnection(nullable(String.class), anyInt(),
+                nullable(String.class), nullable(Authentication.class)))
+                .thenReturn(mockSshConnection);
+            AbstractSendCommandJob2 job = new AbstractSendCommandJob2Impl(mockConfig);
+            Assert.assertThat(job.call(), containsString("OK"));
+            verify(mockSshConnection).executeCommand(anyString());
+            verify(mockSshConnection).disconnect();
+        }
     }
 
     /**
@@ -92,14 +88,15 @@ public class AbstractSendCommandJob2Test {
      *
      * @throws IOException if so.
      */
-    @Test(expected = IOException.class)
+    @Test
     public void testSendCommandNoConnection() throws IOException {
-        PowerMockito.mockStatic(SshConnectionFactory.class);
-        when(SshConnectionFactory.getConnection(nullable(String.class), anyInt(), nullable(String.class),
-            nullable(Authentication.class)))
-            .thenThrow(new IOException());
-        AbstractSendCommandJob2 job = new AbstractSendCommandJob2Impl(mockConfig);
-        job.call();
+        try (MockedStatic<SshConnectionFactory> factory = mockStatic(SshConnectionFactory.class)) {
+            factory.when(() -> SshConnectionFactory.getConnection(nullable(String.class), anyInt(),
+                nullable(String.class), nullable(Authentication.class)))
+                .thenThrow(new IOException());
+            AbstractSendCommandJob2 job = new AbstractSendCommandJob2Impl(mockConfig);
+            Assert.assertThrows(IOException.class, job::call);
+        }
     }
 
     /**
@@ -107,19 +104,17 @@ public class AbstractSendCommandJob2Test {
      *
      * @throws IOException if so.
      */
-    @Test(expected = IOException.class)
+    @Test
     public void testSendCommandWithError() throws IOException {
-        PowerMockito.mockStatic(SshConnectionFactory.class);
         SshConnection mockSshConnection = mock(SshConnection.class);
         when(mockSshConnection.executeCommand(anyString())).thenReturn("OK");
-        when(SshConnectionFactory.getConnection(nullable(String.class), anyInt(), nullable(String.class),
-            nullable(Authentication.class)))
-            .thenReturn(mockSshConnection);
-        when(mockSshConnection.executeCommand(anyString())).thenThrow(new SshException());
-        AbstractSendCommandJob2 job = new AbstractSendCommandJob2Impl(mockConfig);
-        try {
-            job.call();
-        } finally {
+        try (MockedStatic<SshConnectionFactory> factory = mockStatic(SshConnectionFactory.class)) {
+            factory.when(() -> SshConnectionFactory.getConnection(nullable(String.class), anyInt(),
+                nullable(String.class), nullable(Authentication.class)))
+                .thenReturn(mockSshConnection);
+            when(mockSshConnection.executeCommand(anyString())).thenThrow(new SshException());
+            AbstractSendCommandJob2 job = new AbstractSendCommandJob2Impl(mockConfig);
+            Assert.assertThrows(IOException.class, job::call);
             verify(mockSshConnection).executeCommand(anyString());
             verify(mockSshConnection).disconnect();
         }

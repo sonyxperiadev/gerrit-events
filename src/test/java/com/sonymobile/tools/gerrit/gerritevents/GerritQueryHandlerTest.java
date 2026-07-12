@@ -29,10 +29,9 @@ import org.junit.Test;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
 /**
  * Tests for {@link com.sonymobile.tools.gerrit.gerritevents.GerritQueryHandler}.
@@ -179,7 +178,7 @@ public class GerritQueryHandlerTest extends GerritQueryHandlerTestBase {
         queryHandler.queryJava("X");
         queryHandler.queryJava("Y");
 
-        verifyStatic(SshConnectionFactory.class, times(2));
-        SshConnectionFactory.getConnection(anyString(), anyInt(), anyString(), any(Authentication.class), anyInt());
+        sshConnectionFactoryMock.verify(() -> SshConnectionFactory.getConnection(
+                anyString(), anyInt(), anyString(), any(Authentication.class), anyInt()), times(2));
     }
 }

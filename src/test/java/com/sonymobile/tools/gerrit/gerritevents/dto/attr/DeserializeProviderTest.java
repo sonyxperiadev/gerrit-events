@@ -27,7 +27,7 @@ package com.sonymobile.tools.gerrit.gerritevents.dto.attr;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.PatchsetCreated;
 import com.thoughtworks.xstream.XStream;
 import org.junit.Test;
-import org.powermock.reflect.Whitebox;
+import com.sonymobile.tools.gerrit.gerritevents.mock.TestReflectionUtils;
 
 import java.io.IOException;
 
@@ -60,7 +60,7 @@ public class DeserializeProviderTest {
         assertEquals("ssh", provider.getScheme()); //The important test
         assertEquals("Default", provider.getName());
 
-        assertNull(Whitebox.getInternalState(provider, "proto"));
+        assertNull(TestReflectionUtils.getInternalState(provider, "proto"));
     }
 
 
