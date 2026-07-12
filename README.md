@@ -13,6 +13,109 @@ Most of the development will still target the Jenkins plugin, but now it can als
   - robert.sandell@cloudbees.com
   - sandell.robert@gmail.com
 
+## Transport Options
+
+The library supports multiple transport mechanisms for receiving Gerrit events.
+
+### SSH Stream-Events (Default)
+
+The traditional transport. The library opens a persistent SSH connection to the Gerrit server and runs `gerrit stream-events`. Events arrive in near real-time.
+
+```java
+connection = new GerritConnection(name, config);
+GerritHandler handler = new GerritHandler();
+connection.setHandler(handler);
+connection.addListener(gerritConnectionListener);
+connection.start();
+```
+
+### HTTPS Polling (New in 2.22)
+
+The library can poll the Gerrit REST API over HTTPS to detect changes. No SSH connection is required. Use `GerritRestPoller` instead of `GerritConnection` — both implement the `GerritEventSource` interface.
+
+```java
+GerritEventSource source;
+if (config.isUseHttpsPoller()) {
+    source = new GerritRestPoller(name, config);
+} else {
+    source = new GerritConnection(name, config);
+}
+source.setHandler(handler);
+source.addListener(gerritConnectionListener);
+source.start();
+```
+
+**How polling works:**
+- Polls `GET /a/changes/?q=is:open` periodically (configurable interval)
+- Tracks known changes by `(changeId → revision, status, topic, wip, isPrivate)`
+- Detects changes and constructs event DTOs, then posts to `GerritHandler`
+
+**Events detected via HTTPS polling:**
+
+| Event | Detection method |
+|-------|-----------------|
+| `PatchsetCreated` | New change or revision change |
+| `ChangeMerged` | Status transition to MERGED |
+| `ChangeAbandoned` | Status transition to ABANDONED |
+| `TopicChanged` | Topic field change on known change |
+| `WipStateChanged` | `work_in_progress` field toggle |
+| `PrivateStateChanged` | `is_private` field toggle |
+
+**Limitations:** The following events cannot be detected via REST API polling because the Gerrit REST API does not expose the necessary data: `CommentAdded`, `DraftPublished`, `RefUpdated`, `ProjectCreated`, `ChangeDeleted`, `MergeFailed`, `ReviewerAdded`, `VoteDeleted`, `RefReplicated`, `RefReplicationDone`, `PatchsetNotified`, `HashtagsChanged`.
+
+### REST API Queries (New in 2.22)
+
+`GerritRestQueryHandler` extends `GerritQueryHandler` and executes queries via the Gerrit REST API (`GET /a/changes/`) instead of SSH `gerrit query`. Existing callers like `FileHelper` and `Topic` work unchanged because REST API responses are converted to the same JSON format.
+
+```java
+GerritQueryHandler handler;
+if (config.isUseHttpsPoller()) {
+    handler = new GerritRestQueryHandler(config);
+} else {
+    handler = new GerritQueryHandler(config);
+}
+List<JSONObject> results = handler.queryJava("status:open");
+```
+
+## Architecture
+
+The library uses a common `GerritEventSource` interface for all transport implementations:
+
+```
+GerritEventSource (interface)
+  ├─ GerritConnection (SSH stream-events)
+  └─ GerritRestPoller (HTTPS polling)
+
+GerritQueryHandler (base)
+  ├─ GerritQueryHandler (SSH gerrit query)
+  └─ GerritRestQueryHandler (REST API query)
+```
+
+Both `GerritConnection` and `GerritRestPoller` feed events to `GerritHandler`, which routes them to registered `GerritEventListener` implementations.
+
+## Configuration
+
+The `GerritConnectionConfig2` interface provides the configuration needed for both SSH and HTTPS transports:
+
+```java
+public interface GerritConnectionConfig2 extends GerritConnectionConfig, RestConnectionConfig {
+    // Watchdog
+    int getWatchdogTimeoutMinutes();
+    int getWatchdogTimeoutSeconds();
+    WatchTimeExceptionData getExceptionData();
+
+    // HTTPS polling (new in 2.22)
+    boolean isUseHttpsPoller();       // Enable HTTPS polling instead of SSH
+    int getHttpsPollInterval();       // Poll interval in seconds (default 10)
+    int getHttpsPollMaxChanges();     // Max changes per poll (default 100)
+}
+```
+
+Default values are defined in `GerritDefaultValues`:
+- `DEFAULT_USE_HTTPS_POLLER` = `false`
+- `DEFAULT_HTTPS_POLL_INTERVAL` = `10`
+- `DEFAULT_HTTPS_POLL_MAX_CHANGES` = `100`
+
 # Usage
 A "real life" example of usage can be found in the [Jenkins Plugin](https://github.com/jenkinsci/gerrit-trigger-plugin/blob/master/gerrithudsontrigger/src/main/java/com/sonyericsson/hudson/plugins/gerrit/trigger/GerritServer.java#L408).
 
@@ -61,6 +164,7 @@ All event types can be found in the [com.sonymobile.tools.gerrit.gerritevents.dt
         * `maven-3.5.4`
 
 Java 8 & 9: Works.
+Java 21: Works (requires `--add-opens` JVM args for PowerMock tests).
 
 The maintainers' development, tests and production environments are
 Ubuntu 12.04 so we have no means of detecting or fixing any Windows issues,

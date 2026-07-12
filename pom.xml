@@ -193,6 +193,7 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <reuseForks>false</reuseForks>
+                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED</argLine>
                 </configuration>
             </plugin>
             <plugin>

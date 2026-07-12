@@ -109,4 +109,19 @@ public final class GerritDefaultValues {
      * The minimum refresh interval for dynamic configuration.
      */
     public static final int MINIMUM_DYNAMIC_CONFIG_REFRESH_INTERVAL = 5;
+
+    /**
+     * Default value for whether HTTPS polling should be used instead of SSH stream-events.
+     */
+    public static final boolean DEFAULT_USE_HTTPS_POLLER = false;
+
+    /**
+     * Default poll interval in seconds for the HTTPS poller.
+     */
+    public static final int DEFAULT_HTTPS_POLL_INTERVAL = 10;
+
+    /**
+     * Default maximum number of changes to fetch per HTTPS poll.
+     */
+    public static final int DEFAULT_HTTPS_POLL_MAX_CHANGES = 100;
 }
