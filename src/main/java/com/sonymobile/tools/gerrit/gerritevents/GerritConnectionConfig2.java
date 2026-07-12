@@ -54,4 +54,32 @@ public interface GerritConnectionConfig2 extends GerritConnectionConfig, RestCon
      * @return the WatchTimeExceptionData.
      */
     WatchTimeExceptionData getExceptionData();
+
+    /**
+     * Whether HTTPS polling should be used instead of SSH stream-events
+     * for receiving Gerrit events.
+     *
+     * @return true if HTTPS polling is enabled. Default is false (use SSH).
+     */
+    default boolean isUseHttpsPoller() {
+        return GerritDefaultValues.DEFAULT_USE_HTTPS_POLLER;
+    }
+
+    /**
+     * The interval in seconds between HTTPS polls for new changes.
+     *
+     * @return the poll interval in seconds. Default is 10 seconds.
+     */
+    default int getHttpsPollInterval() {
+        return GerritDefaultValues.DEFAULT_HTTPS_POLL_INTERVAL;
+    }
+
+    /**
+     * The maximum number of changes to fetch per HTTPS poll.
+     *
+     * @return the maximum number of changes. Default is 100.
+     */
+    default int getHttpsPollMaxChanges() {
+        return GerritDefaultValues.DEFAULT_HTTPS_POLL_MAX_CHANGES;
+    }
 }

@@ -28,26 +28,19 @@ import com.google.gson.Gson;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.ChangeBasedEvent;
 import com.sonymobile.tools.gerrit.gerritevents.dto.rest.ChangeId;
 import com.sonymobile.tools.gerrit.gerritevents.dto.rest.ReviewInput;
+import com.sonymobile.tools.gerrit.gerritevents.helpers.HttpClientFactory;
 import com.sonymobile.tools.gerrit.gerritevents.rest.RestConnectionConfig;
 import org.apache.http.HttpStatus;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * An abstract Job implementation
@@ -101,26 +94,8 @@ public abstract class AbstractRestCommandJob implements Runnable {
             return;
         }
 
-        CredentialsProvider credsProvider = new BasicCredentialsProvider();
-        credsProvider.setCredentials(new AuthScope(null, -1),
-            config.getHttpCredentials());
-        HttpClientBuilder builder =
-            HttpClients.custom().setDefaultCredentialsProvider(credsProvider);
-        if (config.getGerritProxy() != null && !config.getGerritProxy().isEmpty()) {
-            try {
-                URL url = new URL(config.getGerritProxy());
-                HttpHost proxy = new HttpHost(
-                    url.getHost(), url.getPort(), url.getProtocol());
-                builder.setProxy(proxy);
-            } catch (MalformedURLException e) {
-                logger.error("Could not parse proxy URL, attempting without proxy.", e);
-                if (altLogger != null) {
-                    altLogger.print("ERROR Could not parse proxy URL, attempting without proxy. "
-                            + e.getMessage());
-                }
-            }
-        }
-        HttpClient httpclient = builder.build();
+        HttpClient httpclient = HttpClientFactory.createClient(
+                config.getHttpCredentials(), config.getGerritProxy());
         try {
             HttpResponse httpResponse = httpclient.execute(httpPost);
             String response = IOUtils.toString(httpResponse.getEntity().getContent(), "UTF-8");

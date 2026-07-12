@@ -102,7 +102,7 @@ public class GerritConnectionTest {
         // static mocking here. Instead override the openConnection() seam to hand back the mock.
         connection = new GerritConnection("", "localhost", 29418, new Authentication(null, "")) {
             @Override
-            protected SshConnection openConnection() {
+            SshConnection openConnection() {
                 return sshConnectionMock;
             }
         };

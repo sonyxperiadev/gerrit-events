@@ -56,7 +56,7 @@ import com.sonymobile.tools.gerrit.gerritevents.watchdog.WatchTimeExceptionData;
  *
  * @author rinrinne &lt;rinrin.ne@gmail.com&gt;
  */
-public class GerritConnection extends Thread implements Connector {
+public class GerritConnection extends Thread implements Connector, GerritEventSource {
 
     /**
      * Time to wait between connection attempts.
@@ -465,13 +465,13 @@ public class GerritConnection extends Thread implements Connector {
 
     /**
      * Opens a new {@link SshConnection} to the Gerrit server via the {@link SshConnectionFactory}.
-     * Extracted as a protected seam so tests can supply a mocked connection without having to mock
-     * the static factory across the connection thread.
+     * Extracted as a package-private seam so tests can supply a mocked connection without having to
+     * mock the static factory across the connection thread. Intentionally not part of the public API.
      *
      * @return a new connection.
      * @throws IOException if the connection could not be established.
      */
-    protected SshConnection openConnection() throws IOException {
+    SshConnection openConnection() throws IOException {
         return SshConnectionFactory.getConnection(gerritHostName, gerritSshPort, gerritProxy,
                 authentication, authenticationUpdater);
     }
@@ -501,10 +501,9 @@ public class GerritConnection extends Thread implements Connector {
                 logger.error("ConnectionException: ", sshConEx);
             } catch (SshAuthenticationException sshAuthEx) {
                 logger.error("Could not authenticate to Gerrit server!"
-                        + "\n\tUsername: {}\n\tKeyFile: {}\n\tPassword: {}",
+                        + "\n\tUsername: {}\n\tKeyFile: {}",
                         new Object[]{authentication.getUsername(),
-                                authentication.getPrivateKeyFile(),
-                                authentication.getPrivateKeyFilePassword(), });
+                                authentication.getPrivateKeyFile(), });
                 logger.error("AuthenticationException: ", sshAuthEx);
             } catch (IOException ex) {
                 logger.error("Could not connect to Gerrit server! "
