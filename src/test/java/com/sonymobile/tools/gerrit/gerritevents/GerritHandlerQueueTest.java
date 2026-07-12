@@ -2,10 +2,12 @@ package com.sonymobile.tools.gerrit.gerritevents;
 
 import static com.sonymobile.tools.gerrit.gerritevents.GerritDefaultValues.DEFAULT_NR_OF_RECEIVING_WORKER_THREADS;
 
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.After;
@@ -131,10 +133,17 @@ public class GerritHandlerQueueTest {
         assertThat(handler.getLargestPoolSize(), equalTo(5));
         listener.maxParallel = 0;
         handler.setNumberOfWorkerThreads(DEFAULT_NR_OF_RECEIVING_WORKER_THREADS);
-        Thread.sleep(1000);
-        postEventsToQueue(5);
+        // The pool sheds its surplus threads asynchronously ("when idle"), so wait for the
+        // shrink to actually complete before posting - otherwise leftover threads from the
+        // pool of 5 can still pick up the events below and parallelism overshoots.
+        await().atMost(10, TimeUnit.SECONDS)
+                .until(() -> handler.getPoolSize() == DEFAULT_NR_OF_RECEIVING_WORKER_THREADS);
+        // Post plenty of events so the (now 3) workers stay saturated, then wait for the
+        // observed parallelism to reach 3 (it only ever grows, and the pool caps it at 3).
+        postEventsToQueue(30);
+        await().atMost(10, TimeUnit.SECONDS)
+                .until(() -> listener.maxParallel == DEFAULT_NR_OF_RECEIVING_WORKER_THREADS);
         waitForEventsProcessed();
-        assertThat(listener.maxParallel, equalTo(3));
     }
 
     /**
@@ -154,7 +163,7 @@ public class GerritHandlerQueueTest {
      */
     class SlowEventListener implements GerritEventListener {
 
-        private int maxParallel = 0;
+        private volatile int maxParallel = 0;
         private AtomicInteger counter = new AtomicInteger();
 
         @Override

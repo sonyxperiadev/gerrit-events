@@ -215,6 +215,16 @@ public class GerritHandler implements Coordinator, Handler {
     }
 
     /**
+     * Returns the current number of threads in the pool.
+     * Package visibility for testing purposes only.
+     *
+     * @return number of threads
+     */
+    int getPoolSize() {
+        return executor.getPoolSize();
+    }
+
+    /**
      * Standard getter for the ignoreEMail.
      *
      * @param serverName the server name.
