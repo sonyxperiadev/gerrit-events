@@ -27,18 +27,18 @@
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version><!-- TODO: update to latest -->
         <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
         
-        <slf4j.version>1.7.36</slf4j.version><!-- TODO: update to latest -->
-        <hamcrest.version>2.2</hamcrest.version>
-        <mockito.version>5.19.0</mockito.version>
-        <junit.version>4.13.2</junit.version><!-- TODO: update to latest -->
+        <slf4j.version>2.0.18</slf4j.version>
+        <hamcrest.version>3.0</hamcrest.version>
+        <mockito.version>5.23.0</mockito.version>
+        <junit.version>4.13.2</junit.version>
 
-        <mwiede.jsch.version>0.2.24</mwiede.jsch.version>
-        <apache.sshd.version>2.15.0</apache.sshd.version>
-        <httpclient.version>4.5.14</httpclient.version><!-- TODO: update to latest -->
-        <jetty-server.version>9.4.57.v20241219</jetty-server.version><!-- TODO: update to latest -->
-        <commons-io.version>2.15.1</commons-io.version>
+        <mwiede.jsch.version>2.28.4</mwiede.jsch.version>
+        <apache.sshd.version>2.15.0</apache.sshd.version><!-- 3.x only in milestone releases so far -->
+        <httpclient.version>4.5.14</httpclient.version><!-- latest 4.x; 5.x is a breaking API change, separate PR -->
+        <jetty-server.version>9.4.57.v20241219</jetty-server.version><!-- TODO: bump to 12.x (EE9) with test rework -->
+        <commons-io.version>2.22.0</commons-io.version>
         <xstream.version>1.4.21</xstream.version>
-        <gson.version>2.10.1</gson.version>
+        <gson.version>2.14.0</gson.version>
         <json-lib.version>2.4</json-lib.version><!-- TODO: find replacement -->
     </properties>
 
