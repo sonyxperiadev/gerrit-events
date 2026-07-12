@@ -373,6 +373,7 @@ public class GerritHandlerTest {
 
         }
 
+        //CS IGNORE EqualsHashCode FOR NEXT 3 LINES. REASON: TestMock intentionally varies hashCode only.
         @Override
         public int hashCode() {
             return code;

@@ -35,5 +35,5 @@ public interface AuthenticationUpdater {
      * @param authentication the authentication.
      * @return the updated authentication. If no update, you should return one in argument.
      */
-    Authentication updateAuthentication(final Authentication authentication);
+    Authentication updateAuthentication(Authentication authentication);
 }

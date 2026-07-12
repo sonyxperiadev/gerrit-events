@@ -4,6 +4,13 @@
      "-//Puppy Crawl//DTD Suppressions 1.0//EN"
      "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
 
-<suppressions>  
-  
+<suppressions>
+  <!--
+    LineLength is a Checker-level (file) check, so the inline "//CS IGNORE LineLength" comments
+    (SuppressWithNearbyCommentFilter is TreeWalker-scoped) no longer suppress it after the
+    checkstyle 3.x upgrade. These two test classes embed long, single-line JSON test payloads
+    that are intentionally kept verbatim.
+  -->
+  <suppress checks="LineLength" files="GerritHandlerTest\.java"/>
+  <suppress checks="LineLength" files="GerritConnectionTest\.java"/>
 </suppressions>
