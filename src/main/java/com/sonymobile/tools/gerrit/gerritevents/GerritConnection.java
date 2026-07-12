@@ -464,6 +464,19 @@ public class GerritConnection extends Thread implements Connector, GerritEventSo
     }
 
     /**
+     * Opens a new {@link SshConnection} to the Gerrit server via the {@link SshConnectionFactory}.
+     * Extracted as a package-private seam so tests can supply a mocked connection without having to
+     * mock the static factory across the connection thread. Intentionally not part of the public API.
+     *
+     * @return a new connection.
+     * @throws IOException if the connection could not be established.
+     */
+    SshConnection openConnection() throws IOException {
+        return SshConnectionFactory.getConnection(gerritHostName, gerritSshPort, gerritProxy,
+                authentication, authenticationUpdater);
+    }
+
+    /**
      * Connects to the Gerrit server and authenticates as the specified user.
      *
      * @return not null if everything is well, null if connect and reconnect failed.
@@ -476,8 +489,7 @@ public class GerritConnection extends Thread implements Connector, GerritEventSo
             SshConnection ssh = null;
             try {
                 logger.debug("Connecting...");
-                ssh = SshConnectionFactory.getConnection(gerritHostName, gerritSshPort, gerritProxy,
-                        authentication, authenticationUpdater);
+                ssh = openConnection();
                 gerritVersion  = formatVersion(ssh.executeCommand("gerrit version"));
                 logger.debug("connection seems ok, returning it.");
                 return ssh;

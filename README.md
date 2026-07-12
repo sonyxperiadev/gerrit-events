@@ -160,11 +160,13 @@ All event types can be found in the [com.sonymobile.tools.gerrit.gerritevents.dt
 
 # Environments
 * `linux`
-    * `java-1.8`
-        * `maven-3.5.4`
+    * `java-17`
+        * `maven-3.9.9`
 
-Java 8 & 9: Works.
-Java 21: Works (requires `--add-opens` JVM args for PowerMock tests).
+Java 17 & 21: Works.
+
+Java 17 is the minimum required version (the library is compiled for Java 17).
+Maven 3.8.1 or newer is required.
 
 The maintainers' development, tests and production environments are
 Ubuntu 12.04 so we have no means of detecting or fixing any Windows issues,

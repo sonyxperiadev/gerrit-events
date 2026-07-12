@@ -28,10 +28,9 @@ package com.sonymobile.tools.gerrit.gerritevents;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -50,17 +49,11 @@ import java.util.concurrent.CountDownLatch;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.jcraft.jsch.ChannelExec;
 import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Provider;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.Authentication;
 import com.sonymobile.tools.gerrit.gerritevents.ssh.SshConnection;
-import com.sonymobile.tools.gerrit.gerritevents.ssh.SshConnectionFactory;
 
 //CS IGNORE MagicNumber FOR NEXT 300 LINES. REASON: TestData
 
@@ -69,9 +62,6 @@ import com.sonymobile.tools.gerrit.gerritevents.ssh.SshConnectionFactory;
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(SshConnectionFactory.class)
-@PowerMockIgnore("org.slf4j.*") // Prevent warning about multiple sl4fj binding
 public class GerritConnectionTest {
 
     private static SshConnection sshConnectionMock;
@@ -108,10 +98,14 @@ public class GerritConnectionTest {
         when(sshConnectionMock.executeCommandChannel(eq("gerrit stream-events"), anyBoolean()))
             .thenReturn(channelExecMock);
         when(channelExecMock.getInputStream()).thenReturn(pipedInStream);
-        PowerMockito.mockStatic(SshConnectionFactory.class);
-        PowerMockito.doReturn(sshConnectionMock).when(SshConnectionFactory.class, "getConnection",
-                isA(String.class), isA(Integer.class), isA(String.class), isA(Authentication.class), any());
-        connection = new GerritConnection("", "localhost", 29418, new Authentication(null, ""));
+        // The connection loop runs on its own thread, so we cannot use Mockito's thread-scoped
+        // static mocking here. Instead override the openConnection() seam to hand back the mock.
+        connection = new GerritConnection("", "localhost", 29418, new Authentication(null, "")) {
+            @Override
+            SshConnection openConnection() {
+                return sshConnectionMock;
+            }
+        };
         connection.setSshRxBufferSize(13);
         handlerMock = mock(HandlerMock.class);
         connection.setHandler(handlerMock);

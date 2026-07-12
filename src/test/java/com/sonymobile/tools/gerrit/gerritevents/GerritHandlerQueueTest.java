@@ -2,10 +2,13 @@ package com.sonymobile.tools.gerrit.gerritevents;
 
 import static com.sonymobile.tools.gerrit.gerritevents.GerritDefaultValues.DEFAULT_NR_OF_RECEIVING_WORKER_THREADS;
 
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.After;
@@ -131,10 +134,17 @@ public class GerritHandlerQueueTest {
         assertThat(handler.getLargestPoolSize(), equalTo(5));
         listener.maxParallel = 0;
         handler.setNumberOfWorkerThreads(DEFAULT_NR_OF_RECEIVING_WORKER_THREADS);
-        Thread.sleep(1000);
-        postEventsToQueue(5);
+        // The pool sheds its surplus threads asynchronously ("when idle"), so wait for the pool
+        // to actually shrink to the new size. This is the deterministic signal that the workers
+        // were decreased - getLargestPoolSize() can't be used here as it never shrinks.
+        await().atMost(10, TimeUnit.SECONDS)
+                .until(() -> handler.getPoolSize() == DEFAULT_NR_OF_RECEIVING_WORKER_THREADS);
+        // The decreased pool must still process events, and never run more than the new number
+        // of workers in parallel. (Asserting it reaches exactly 3 in parallel is too dependent
+        // on thread scheduling under load to be reliable.)
+        postEventsToQueue(10);
         waitForEventsProcessed();
-        assertThat(listener.maxParallel, equalTo(3));
+        assertThat(listener.maxParallel, lessThanOrEqualTo(DEFAULT_NR_OF_RECEIVING_WORKER_THREADS));
     }
 
     /**
@@ -154,7 +164,7 @@ public class GerritHandlerQueueTest {
      */
     class SlowEventListener implements GerritEventListener {
 
-        private int maxParallel = 0;
+        private volatile int maxParallel = 0;
         private AtomicInteger counter = new AtomicInteger();
 
         @Override

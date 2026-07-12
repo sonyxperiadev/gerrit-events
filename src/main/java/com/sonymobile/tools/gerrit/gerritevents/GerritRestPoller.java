@@ -127,18 +127,20 @@ public class GerritRestPoller extends Thread implements GerritEventSource, Conne
      * {@link #knownChanges} without emitting events, preventing all open
      * changes from re-firing PatchsetCreated after a restart.
      */
-    private volatile boolean firstPollDone;
+    volatile boolean firstPollDone;
 
     /**
      * Tracks the last known state of each change.
      * Key: changeId, Value: {revision, status}
+     * Package-private (rather than private) as a test seam; not part of the public API.
      */
-    private final Map<String, ChangeState> knownChanges = new ConcurrentHashMap<String, ChangeState>();
+    final Map<String, ChangeState> knownChanges = new ConcurrentHashMap<String, ChangeState>();
 
     /**
      * Stores the last known state for a change.
+     * Package-private (rather than private) as a test seam; not part of the public API.
      */
-    private static class ChangeState {
+    static class ChangeState {
         /** The last known revision. */
         final String revision;
         /** The last known status. */
@@ -465,7 +467,7 @@ public class GerritRestPoller extends Thread implements GerritEventSource, Conne
      * @param changeJson the JSON object representing the change.
      * @param provider the Provider to attach to events.
      */
-    private void processChange(JSONObject changeJson, Provider provider) {
+    void processChange(JSONObject changeJson, Provider provider) {
         // Build the Change DTO once — reused by all event-detection branches
         Change change = buildChange(changeJson);
         String changeId = change.getId();

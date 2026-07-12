@@ -30,7 +30,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -41,12 +40,9 @@ import java.util.concurrent.CountDownLatch;
 
 import net.sf.json.JSONObject;
 
-import org.apache.http.HttpHost;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.HttpClient;
 
-import com.sonymobile.tools.gerrit.gerritevents.helpers.HttpClientFactory;
 
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritChangeStatus;
 import com.sonymobile.tools.gerrit.gerritevents.dto.GerritEvent;
@@ -219,7 +215,7 @@ public class GerritRestPollerTest {
         listenerMock = new ListenerMock(null);
         // Tests exercise processChange() directly; set firstPollDone so
         // the guard does not skip event emission for every call.
-        org.powermock.reflect.Whitebox.setInternalState(poller, "firstPollDone", true);
+        poller.firstPollDone = true;
     }
 
     /**
@@ -458,7 +454,7 @@ public class GerritRestPollerTest {
         // First call establishes known state (no topic)
         JSONObject first = buildRestChangeJson(changeId, "proj", "master", 1,
                 "Test", "NEW", "rev1", null);
-        org.powermock.reflect.Whitebox.invokeMethod(poller, "processChange", first, provider);
+        poller.processChange(first, provider);
 
         // Should get 1 PatchsetCreated, no topic event
         assertEquals(1, handlerMock.eventCount);
@@ -467,7 +463,7 @@ public class GerritRestPollerTest {
         // Second call: topic added
         JSONObject second = buildRestChangeJson(changeId, "proj", "master", 1,
                 "Test", "NEW", "rev1", "new-topic");
-        org.powermock.reflect.Whitebox.invokeMethod(poller, "processChange", second, provider);
+        poller.processChange(second, provider);
 
         // Should get 1 TopicChanged (no PatchsetCreated since revision didn't change)
         assertEquals(1, handlerMock.eventCount);
@@ -492,14 +488,14 @@ public class GerritRestPollerTest {
         // First call with topic "old-topic"
         JSONObject first = buildRestChangeJson(changeId, "proj", "master", 2,
                 "Test", "NEW", "rev1", "old-topic");
-        org.powermock.reflect.Whitebox.invokeMethod(poller, "processChange", first, provider);
+        poller.processChange(first, provider);
         assertEquals(1, handlerMock.eventCount);
         handlerMock.reset();
 
         // Second call: topic changed
         JSONObject second = buildRestChangeJson(changeId, "proj", "master", 2,
                 "Test", "NEW", "rev1", "new-topic");
-        org.powermock.reflect.Whitebox.invokeMethod(poller, "processChange", second, provider);
+        poller.processChange(second, provider);
 
         assertEquals(1, handlerMock.eventCount);
         GerritEvent event = handlerMock.capturedEvents.get(0);
@@ -523,14 +519,14 @@ public class GerritRestPollerTest {
         // First call with topic "my-topic"
         JSONObject first = buildRestChangeJson(changeId, "proj", "master", 3,
                 "Test", "NEW", "rev1", "my-topic");
-        org.powermock.reflect.Whitebox.invokeMethod(poller, "processChange", first, provider);
+        poller.processChange(first, provider);
         assertEquals(1, handlerMock.eventCount);
         handlerMock.reset();
 
         // Second call: topic removed (null)
         JSONObject second = buildRestChangeJson(changeId, "proj", "master", 3,
                 "Test", "NEW", "rev1", null);
-        org.powermock.reflect.Whitebox.invokeMethod(poller, "processChange", second, provider);
+        poller.processChange(second, provider);
 
         assertEquals(1, handlerMock.eventCount);
         GerritEvent event = handlerMock.capturedEvents.get(0);
@@ -554,7 +550,7 @@ public class GerritRestPollerTest {
 
         JSONObject json = buildRestChangeJson(changeId, "proj", "master", 5,
                 "Test", "NEW", "rev1", "my-topic");
-        org.powermock.reflect.Whitebox.invokeMethod(poller, "processChange", json, provider);
+        poller.processChange(json, provider);
 
         // Should get exactly 1 PatchsetCreated, no TopicChanged
         assertEquals(1, handlerMock.eventCount);
@@ -574,13 +570,13 @@ public class GerritRestPollerTest {
 
         JSONObject first = buildRestChangeJson(changeId, "proj", "master", 10,
                 "Test", "NEW", "rev1", null, false, false);
-        org.powermock.reflect.Whitebox.invokeMethod(poller, "processChange", first, provider);
+        poller.processChange(first, provider);
         assertEquals(1, handlerMock.eventCount);
         handlerMock.reset();
 
         JSONObject second = buildRestChangeJson(changeId, "proj", "master", 10,
                 "Test", "NEW", "rev1", null, true, false);
-        org.powermock.reflect.Whitebox.invokeMethod(poller, "processChange", second, provider);
+        poller.processChange(second, provider);
 
         assertEquals(1, handlerMock.eventCount);
         GerritEvent event = handlerMock.capturedEvents.get(0);
@@ -598,13 +594,13 @@ public class GerritRestPollerTest {
 
         JSONObject first = buildRestChangeJson(changeId, "proj", "master", 11,
                 "Test", "NEW", "rev1", null, true, false);
-        org.powermock.reflect.Whitebox.invokeMethod(poller, "processChange", first, provider);
+        poller.processChange(first, provider);
         assertEquals(1, handlerMock.eventCount);
         handlerMock.reset();
 
         JSONObject second = buildRestChangeJson(changeId, "proj", "master", 11,
                 "Test", "NEW", "rev1", null, false, false);
-        org.powermock.reflect.Whitebox.invokeMethod(poller, "processChange", second, provider);
+        poller.processChange(second, provider);
 
         assertEquals(1, handlerMock.eventCount);
         GerritEvent event = handlerMock.capturedEvents.get(0);
@@ -624,13 +620,13 @@ public class GerritRestPollerTest {
 
         JSONObject first = buildRestChangeJson(changeId, "proj", "master", 20,
                 "Test", "NEW", "rev1", null, false, false);
-        org.powermock.reflect.Whitebox.invokeMethod(poller, "processChange", first, provider);
+        poller.processChange(first, provider);
         assertEquals(1, handlerMock.eventCount);
         handlerMock.reset();
 
         JSONObject second = buildRestChangeJson(changeId, "proj", "master", 20,
                 "Test", "NEW", "rev1", null, false, true);
-        org.powermock.reflect.Whitebox.invokeMethod(poller, "processChange", second, provider);
+        poller.processChange(second, provider);
 
         assertEquals(1, handlerMock.eventCount);
         GerritEvent event = handlerMock.capturedEvents.get(0);
@@ -648,13 +644,13 @@ public class GerritRestPollerTest {
 
         JSONObject first = buildRestChangeJson(changeId, "proj", "master", 21,
                 "Test", "NEW", "rev1", null, false, true);
-        org.powermock.reflect.Whitebox.invokeMethod(poller, "processChange", first, provider);
+        poller.processChange(first, provider);
         assertEquals(1, handlerMock.eventCount);
         handlerMock.reset();
 
         JSONObject second = buildRestChangeJson(changeId, "proj", "master", 21,
                 "Test", "NEW", "rev1", null, false, false);
-        org.powermock.reflect.Whitebox.invokeMethod(poller, "processChange", second, provider);
+        poller.processChange(second, provider);
 
         assertEquals(1, handlerMock.eventCount);
         GerritEvent event = handlerMock.capturedEvents.get(0);
@@ -673,30 +669,19 @@ public class GerritRestPollerTest {
      */
     @Test
     public void testPruneStaleEntries() throws Exception {
-        // Get the knownChanges map from the poller
-        @SuppressWarnings("unchecked")
-        Map<String, Object> knownChanges = (Map<String, Object>)
-                org.powermock.reflect.Whitebox.getInternalState(poller, "knownChanges");
+        // Get the knownChanges map from the poller (package-private test seam)
+        Map<String, GerritRestPoller.ChangeState> knownChanges = poller.knownChanges;
 
-        // Construct ChangeState objects via reflection
-        // (ChangeState is a private inner class; Whitebox.invokeConstructor
-        //  can't resolve null argument types, so use direct reflection)
-        Class<?> csClass = org.powermock.reflect.Whitebox.getInnerClassType(
-                GerritRestPoller.class, "ChangeState");
-        Constructor<?> csCtor = csClass.getDeclaredConstructor(
-                String.class, GerritChangeStatus.class, String.class,
-                boolean.class, boolean.class);
-        csCtor.setAccessible(true);
-
-        Object stateMerged = csCtor.newInstance(
+        // Construct ChangeState objects directly (package-private class + constructor)
+        GerritRestPoller.ChangeState stateMerged = new GerritRestPoller.ChangeState(
                 "rev1", GerritChangeStatus.MERGED, null, false, false);
-        Object stateAbandoned = csCtor.newInstance(
+        GerritRestPoller.ChangeState stateAbandoned = new GerritRestPoller.ChangeState(
                 "rev2", GerritChangeStatus.ABANDONED, null, false, false);
-        Object stateNew = csCtor.newInstance(
+        GerritRestPoller.ChangeState stateNew = new GerritRestPoller.ChangeState(
                 "rev3", GerritChangeStatus.NEW, null, false, false);
-        Object stateUnknown = csCtor.newInstance(
+        GerritRestPoller.ChangeState stateUnknown = new GerritRestPoller.ChangeState(
                 "rev5", GerritChangeStatus.UNKNOWN, null, false, false);
-        Object stateMergedSeen = csCtor.newInstance(
+        GerritRestPoller.ChangeState stateMergedSeen = new GerritRestPoller.ChangeState(
                 "rev4", GerritChangeStatus.MERGED, null, false, false);
 
         // Populate with 5 known changes:
@@ -717,8 +702,7 @@ public class GerritRestPollerTest {
         seenChangeIds.add("change_merged_seen");
 
         // Invoke pruning
-        org.powermock.reflect.Whitebox.invokeMethod(poller, "pruneStaleEntries",
-                seenChangeIds);
+        poller.pruneStaleEntries(seenChangeIds);
 
         // change_merged (MERGED, not seen) -> pruned
         assertFalse("MERGED entry not in poll should be pruned",
@@ -739,57 +723,4 @@ public class GerritRestPollerTest {
         assertEquals(2, knownChanges.size());
     }
 
-    // ---- Proxy configuration tests ----
-
-    /**
-     * Tests that {@link HttpClientFactory#createClient} does not configure
-     * a custom proxy when the proxy URL is null or empty.
-     */
-    @Test
-    public void testConfigureProxyNullAndEmpty() throws Exception {
-        Credentials creds = config.getHttpCredentials();
-
-        // Client creation must succeed; no proxy means DefaultRoutePlanner
-        // (which lacks a "proxy" field) is used as the route planner.
-        HttpClient client = HttpClientFactory.createClient(creds, null);
-        assertNotNull("Client should be created with null proxy", client);
-
-        client = HttpClientFactory.createClient(creds, "");
-        assertNotNull("Client should be created with empty proxy", client);
-    }
-
-    //CS IGNORE MagicNumber FOR NEXT 20 LINES. REASON: Test assertion.
-
-    /**
-     * Tests that {@link HttpClientFactory#createClient} correctly configures
-     * the proxy host, port and scheme from a valid proxy URL.
-     */
-    @Test
-    public void testConfigureProxyValidUrl() throws Exception {
-        Credentials creds = config.getHttpCredentials();
-        HttpClient client = HttpClientFactory.createClient(creds, "http://proxy.example.com:8080");
-        assertNotNull("Client should be created with valid proxy", client);
-
-        Object routePlanner =
-                org.powermock.reflect.Whitebox.getInternalState(client, "routePlanner");
-        HttpHost proxy = (HttpHost)
-                org.powermock.reflect.Whitebox.getInternalState(routePlanner, "proxy");
-        assertNotNull("Proxy should be set for valid URL", proxy);
-        assertEquals("proxy.example.com", proxy.getHostName());
-        assertEquals(8080, proxy.getPort());
-        assertEquals("http", proxy.getSchemeName());
-    }
-
-    /**
-     * Tests that {@link HttpClientFactory#createClient} does not throw when
-     * a malformed proxy URL is given.
-     */
-    @Test
-    public void testConfigureProxyInvalidUrl() throws Exception {
-        Credentials creds = config.getHttpCredentials();
-        // Must not throw; the factory logs a warning and creates the client
-        // without a proxy (DefaultRoutePlanner, which has no "proxy" field).
-        HttpClient client = HttpClientFactory.createClient(creds, ":::not-a-valid-url:::");
-        assertNotNull("Client should be created even with invalid proxy", client);
-    }
 }

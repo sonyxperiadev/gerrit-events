@@ -26,7 +26,7 @@ package com.sonymobile.tools.gerrit.gerritevents.dto.attr;
 
 import com.thoughtworks.xstream.XStream;
 import org.junit.Test;
-import org.powermock.reflect.Whitebox;
+import com.sonymobile.tools.gerrit.gerritevents.mock.TestReflectionUtils;
 
 import java.io.IOException;
 
@@ -54,6 +54,6 @@ public class DeserializeApprovalTest {
         assertNotNull(approval.getBy());
         assertEquals("uname", approval.getBy().getUsername());
         assertEquals("uname", approval.getUsername());
-        assertNull(Whitebox.getInternalState(approval, "username"));
+        assertNull(TestReflectionUtils.getInternalState(approval, "username"));
     }
 }

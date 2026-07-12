@@ -42,12 +42,10 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.events.WipStateChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.HashtagsChanged;
 import com.sonymobile.tools.gerrit.gerritevents.dto.events.VoteDeleted;
 
+import com.sonymobile.tools.gerrit.gerritevents.mock.TestReflectionUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.reflect.Whitebox;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -76,7 +74,6 @@ import static org.mockito.Mockito.only;
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-@RunWith(PowerMockRunner.class)
 public class GerritHandlerTest {
 
     private GerritHandler handler;
@@ -110,7 +107,7 @@ public class GerritHandlerTest {
         GerritEventListener listenerMock = mock(GerritEventListener.class);
         handler.addListener(listenerMock);
         Collection<GerritEventListener> gerritEventListeners =
-                Whitebox.getInternalState(handler, "gerritEventListeners");
+                TestReflectionUtils.getInternalState(handler, "gerritEventListeners");
         assertThat(listenerMock, isIn(gerritEventListeners));
         assertEquals(1, gerritEventListeners.size());
     }
@@ -171,7 +168,7 @@ public class GerritHandlerTest {
         listeners.add(listenerMock);
         handler.addEventListeners(listeners);
         Collection<GerritEventListener> gerritEventListeners =
-                Whitebox.getInternalState(handler, "gerritEventListeners");
+                TestReflectionUtils.getInternalState(handler, "gerritEventListeners");
         assertThat(listenerMock, isIn(gerritEventListeners));
         assertEquals(5, gerritEventListeners.size());
     }
@@ -187,7 +184,7 @@ public class GerritHandlerTest {
         handler.addListener(listenerMock);
         handler.removeListener(listenerMock);
         Collection<GerritEventListener> gerritEventListeners =
-                Whitebox.getInternalState(handler, "gerritEventListeners");
+                TestReflectionUtils.getInternalState(handler, "gerritEventListeners");
         assertTrue(gerritEventListeners.isEmpty());
     }
 
@@ -213,7 +210,7 @@ public class GerritHandlerTest {
         listeners = handler.removeAllEventListeners();
         assertThat(listenerMock, isIn(listeners));
         assertEquals(5, listeners.size());
-        listeners = Whitebox.getInternalState(handler, "gerritEventListeners");
+        listeners = TestReflectionUtils.getInternalState(handler, "gerritEventListeners");
         assertTrue(listeners.isEmpty());
     }
 
@@ -241,7 +238,7 @@ public class GerritHandlerTest {
         listeners = handler.removeAllEventListeners();
         assertThat(listenerMock, isIn(listeners));
         assertEquals(5, listeners.size());
-        listeners = Whitebox.getInternalState(handler, "gerritEventListeners");
+        listeners = TestReflectionUtils.getInternalState(handler, "gerritEventListeners");
         assertTrue(listeners.isEmpty());
     }
 
@@ -269,10 +266,10 @@ public class GerritHandlerTest {
         assertThat(listenerMock, isIn(listeners));
         assertEquals(5, listeners.size());
         Collection<GerritEventListener> gerritEventListeners =
-                Whitebox.getInternalState(handler, "gerritEventListeners");
+                TestReflectionUtils.getInternalState(handler, "gerritEventListeners");
         assertTrue(gerritEventListeners.isEmpty());
         handler.addEventListeners(listeners);
-        gerritEventListeners = Whitebox.getInternalState(handler, "gerritEventListeners");
+        gerritEventListeners = TestReflectionUtils.getInternalState(handler, "gerritEventListeners");
         assertThat(listenerMock, isIn(gerritEventListeners));
         assertEquals(5, gerritEventListeners.size());
     }
@@ -376,6 +373,7 @@ public class GerritHandlerTest {
 
         }
 
+        //CS IGNORE EqualsHashCode FOR NEXT 3 LINES. REASON: TestMock intentionally varies hashCode only.
         @Override
         public int hashCode() {
             return code;

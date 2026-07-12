@@ -8,7 +8,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
-import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
 /**
  * Tests for {@link com.sonymobile.tools.gerrit.gerritevents.GerritQueryHandlerWithPersistedConnection}.
@@ -35,7 +34,7 @@ public class GerritQueryHandlerWithPersistedConnectionTest extends GerritQueryHa
         queryHandler.queryJava("X");
         queryHandler.queryJava("Y");
 
-        verifyStatic(SshConnectionFactory.class, times(1));
-        SshConnectionFactory.getConnection(anyString(), anyInt(), anyString(), any(Authentication.class), anyInt());
+        sshConnectionFactoryMock.verify(() -> SshConnectionFactory.getConnection(
+                anyString(), anyInt(), anyString(), any(Authentication.class), anyInt()), times(1));
     }
 }

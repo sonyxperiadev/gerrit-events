@@ -242,11 +242,12 @@ public class GerritRestQueryHandler extends GerritQueryHandler {
 
     /**
      * Converts a single REST API change JSON to SSH query format.
+     * Package-private (rather than private) as a test seam; not part of the public API.
      *
      * @param rest the change JSON from the REST API.
      * @return a JSONObject in SSH query format, or null if conversion fails.
      */
-    private JSONObject convertSingleChange(JSONObject rest) {
+    JSONObject convertSingleChange(JSONObject rest) {
         JSONObject q = new JSONObject();
 
         // Top-level fields — map REST names to SSH query names

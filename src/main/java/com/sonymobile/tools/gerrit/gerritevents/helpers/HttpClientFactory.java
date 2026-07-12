@@ -48,16 +48,33 @@ public final class HttpClientFactory {
         HttpClientBuilder builder = HttpClients.custom()
                 .setDefaultCredentialsProvider(credsProvider);
 
-        if (proxyUrl != null && !proxyUrl.isEmpty()) {
-            try {
-                URL url = new URL(proxyUrl);
-                builder.setProxy(new HttpHost(url.getHost(), url.getPort(), url.getProtocol()));
-            } catch (MalformedURLException e) {
-                logger.warn("Could not parse HTTP proxy URL, proceeding without proxy: {}",
-                        e.getMessage());
-            }
+        HttpHost proxy = resolveProxy(proxyUrl);
+        if (proxy != null) {
+            builder.setProxy(proxy);
         }
 
         return builder.build();
+    }
+
+    /**
+     * Resolves a proxy URL string into an {@link HttpHost}, or {@code null} if none should be used.
+     * Package-private (rather than folded into {@link #createClient}) as a test seam so the proxy
+     * decision can be asserted directly instead of reflecting into the built client. Not public API.
+     *
+     * @param proxyUrl the proxy URL, or {@code null}/empty for no proxy.
+     * @return the proxy host, or {@code null} if not set or the URL is malformed.
+     */
+    static HttpHost resolveProxy(String proxyUrl) {
+        if (proxyUrl == null || proxyUrl.isEmpty()) {
+            return null;
+        }
+        try {
+            URL url = new URL(proxyUrl);
+            return new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
+        } catch (MalformedURLException e) {
+            logger.warn("Could not parse HTTP proxy URL, proceeding without proxy: {}",
+                    e.getMessage());
+            return null;
+        }
     }
 }

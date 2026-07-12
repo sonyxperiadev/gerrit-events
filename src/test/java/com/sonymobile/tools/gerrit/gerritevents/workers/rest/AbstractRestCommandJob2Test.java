@@ -34,15 +34,16 @@ import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.ee9.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee9.servlet.ServletHolder;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.Test;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
@@ -80,8 +81,11 @@ public class AbstractRestCommandJob2Test {
         final String expectedLabelName = "code-review";
         final int expectedLabelValue = 1;
 
-        TestHandler handler = new TestHandler(assertTarget);
-        server.setHandler(handler);
+        ServletContextHandler context = new ServletContextHandler();
+        context.setContextPath("/");
+        TestServlet handler = new TestServlet(assertTarget);
+        context.addServlet(new ServletHolder(handler), "/*");
+        server.setHandler(context);
         System.out.println("Starting server");
         server.start();
 
@@ -141,9 +145,9 @@ public class AbstractRestCommandJob2Test {
 
 
     /**
-     * A Jetty handler to accept or deny a request.
+     * A Jetty servlet to accept or deny a request.
      */
-    static class TestHandler extends AbstractHandler {
+    static class TestServlet extends HttpServlet {
         String assertTarget;
         String requestContent;
         boolean targetOk = false;
@@ -154,27 +158,24 @@ public class AbstractRestCommandJob2Test {
          *
          * @param assertTarget the target url to expect and fail if not.
          */
-        TestHandler(String assertTarget) {
+        TestServlet(String assertTarget) {
             this.assertTarget = assertTarget;
         }
 
         @Override
-        public void handle(String target, Request request, HttpServletRequest httpServletRequest,
-                           HttpServletResponse response)
-                throws IOException, ServletException {
-            requestContent = IOUtils.toString(httpServletRequest.getReader());
+        protected void service(HttpServletRequest request, HttpServletResponse response)
+                throws ServletException, IOException {
+            requestContent = IOUtils.toString(request.getReader());
             System.out.println("requestContent = " + requestContent);
-            actualTarget = target;
-            if (target.equals(assertTarget)) {
+            actualTarget = request.getRequestURI();
+            if (actualTarget.equals(assertTarget)) {
                 response.setContentType("application/xml;charset=utf-8");
                 response.setStatus(HttpServletResponse.SC_OK);
-                request.setHandled(true);
                 response.getWriter().println("<response>OK</response>");
                 targetOk = true;
             } else {
                 response.setContentType("application/xml;charset=utf-8");
                 response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
-                request.setHandled(true);
                 response.getWriter().println("<response>This is not the resource you are looking for</response>");
                 targetOk = false;
             }

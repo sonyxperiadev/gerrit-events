@@ -14,32 +14,32 @@
     <properties>
         <project.build.outputEncoding>UTF-8</project.build.outputEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>11</maven.compiler.release>
+        <maven.compiler.release>17</maven.compiler.release>
         <maven.compiler.testRelease>${maven.compiler.release}</maven.compiler.testRelease>
 
-        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
-        <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
-        <maven-surefire-plugin.version>3.2.2</maven-surefire-plugin.version>
-        <maven-checkstyle-plugin.version>2.16</maven-checkstyle-plugin.version><!-- TODO: update to latest -->
-        <maven-release-plugin.version>2.5.3</maven-release-plugin.version><!-- TODO: update to latest -->
-        <maven-source-plugin.version>2.4</maven-source-plugin.version><!-- TODO: update to latest -->
-        <maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version><!-- TODO: update to latest -->
-        <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version><!-- TODO: update to latest -->
-        <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
+        <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
+        <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
+        <maven-surefire-plugin.version>3.5.6</maven-surefire-plugin.version>
+        <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
+        <maven-release-plugin.version>3.3.1</maven-release-plugin.version>
+        <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
+        <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
+        <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
+        <maven-enforcer-plugin.version>3.6.3</maven-enforcer-plugin.version>
         
-        <slf4j.version>1.7.36</slf4j.version><!-- TODO: update to latest -->
-        <hamcrest.version>2.2</hamcrest.version>
-        <powermock.version>2.0.9</powermock.version>
-        <mockito.version>2.28.2</mockito.version><!-- TODO: update to latest -->        
-        <junit.version>4.13.2</junit.version><!-- TODO: update to latest -->
+        <slf4j.version>2.0.18</slf4j.version>
+        <hamcrest.version>3.0</hamcrest.version>
+        <awaitility.version>4.3.0</awaitility.version>
+        <mockito.version>5.23.0</mockito.version>
+        <junit.version>4.13.2</junit.version>
 
-        <mwiede.jsch.version>0.2.24</mwiede.jsch.version>
-        <apache.sshd.version>2.15.0</apache.sshd.version>
-        <httpclient.version>4.5.14</httpclient.version><!-- TODO: update to latest -->
-        <jetty-server.version>9.4.57.v20241219</jetty-server.version><!-- TODO: update to latest -->
-        <commons-io.version>2.15.1</commons-io.version>
+        <mwiede.jsch.version>2.28.4</mwiede.jsch.version>
+        <apache.sshd.version>2.15.0</apache.sshd.version><!-- 3.x only in milestone releases so far -->
+        <httpclient.version>4.5.14</httpclient.version><!-- latest 4.x; 5.x is a breaking API change, separate PR -->
+        <jetty.version>12.1.11</jetty.version><!-- test-only; EE9 (jakarta.servlet) environment -->
+        <commons-io.version>2.22.0</commons-io.version>
         <xstream.version>1.4.21</xstream.version>
-        <gson.version>2.10.1</gson.version>
+        <gson.version>2.14.0</gson.version>
         <json-lib.version>2.4</json-lib.version><!-- TODO: find replacement -->
     </properties>
 
@@ -131,21 +131,15 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-            <version>${powermock.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito2</artifactId>
-            <version>${powermock.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest</artifactId>
             <version>${hamcrest.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <version>${awaitility.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -157,7 +151,13 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>${jetty-server.version}</version>
+            <version>${jetty.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty.ee9</groupId>
+            <artifactId>jetty-ee9-servlet</artifactId>
+            <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -177,7 +177,7 @@
                     <configuration>
                         <quiet>true</quiet>
                         <locale>en_US</locale>
-                        <source>8</source>
+                        <source>${maven.compiler.release}</source>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -193,7 +193,6 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <reuseForks>false</reuseForks>
-                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -258,7 +257,7 @@
             <plugin>
               <groupId>org.sonatype.central</groupId>
               <artifactId>central-publishing-maven-plugin</artifactId>
-              <version>0.7.0</version>
+              <version>0.11.0</version>
               <extensions>true</extensions>
               <configuration>
                 <publishingServerId>central</publishingServerId>
@@ -271,7 +270,7 @@
                     <dependency>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>extra-enforcer-rules</artifactId>
-                        <version>1.7.0</version>
+                        <version>1.12.0</version>
                     </dependency>
                 </dependencies>
                 <executions>

@@ -83,7 +83,7 @@ public class GerritRestQueryHandlerTest {
 
     /**
      * Tests conversion of a minimal REST change to query format.
-     * Uses {@code convertSingleChange} via Whitebox for direct verification.
+     * Calls the package-private convertSingleChange directly for verification.
      */
     @Test
     public void testConvertMinimalChange() throws Exception {
@@ -116,8 +116,7 @@ public class GerritRestQueryHandlerTest {
         revisions.put("abc123def456", revObj);
         rest.put("revisions", revisions);
 
-        JSONObject q = (JSONObject)org.powermock.reflect.Whitebox.invokeMethod(
-                handler, "convertSingleChange", rest);
+        JSONObject q = handler.convertSingleChange(rest);
         assertNotNull(q);
 
         assertEquals("myProject", q.getString("project"));
@@ -166,8 +165,7 @@ public class GerritRestQueryHandlerTest {
         revisions.put("rev123", revObj);
         rest.put("revisions", revisions);
 
-        JSONObject q = (JSONObject)org.powermock.reflect.Whitebox.invokeMethod(
-                handler, "convertSingleChange", rest);
+        JSONObject q = handler.convertSingleChange(rest);
 
         assertNotNull(q);
         assertEquals("Subject\n\nLong description.", q.getString("commitMessage"));
@@ -200,8 +198,7 @@ public class GerritRestQueryHandlerTest {
         revisions.put("revfile", revObj);
         rest.put("revisions", revisions);
 
-        JSONObject q = (JSONObject)org.powermock.reflect.Whitebox.invokeMethod(
-                handler, "convertSingleChange", rest);
+        JSONObject q = handler.convertSingleChange(rest);
 
         assertNotNull(q);
         assertTrue(q.has("currentPatchSet"));
@@ -236,8 +233,7 @@ public class GerritRestQueryHandlerTest {
         revisions.put("abanrev", revObj);
         rest.put("revisions", revisions);
 
-        JSONObject q = (JSONObject)org.powermock.reflect.Whitebox.invokeMethod(
-                handler, "convertSingleChange", rest);
+        JSONObject q = handler.convertSingleChange(rest);
 
         assertNotNull(q);
         assertEquals("ABANDONED", q.getString("status"));
@@ -265,8 +261,7 @@ public class GerritRestQueryHandlerTest {
         revisions.put("rev1", revObj);
         rest.put("revisions", revisions);
 
-        JSONObject q = (JSONObject)org.powermock.reflect.Whitebox.invokeMethod(
-                handler, "convertSingleChange", rest);
+        JSONObject q = handler.convertSingleChange(rest);
 
         assertNotNull(q);
         assertEquals("someProject~main~Iabc123", q.getString("id"));
@@ -286,8 +281,7 @@ public class GerritRestQueryHandlerTest {
         rest.put("status", "NEW");
         // No current_revision, no revisions
 
-        JSONObject q = (JSONObject)org.powermock.reflect.Whitebox.invokeMethod(
-                handler, "convertSingleChange", rest);
+        JSONObject q = handler.convertSingleChange(rest);
 
         assertNotNull(q);
         assertEquals("Inorev", q.getString("id"));
