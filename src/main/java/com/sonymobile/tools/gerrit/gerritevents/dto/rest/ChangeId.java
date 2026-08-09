@@ -25,12 +25,12 @@
 package com.sonymobile.tools.gerrit.gerritevents.dto.rest;
 
 import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Change;
-import org.apache.commons.lang.CharEncoding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * A changeId.
@@ -88,7 +88,7 @@ public class ChangeId {
      * @throws UnsupportedEncodingException if UTF-8 is unsupported, handled in caller for better log message
      */
     private String encode(final String s) throws UnsupportedEncodingException {
-        return URLEncoder.encode(s, CharEncoding.UTF_8);
+        return URLEncoder.encode(s, StandardCharsets.UTF_8.name());
     }
 
     @Override

@@ -32,7 +32,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.attr.Account;
 
 import com.sonymobile.tools.gerrit.gerritevents.dto.rest.Topic;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * A DTO representation of the topic-changed Gerrit Event.

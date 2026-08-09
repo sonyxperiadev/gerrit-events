@@ -31,7 +31,7 @@ import com.sonymobile.tools.gerrit.gerritevents.dto.rest.Topic;
 import com.sonymobile.tools.gerrit.gerritevents.helpers.FileHelper;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
